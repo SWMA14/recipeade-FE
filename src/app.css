@@ -1,0 +1,93 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.6/dist/web/variable/pretendardvariable-dynamic-subset.css");
+
+@tailwind base;
+@tailwind components;
+@twilwind utilities;
+
+:root {
+    --c-primary: #fc5e03;
+    --c-primary-light: #fed7c0;
+    --c-secondary: #ffffff;
+    --c-foreground: #000000;
+    --c-foreground-gray: #adadad;
+    --c-background: #f3f3f3;
+    --c-background-dark: #2e2e2e;
+    --max-width: 40rem;
+    --padding: 1rem;
+    --radius: 7px;
+
+    color: var(--c-foreground);
+    background-color: var(--c-background);
+    font-family: "Pretendard Variable", sans-serif;
+    word-break: keep-all;
+}
+
+@media only screen and (min-width: 64rem) {
+    :root {
+        --padding: 3rem;
+    }
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    font-weight: 900;
+    font-size: 1.75rem;
+}
+
+h2 {
+    font-weight: 900;
+    font-size: 1.5rem;
+}
+
+h3 {
+    font-weight: 900;
+    font-size: 1.25rem;
+}
+
+strong {
+    color: var(--c-primary);
+}
+
+ul {
+    margin-top: 1rem;
+    list-style-type: disc;
+    list-style-position: inside;
+}
+
+li::marker {
+    color: var(--c-primary);
+}
+
+::-webkit-scrollbar {
+    width: 15px;
+    height: 15px;
+    display: block;
+    -webkit-appearance: none;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--c-foreground-gray);
+    border-radius: var(--radius);
+    background-clip: padding-box;
+    border: 4px solid transparent;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--c-background-dark);
+    background-clip: padding-box;
+    border: 4px solid transparent;
+}
+
+.main {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 5rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
