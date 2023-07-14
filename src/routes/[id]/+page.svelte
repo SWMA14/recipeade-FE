@@ -1,7 +1,5 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import Player from "youtube-player";
-    import type { Options, YouTubePlayer } from "youtube-player/dist/types";
     import Device from "svelte-device-info";
     import { duration, flyingFade } from "$lib/transition";
     import { unitizeViews } from "$lib/video";
@@ -11,19 +9,6 @@
     import { goto } from "$app/navigation";
 
     export let data;
-
-    let options: Options = {
-        playerVars: {
-            modestbranding: 1,
-            controls: 0,
-            rel: 0
-        }
-    };
-    let player: YouTubePlayer | HTMLElement;
-    $: if (player) {
-        player = Player(player, options);
-        player.loadVideoById(data.id);
-    }
 
     let isMobile = true;
     let isRendered = false;
@@ -35,119 +20,124 @@
 </script>
 
 {#if isRendered}
-    <div class="main">
-        <div class="player-container">
-            <div class="player" bind:this={player} />
+    <div class="info" in:flyingFade={{ delay: duration }}>
+        <div class="categories">
+            <Category id={data.video.difficulty} />
+            <Category id={data.video.cateogry} />
         </div>
-        <div class="info" in:flyingFade={{ delay: duration }}>
-            <h2>{data.video.title}</h2>
-            <p class="statistics">{data.video.channel} · 조회수 {unitizeViews(data.video.viewCount)}회 · {data.video.publishedAt}</p>
-            <div class="categories">
-                <Category id={data.video.difficulty} />
-                <Category id={data.video.cateogry} />
+        <h2 style="font-weight: 700;">{data.video.title}</h2>
+        <p class="statistics">
+            조회수 {unitizeViews(data.video.viewCount)}회 · {data.video.publishedAt}
+        </p>
+        <div class="channel">
+            <div class="profile">
+                <img src="https://i.namu.wiki/i/d1A_wD4kuLHmOOFqJdVlOXVt1TWA9NfNt_HA0CS0Y_N0zayUAX8olMuv7odG2FiDLDQZIRBqbPQwBSArXfEJlQ.webp" alt="채널 이미지" />
+                {data.video.channel}
             </div>
+            <button class="white subscribe">구독</button>
         </div>
-        <div class="reviews-container" in:flyingFade={{ delay: duration * 2 }}>
-            <h3>후기</h3>
-            <div class="reviews" class:desktop={!isMobile}>
-                {#each [...Array(5).keys()] as i}
-                    <Review nickname="김*현" content="너무 맛있게 먹었어요! 감사합니다!" rightMargin />
-                {/each}
-            </div>
-        </div>
-        <div class="ingredients" in:flyingFade={{ delay: duration * 2 }}>
-            <h3>재료</h3>
-            {#each data.video.ingredients as ingredient}
-                <div style="width: 100%; display: flex;">
-                    <span style="min-width: 50%;">{ingredient.name}</span>
-                    <span style="min-width: 50%;">{ingredient.quantity ?? ""}{ingredient.unit ?? ""}</span>
-                </div>
-                <div style="border-top: 1px solid var(--c-foreground-gray); margin: 0.5rem 0; opacity: 0.5;" />
+        <div class="divider" />
+    </div>
+    <div class="reviews-container" in:flyingFade={{ delay: duration * 2 }}>
+        <h3>후기</h3>
+        <div class="reviews" class:desktop={!isMobile}>
+            {#each [...Array(5).keys()] as i}
+                <Review nickname="김*현" content="너무 맛있게 먹었어요! 감사합니다!" rightMargin
+                    image="https://i.namu.wiki/i/d1A_wD4kuLHmOOFqJdVlOXVt1TWA9NfNt_HA0CS0Y_N0zayUAX8olMuv7odG2FiDLDQZIRBqbPQwBSArXfEJlQ.webp" />
             {/each}
         </div>
-        <div class="steps" in:flyingFade={{ delay: duration * 2 }}>
-            <h3>이렇게 요리해요</h3>
-            <ul>
-                {#each data.video.steps as step}
-                    <li style="margin-bottom: 3rem;">{step.description}</li>
-                {/each}
-            </ul>
-        </div>
-        <div class="videos-container" in:flyingFade={{ delay: duration * 2 }}>
-            <h3>이 레시피는 어때요?</h3>
-            <div class="videos" class:desktop={!isMobile}>
-                {#each [...Array(5).keys()] as i}
-                    <Video video={data.video} rightMargin />
-                {/each}
+    </div>
+    <div class="ingredients" in:flyingFade={{ delay: duration * 2 }}>
+        <h3>재료</h3>
+        {#each data.video.ingredients as ingredient}
+            <div class="ingredient">
+                <span>{ingredient.name}</span>
+                <span>{ingredient.quantity ?? ""}{ingredient.unit ?? ""}</span>
             </div>
+            <div class="divider" />
+        {/each}
+    </div>
+    <div class="steps" in:flyingFade={{ delay: duration * 2 }}>
+        <h3>단계 미리 보기</h3>
+        <ul>
+            {#each data.video.steps as step, i}
+                <li class:line={i < data.video.steps.length - 1}>
+                    {step.description}
+                </li>
+            {/each}
+        </ul>
+    </div>
+    <div class="videos-container" in:flyingFade={{ delay: duration * 2 }}>
+        <h3>이 레시피는 어때요?</h3>
+        <div class="videos" class:desktop={!isMobile}>
+            {#each [...Array(5).keys()] as i}
+                <Video video={data.video} rightMargin />
+            {/each}
         </div>
-        <div class="buttons">
-            <button class="round like">👍</button>
-            <button class="round start" on:click={() => goto(`/${data.id}/cook`)}>요리 시작하기</button>
-        </div>
+    </div>
+    <div class="buttons">
+        <button class="like">👍</button>
+        <button class="start" on:click={() => goto(`/${data.id}/cook`)}>요리 시작하기</button>
     </div>
 {/if}
 
 <style>
-    .main {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    button {
-        height: 3rem;
-        color: var(--c-secondary);
-        background-color: var(--c-primary);
-    }
-
-    .round {
-        padding: 0.5rem;
-        border-radius: var(--radius);
-    }
-
-    .player-container {
-        width: 100%;
-        max-width: var(--max-width);
-        border-radius: var(--radius);
-        overflow: hidden;
-        position: fixed;
-        top: 0;
-        z-index: 1;
-    }
-
-    .player {
-        width: 100%;
+    .divider {
+        margin: 0.5rem 0;
+        border-top: 1px solid var(--c-foreground-gray); 
+        opacity: 0.35;
     }
 
     .info {
-        margin-top: 17rem;
         display: flex;
         flex-direction: column;
-        align-items: center;
-    }
-
-    .info h2 {
-        text-align: center;
+        align-items: flex-start;
     }
 
     .statistics {
         font-size: 0.75rem;
+        text-align: center;
         color: var(--c-foreground-gray);
     }
 
     .categories {
         flex: 0 0 auto;
         margin-top: 1rem;
-        padding-left: 0.25rem;
+        margin-left: -0.15rem;
         display: flex;
         align-items: center;
         justify-content: center;
     }
 
+    .channel {
+        width: 100%;
+        margin: 1rem 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .profile {
+        display: flex;
+        align-items: center;
+    }
+
+    .profile img {
+        width: 2rem;
+        height: 2rem;
+        margin-right: 0.5rem;
+        object-fit: cover;
+        border-radius: 20px;
+    }
+
+    .subscribe {
+        height: 1.5rem;
+        font-size: 0.75rem;
+    }
+
     .reviews-container {
         width: 100%;
+        margin-top: 2rem;
         display: flex;
         flex-direction: column;
     }
@@ -183,15 +173,26 @@
         flex-direction: column;
     }
 
-    .ingredients span {
+    .ingredient {
+        width: 100%;
+        display: flex;
+    }
+
+    .ingredient span {
+        min-width: 50%;
         margin-top: 0.5rem;
     }
 
+    .ingredient span:nth-child(2) {
+        color: var(--c-primary);
+    }
+
     .steps li {
+        margin-bottom: 3rem;
         position: relative;
     }
 
-    .steps li::after {
+    .steps li.line::after {
         content: "";
         position: absolute;
         left: 0.115rem;
@@ -201,12 +202,12 @@
     }
 
     .buttons {
-        width: 100%;
+        width: calc(100% - var(--padding) * 2);
         max-width: var(--max-width);
         margin-top: 2rem;
         display: flex;
         position: fixed;
-        bottom: 0;
+        bottom: 1rem;
         z-index: 1;
     }
 
@@ -217,9 +218,5 @@
 
     .buttons .start {
         width: 100%;
-        height: 3rem;
-        margin-bottom: 0;
-        color: var(--c-secondary);
-        background-color: var(--c-primary);
     }
 </style>

@@ -54,14 +54,20 @@
 </script>
 
 <main>
-    <div class="main-content">
-        <slot />
-    </div>
+    <slot />
+    <!-- <div class="main-content">
+    </div> -->
 </main>
   
 <style>
-    .main-content {
+    main {
+        width: 100%;
+        max-width: var(--max-width);
+        margin: 0 auto;
         margin-top: 2rem;
         padding: 0 var(--padding);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 </style>

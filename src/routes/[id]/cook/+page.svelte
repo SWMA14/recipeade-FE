@@ -178,62 +178,60 @@
 />
 
 {#if isRendered}
-    <div class="main">
-        <div class="player-container" in:flyingFade={{ delay: duration * 2 }}>
-            <div class="player" bind:this={player} />
-        </div>
-        <div class="step-buttons">
-            {#each [...Array(steps.length).keys()] as i}
-                {@const percentage = $progress * 100}
-                <button id="step-button-{i}" class="round" class:selected={i === selectedStep}
-                    in:flyingFade|global={{ delay: duration * (i + 1) }}
-                    class:margin={i < steps.length - 1} on:click={() => selectStep(i)}
-                    style="--progress: {i === selectedStep ? percentage : 0}%;">
-                    {i === 0 ? "준비" : i}
+    <div class="player-container" in:flyingFade={{ delay: duration * 2 }}>
+        <div class="player" bind:this={player} />
+    </div>
+    <div class="step-buttons">
+        {#each [...Array(steps.length).keys()] as i}
+            {@const percentage = $progress * 100}
+            <button id="step-button-{i}" class="round" class:selected={i === selectedStep}
+                in:flyingFade|global={{ delay: duration * (i + 1) }}
+                class:margin={i < steps.length - 1} on:click={() => selectStep(i)}
+                style="--progress: {i === selectedStep ? percentage : 0}%;">
+                {i === 0 ? "준비" : i}
+            </button>
+        {/each}
+    </div>
+    <div class="alert step-description" in:flyingFade={{ delay: duration * 2 }}>
+        {@html steps[selectedStep].description
+            .replace(/^\*/g, "<strong>")
+            .replace(/\s\*/g, " <strong>")
+            .replace(/\*/g, "</strong>")}
+        {#if selectedStep === 0}
+            <strong>{steps[selectedStep].ingredients.join(", ")}</strong>
+        {/if}
+        <div class="button-groups">
+            <div class="group">
+                <button class="vote" class:selected={isUpvoted}
+                    on:click={() => vote(1)}>👍</button>
+                <button class="vote" class:selected={isUpvoted === false}
+                    on:click={() => vote(-1)}>👎</button>
+                <Tooltip fixedPosition>
+                    <div class="help" slot="content">?</div>
+                    <div class="alert help-tooltip" slot="tooltip">
+                        더욱 정확한 레시피를 제공해 드리기 위해 여러분의 도움이 필요해요 🙇
+                        <ul>
+                            <li>이 단계의 설명이 <strong>정확하다면</strong> 👍을 눌러 주세요.</li>
+                            <li><strong>정확하지 않거나 모호한</strong> 부분이 있다면 👎을 눌러 주세요.</li>
+                        </ul>
+                    </div>
+                </Tooltip>
+            </div>
+            <div class="group">
+                <button class="control" class:selected={isAutoNext} on:click={() => isAutoNext = !isAutoNext}>
+                    {#if isAutoNext}
+                        <img transition:fade={{ duration }} alt="다음 단계 자동 재생" src="/images/icons/autonext-selected.png" />
+                    {:else}
+                        <img transition:fade={{ duration }} alt="다음 단계 자동 재생" src="/images/icons/autonext.png" />
+                    {/if}
                 </button>
-            {/each}
-        </div>
-        <div class="round alert step-description" in:flyingFade={{ delay: duration * 2 }}>
-            {@html steps[selectedStep].description
-                .replace(/^\*/g, "<strong>")
-                .replace(/\s\*/g, " <strong>")
-                .replace(/\*/g, "</strong>")}
-            {#if selectedStep === 0}
-                <strong>{steps[selectedStep].ingredients.join(", ")}</strong>
-            {/if}
-            <div class="button-groups">
-                <div class="group">
-                    <button class="round vote" class:selected={isUpvoted}
-                        on:click={() => vote(1)}>👍</button>
-                    <button class="round vote" class:selected={isUpvoted === false}
-                        on:click={() => vote(-1)}>👎</button>
-                    <Tooltip fixedPosition>
-                        <div class="help" slot="content">?</div>
-                        <div class="round alert help-tooltip" slot="tooltip">
-                            더욱 정확한 레시피를 제공해 드리기 위해 여러분의 도움이 필요해요 🙇
-                            <ul>
-                                <li>이 단계의 설명이 <strong>정확하다면</strong> 👍을 눌러 주세요.</li>
-                                <li><strong>정확하지 않거나 모호한</strong> 부분이 있다면 👎을 눌러 주세요.</li>
-                            </ul>
-                        </div>
-                    </Tooltip>
-                </div>
-                <div class="group">
-                    <button class="round control" class:selected={isAutoNext} on:click={() => isAutoNext = !isAutoNext}>
-                        {#if isAutoNext}
-                            <img transition:fade={{ duration }} alt="다음 단계 자동 재생" src="/images/icons/autonext-selected.png" />
-                        {:else}
-                            <img transition:fade={{ duration }} alt="다음 단계 자동 재생" src="/images/icons/autonext.png" />
-                        {/if}
-                    </button>
-                    <button class="round control" class:selected={isRepeating} on:click={() => isRepeating = !isRepeating}>
-                        {#if isRepeating}
-                            <img transition:fade={{ duration }} alt="현재 단계 반복" src="/images/icons/loop-selected.png" />
-                        {:else}
-                            <img transition:fade={{ duration }} alt="현재 단계 반복" src="/images/icons/loop.png" />
-                        {/if}
-                    </button>
-                </div>
+                <button class="control" class:selected={isRepeating} on:click={() => isRepeating = !isRepeating}>
+                    {#if isRepeating}
+                        <img transition:fade={{ duration }} alt="현재 단계 반복" src="/images/icons/loop-selected.png" />
+                    {:else}
+                        <img transition:fade={{ duration }} alt="현재 단계 반복" src="/images/icons/loop.png" />
+                    {/if}
+                </button>
             </div>
         </div>
     </div>

@@ -40,30 +40,28 @@
     ]}
 />
 
-<div class="main">
-    <div class="section">
-        <h2>유튜브에서 핫해요🔥</h2>
-        <div class="videos-container" class:desktop={!isMobile}>
-            {#each data.highViews as video, i (video.thumbnail)}
-                <Video {video} rightMargin={i < data.highViews.length - 1} />
-            {/each}
-        </div>
+<div class="section">
+    <h2>유튜브에서 핫해요🔥</h2>
+    <div class="videos-container" class:desktop={!isMobile}>
+        {#each data.highViews as video, i (video.thumbnail)}
+            <Video {video} rightMargin={i < data.highViews.length - 1} />
+        {/each}
     </div>
-    <div class="section">
-        <h2>쉽게 따라해요😏</h2>
-        <div class="videos-container" class:desktop={!isMobile}>
-            {#each data.easy as video, i (video.thumbnail)}
-                <Video {video} rightMargin={i < data.easy.length - 1} />
-            {/each}
-        </div>
+</div>
+<div class="section">
+    <h2>쉽게 따라해요😏</h2>
+    <div class="videos-container" class:desktop={!isMobile}>
+        {#each data.easy as video, i (video.thumbnail)}
+            <Video {video} rightMargin={i < data.easy.length - 1} />
+        {/each}
     </div>
-    <div class="section">
-        <h2>다른 레시피들도 있어요😯</h2>
-        <div class="videos-container grid" class:desktop={!isMobile}>
-            {#each data.others as video (video.thumbnail)}
-                <Video {video} bottomMargin />
-            {/each}
-        </div>
+</div>
+<div class="section">
+    <h2>다른 레시피들도 있어요😯</h2>
+    <div class="videos-container grid" class:desktop={!isMobile}>
+        {#each data.others as video (video.thumbnail)}
+            <Video {video} bottomMargin />
+        {/each}
     </div>
 </div>
 
