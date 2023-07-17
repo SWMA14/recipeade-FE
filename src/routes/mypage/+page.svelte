@@ -38,6 +38,10 @@
         <h3>작성한 후기</h3>
         <img alt="review" src="/images/icons/autonext-selected.png"/>
     </a>
+    <a href="/mypage/likes" class="section">
+        <h3>좋아요한 레시피</h3>
+        <img alt="review" src="/images/icons/autonext-selected.png"/>
+    </a>
 </div>
 
 <style>
