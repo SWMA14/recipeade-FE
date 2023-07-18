@@ -1,6 +1,7 @@
 import { questions } from "$lib/questions";
 import { writable } from "svelte/store";
 import { v4 as uuidv4 } from "uuid";
+import type { YouTubePlayer } from "youtube-player/dist/types";
 
 interface StepFeedback
 {
@@ -14,3 +15,5 @@ export const feedbackResult = writable({
     steps: [] as StepFeedback[],
     overall: Array<number | string>(questions.length).fill(-1)
 });
+
+export const sharedPlayer = writable<YouTubePlayer>();

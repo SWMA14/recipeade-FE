@@ -1,14 +1,13 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { fade } from "svelte/transition";
-    import Player from "youtube-player";
     import PlayerStates from "youtube-player/dist/constants/PlayerStates.js";
-    import type { Options, YouTubePlayer } from "youtube-player/dist/types";
+    import type { YouTubePlayer } from "youtube-player/dist/types";
     import { MetaTags } from "svelte-meta-tags";
     import type { Step } from "$lib/step";
     import { pausableTweened } from "$lib/pausableTween";
     import { duration, flyingFade } from "$lib/transition";
-    import { feedbackResult } from "../../../store";
+    import { feedbackResult, sharedPlayer } from "../../../store";
     import Tooltip from "$components/Tooltip.svelte";
 
     export let data;
@@ -17,15 +16,7 @@
     const title = data.video.title;
     const description = "";
 
-    let steps: Step[] = data.video.steps.map((step, i) => {
-        if (i === 0)
-            return {
-                seconds: 0,
-                description: "재료를 준비합니다.",
-                ingredients: data.video.ingredients.map(x => 
-                    `${x.name} ${(x.quantity === 0 ? "" : x.quantity) ?? ""}${x.unit ?? ""}`)
-            };
-
+    let steps: Step[] = data.video.steps.map(step => {
         const regex = /\d{1,}:\d{2}/;
         const match = step.timestamp.match(regex)![0];
         const [minute, second] = match.split(":").map((x) => parseInt(x));
@@ -37,28 +28,19 @@
     });
 
     let progress = pausableTweened(0, { duration: progressDuration });
-    let options: Options = {
-        playerVars: {
-            modestbranding: 1,
-            controls: 0,
-            rel: 0
-        }
-    };
-    let player: YouTubePlayer | HTMLElement;
-    $: if (player) {
-        player = Player(player, options);
-        player.loadVideoById(data.id).then(async () => {
-            videoContentWindow = (await (player as YouTubePlayer).getIframe()).contentWindow;
-            selectStep(0);
-        });
+    let player: YouTubePlayer = $sharedPlayer;
 
+    $: if (player) {
+        player.getIframe().then(x => videoContentWindow = x.contentWindow);
         player.addEventListener("onStateChange", (event: any) => {
             if (event.data === PlayerStates.PAUSED)
                 progress.pause();
             else if (event.data === PlayerStates.PLAYING && progress.paused)
                 progress.continue();
-        })
-    };
+        });
+
+        selectStep(0);
+    }
     let videoDuration: number;
     let videoContentWindow: Window | null;
 
@@ -81,7 +63,7 @@
                 if (data.event === "infoDelivery" && data.info && data.info.currentTime)
                 {
                     if (videoDuration === undefined)
-                        (player as YouTubePlayer).getDuration().then(x => videoDuration = x);
+                        player.getDuration().then(x => videoDuration = x);
                         // duration needs to be set here, not right after loadVideoById(), as there's some delay
 
                     const now = data.info.currentTime;
@@ -95,7 +77,7 @@
                         if (isAutoNext || isRepeating)
                             selectStep(isRepeating ? selectedStep : selectedStep + 1);
                         else
-                            (player as YouTubePlayer).pauseVideo();
+                            player.pauseVideo();
                     }
                 }
             }
@@ -105,8 +87,8 @@
     async function selectStep(step: number)
     {
         selectedStep = step;
-        (player as YouTubePlayer).playVideo();
-        (player as YouTubePlayer).seekTo(steps[step].seconds, true);
+        player.playVideo();
+        player.seekTo(steps[step].seconds, true);
 
         const element = document.querySelector(`#step-button-${step}`);
         if (element)
@@ -178,17 +160,13 @@
 />
 
 {#if isRendered}
-    <div class="player-container" in:flyingFade={{ delay: duration * 2 }}>
-        <div class="player" bind:this={player} />
-    </div>
     <div class="step-buttons">
         {#each [...Array(steps.length).keys()] as i}
             {@const percentage = $progress * 100}
-            <button id="step-button-{i}" class="round" class:selected={i === selectedStep}
-                in:flyingFade|global={{ delay: duration * (i + 1) }}
-                class:margin={i < steps.length - 1} on:click={() => selectStep(i)}
+            <button in:flyingFade|global={{ delay: duration * i }} on:click={() => selectStep(i)}
+                id="step-button-{i}" class:selected={i === selectedStep} class:margin={i < steps.length - 1} 
                 style="--progress: {i === selectedStep ? percentage : 0}%;">
-                {i === 0 ? "준비" : i}
+                {i + 1}
             </button>
         {/each}
     </div>
@@ -197,16 +175,13 @@
             .replace(/^\*/g, "<strong>")
             .replace(/\s\*/g, " <strong>")
             .replace(/\*/g, "</strong>")}
-        {#if selectedStep === 0}
-            <strong>{steps[selectedStep].ingredients.join(", ")}</strong>
-        {/if}
         <div class="button-groups">
             <div class="group">
                 <button class="vote" class:selected={isUpvoted}
                     on:click={() => vote(1)}>👍</button>
                 <button class="vote" class:selected={isUpvoted === false}
                     on:click={() => vote(-1)}>👎</button>
-                <Tooltip fixedPosition>
+                <Tooltip>
                     <div class="help" slot="content">?</div>
                     <div class="alert help-tooltip" slot="tooltip">
                         더욱 정확한 레시피를 제공해 드리기 위해 여러분의 도움이 필요해요 🙇
@@ -238,40 +213,12 @@
 {/if}
 
 <style>
-    .main {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    button {
-        height: 3rem;
-        color: var(--c-secondary);
-        background-color: var(--c-primary);
-    }
-
-    .round {
-        padding: 0.5rem;
-        border-radius: var(--radius);
-    }
-
     .alert {
         margin-top: 1rem;
         padding: 0.5rem var(--padding);
         color: var(--c-secondary);
         background-color: var(--c-background-dark);
         text-align: center;
-    }
-
-    .player-container {
-        width: 100%;
-        border-radius: var(--radius);
-        overflow: hidden;
-    }
-
-    .player {
-        width: 100%;
     }
 
     .step-buttons {
@@ -312,7 +259,8 @@
         width: 100%;
         padding: 1.5rem var(--padding);
         color: var(--c-foreground);
-        background-color: var(--c-secondary);
+        background-color: var(--c-background-lightdark);
+        border-radius: var(--radius);
         text-align: left;
     }
 
@@ -335,11 +283,6 @@
         background-color: var(--c-background);
         position: relative;
         transition: all 0.25s;
-    }
-
-    .vote {
-        color: transparent;
-        text-shadow: 0 0 0 var(--c-foreground-gray);
     }
 
     .vote.selected {
@@ -383,5 +326,6 @@
         display: flex;
         flex-direction: column;
         text-align: left;
+        border-radius: var(--radius);
     }
 </style>

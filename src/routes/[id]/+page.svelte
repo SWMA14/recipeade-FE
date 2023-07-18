@@ -6,7 +6,6 @@
     import Category from "$components/Category.svelte";
     import Review from "$components/Review.svelte";
     import Video from "$components/Video.svelte";
-    import { goto } from "$app/navigation";
 
     export let data;
 
@@ -54,7 +53,7 @@
                 <span>{ingredient.name}</span>
                 <span>{ingredient.quantity ?? ""}{ingredient.unit ?? ""}</span>
             </div>
-            <div class="divider" />
+            <!-- <div class="divider" /> -->
         {/each}
     </div>
     <div class="steps" in:flyingFade={{ delay: duration * 2 }}>
@@ -74,10 +73,6 @@
                 <Video video={data.video} rightMargin />
             {/each}
         </div>
-    </div>
-    <div class="buttons">
-        <button class="like">👍</button>
-        <button class="start" on:click={() => goto(`/${data.id}/cook`)}>요리 시작하기</button>
     </div>
 {/if}
 
@@ -175,12 +170,12 @@
 
     .ingredient {
         width: 100%;
+        margin-bottom: 1rem;
+        padding: 1rem;
         display: flex;
-    }
-
-    .ingredient span {
-        min-width: 50%;
-        margin-top: 0.5rem;
+        justify-content: space-between;
+        background-color: var(--c-background-lightdark);
+        border-radius: var(--radius);
     }
 
     .ingredient span:nth-child(2) {
@@ -199,24 +194,18 @@
         margin-top: 2rem;
         padding: 1rem 0;
         border: 1px solid var(--c-primary);
+        opacity: 0.2;
     }
 
-    .buttons {
-        width: calc(100% - var(--padding) * 2);
-        max-width: var(--max-width);
-        margin-top: 2rem;
-        display: flex;
-        position: fixed;
-        bottom: 1rem;
-        z-index: 1;
+    .videos::-webkit-scrollbar {
+        display: none;
     }
 
-    .buttons .like {
-        margin-right: 0.5rem;
-        background-color: var(--c-foreground-gray);
+    .videos.desktop {
+        padding-bottom: 1rem;
     }
 
-    .buttons .start {
-        width: 100%;
+    .videos.desktop::-webkit-scrollbar {
+        display: block;
     }
 </style>

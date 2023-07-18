@@ -40,9 +40,11 @@
 
 <style>
     .container {
+        min-width: calc(100% - 3rem);
         display: flex;
         flex-direction: column;
-        min-width: calc(100% - 3rem);
+        background-color: var(--c-background-lightdark);
+        border-radius: var(--radius);
         scroll-snap-align: start;
         scroll-snap-stop: always;
     }
@@ -79,6 +81,8 @@
 
     .info {
         width: 100%;
+        padding: 1rem;
+        padding-top: 0.5rem;
         display: flex;
         align-items: center;
         justify-content: space-between;

@@ -70,4 +70,10 @@
         flex-direction: column;
         align-items: center;
     }
+
+    @media only screen and (min-width: 64rem) {
+        main {
+            padding: 0;
+        }
+    }
 </style>
