@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onDestroy } from "svelte";
     import Keyword from "$components/Keyword.svelte";
     import { goto,afterNavigate } from "$app/navigation";
     import { page } from "$app/stores";
@@ -20,29 +21,37 @@
     let searchValue = "";
     let previousPage : string = base;
 
+    const deleteAllKeywords = () => {
+        items = [];
+        Preferences.set({ 
+            key: "keywords", 
+            value: arrayToString(items)
+        });
+    };
 
     const deleteKeyword = (keywordToRemove: string) => {
-        console.log(keywordToRemove);
         items = items.filter((keyword) => keyword !== keywordToRemove);
+        Preferences.set({ 
+            key: "keywords", 
+            value: arrayToString(items)
+        });
     };
 
     const addKeywords = async () => {
         if(searchValue.length > 0){
             items.push(searchValue);
         }
-        else{
-            items = [searchValue]
-        }
 
         await Preferences.set({ 
             key: "keywords", 
             value: arrayToString(items)
         });
+
+        goto("/");
     }
 
     const getKeywords =async () => {
         const {value} = await Preferences.get({key: 'keywords'});
-        console.log(value);
         if(value){
             items = stringToArray(value);
         }
@@ -54,7 +63,8 @@
 
     onMount(()=>{
         getKeywords();
-    })
+    });
+
 
 </script>
 
@@ -74,9 +84,9 @@
         <div class="section" out:flyingFade={{duration: 500 }}>
             <div class="topic">
                 <h2>최근 검색어</h2>
-                <div class="delete">
+                 <!-- A11y: visible, non-interactive elements with an on:click event must be accompanied by an on:keydown, on:keyup, or on:keypress event. -->
+                <div class="delete" on:click={deleteAllKeywords}>
                     <img alt="이전 화면" src="/images/icons/autonext.png" />
-                    <!-- A11y: visible, non-interactive elements with an on:click event must be accompanied by an on:keydown, on:keyup, or on:keypress event. -->
                     <span>모두 지우기</span>
                 </div>
             </div>
