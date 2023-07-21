@@ -20,7 +20,8 @@
     let searchValue = "";
     let previousPage : string = base;
 
-    const handleRemove = (keywordToRemove: string) => {
+
+    const deleteKeyword = (keywordToRemove: string) => {
         console.log(keywordToRemove);
         items = items.filter((keyword) => keyword !== keywordToRemove);
     };
@@ -81,7 +82,7 @@
             </div>
             <div class="keywords">
                 {#each items as item (item)}
-                    <Keyword name={item} isDelete={true} on:remove={()=>{handleRemove(item)}}/>
+                    <Keyword name={item} isDelete={true} on:remove={()=>{deleteKeyword(item)}}/>
                 {/each}
             </div>
         </div>
