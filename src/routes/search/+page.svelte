@@ -4,32 +4,53 @@
     import { page } from "$app/stores";
     import { base } from "$app/paths";
     import { flyingFade,duration } from "$lib/transition";
+    import { Preferences } from "@capacitor/preferences";   
+    import { onMount } from "svelte";
 
+
+    const arrayToString = (arr: string[]) : string =>{
+        return arr.join("/");
+    }
+
+    const stringToArray = (str:string): string[] => {
+        return str.split("/");
+    }
+
+    let items : string[] = [];
     let searchValue = "";
     let previousPage : string = base;
-    let items = [
-        { id: 1, name: "항목 1" },
-        { id: 2, name: "항목 2" },
-        { id: 3, name: "항목 3" },
-    ];
 
-    function removeItem(event: any) {
-        const itemToRemove = event.detail;
-        items = items.filter((item) => item.name !== itemToRemove);
+
+
+    const addKeywords = async () => {
+        if(searchValue.length > 0){
+            items.push(searchValue);
+        }
+        else{
+            items = [searchValue]
+        }
+
+        await Preferences.set({ 
+            key: "keywords", 
+            value: arrayToString(items)
+        });
     }
 
-    function removeAllItems() {
-        items = [];
+    const getKeywords =async () => {
+        const {value} = await Preferences.get({key: 'keywords'});
+        console.log(value);
+        if(value){
+            items = stringToArray(value);
+        }
     }
-
-    function changeSerachValue(event: any) {
-        searchValue = event.target.value;
-    }
-
 
     afterNavigate(({from}) => {
         previousPage = from?.url.pathname || previousPage;
     });
+
+    onMount(()=>{
+        getKeywords();
+    })
 
 </script>
 
@@ -37,8 +58,10 @@
     <a href={previousPage}>
         <img alt="이전 화면" src="/images/icons/autonext.png"/>
     </a>
-    <input class="search" type="search" placeholder="어떤 요리를 찾아 볼까요"  value={searchValue} on:change={changeSerachValue}/>        
-    <img alt="이전 화면" src="/images/icons/autonext.png" />
+    <input class="search" bind:value={searchValue} placeholder="어떤 요리를 찾아 볼까요" />        
+    <button on:click={addKeywords}>
+        <img alt="이전 화면" src="/images/icons/autonext.png"/>
+    </button>
 </div>
 
 
@@ -50,12 +73,12 @@
                 <div class="delete">
                     <img alt="이전 화면" src="/images/icons/autonext.png" />
                     <!-- A11y: visible, non-interactive elements with an on:click event must be accompanied by an on:keydown, on:keyup, or on:keypress event. -->
-                    <span on:click={removeAllItems} on:keydown={removeAllItems}>모두 지우기</span>
+                    <span>모두 지우기</span>
                 </div>
             </div>
             <div class="keywords">
-                {#each items as item (item.id)}
-                    <Keyword name={item.name} isDelete={true} on:remove={removeItem} />
+                {#each items as item (item)}
+                    <Keyword name={item} isDelete={true}/>
                 {/each}
             </div>
         </div>
@@ -68,9 +91,9 @@
             </div>
         </div>
         <div class="keywords">
-            {#each items as item (item.id)}
+            <!-- {#each items as item (item.id)}
                 <Keyword name={item.name} isDelete={false} on:remove={removeItem} />
-            {/each}
+            {/each} -->
         </div>
     </div>
 </div>
@@ -133,7 +156,7 @@
     }
 
 
-    .header > img,
+    .header > button > img,
     .header > a {
         transform: scaleX(-1);
         width: 7.5%;
