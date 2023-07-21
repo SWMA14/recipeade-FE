@@ -7,7 +7,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "ionic:build": "npm run build",
+    "ionic:serve": "npm run dev"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230628.0",
@@ -29,6 +31,14 @@
   },
   "type": "module",
   "dependencies": {
+    "@capacitor/app": "5.0.6",
+    "@capacitor/cli": "5.2.2",
+    "@capacitor/core": "5.2.2",
+    "@capacitor/haptics": "5.0.6",
+    "@capacitor/ios": "5.2.2",
+    "@capacitor/keyboard": "5.0.6",
+    "@capacitor/preferences": "^5.0.6",
+    "@capacitor/status-bar": "5.0.6",
     "svelte-device-info": "^1.0.0",
     "uuid": "^9.0.0",
     "youtube-player": "^5.6.0"
