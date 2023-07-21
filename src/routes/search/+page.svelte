@@ -20,7 +20,10 @@
     let searchValue = "";
     let previousPage : string = base;
 
-
+    const handleRemove = (keywordToRemove: string) => {
+        console.log(keywordToRemove);
+        items = items.filter((keyword) => keyword !== keywordToRemove);
+    };
 
     const addKeywords = async () => {
         if(searchValue.length > 0){
@@ -78,7 +81,7 @@
             </div>
             <div class="keywords">
                 {#each items as item (item)}
-                    <Keyword name={item} isDelete={true}/>
+                    <Keyword name={item} isDelete={true} on:remove={()=>{handleRemove(item)}}/>
                 {/each}
             </div>
         </div>
