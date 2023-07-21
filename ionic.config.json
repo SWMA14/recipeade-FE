@@ -1,0 +1,7 @@
+{
+  "name": "recipeade",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "custom"
+}
