@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { onDestroy } from "svelte";
     import Keyword from "$components/Keyword.svelte";
     import { goto,afterNavigate } from "$app/navigation";
     import { page } from "$app/stores";
@@ -17,7 +16,9 @@
         return str.split("/");
     }
 
-    let items : string[] = [];
+    let items : string[] = [
+        "item1","item2","item3"
+    ];
     let searchValue = "";
     let previousPage : string = base;
 
@@ -62,29 +63,43 @@
     });
 
     onMount(()=>{
-        getKeywords();
+        //getKeywords();
     });
-
-
 </script>
 
-<div class="header">
+<!-- <div class="header">
     <a href={previousPage}>
         <img alt="이전 화면" src="/images/icons/autonext.png"/>
     </a>
-    <input class="search" bind:value={searchValue} placeholder="어떤 요리를 찾아 볼까요" />        
-    <button on:click={addKeywords}>
-        <img alt="이전 화면" src="/images/icons/autonext.png"/>
-    </button>
+        <input class="search" bind:value={searchValue} placeholder="어떤 요리를 찾아 볼까요" />        
+        <button on:click={addKeywords}>
+            <img alt="이전 화면" src="/images/icons/autonext.png"/>
+        </button>
+</div> -->
+
+<div class="search-container">
+    <img alt="이전 화면" src="/images/icons/autonext.png" />
+    <input type="search" bind:value={searchValue} placeholder="어떤 요리를 해 볼까요?">
 </div>
 
+<div class="section">
+    <div class="section-top">
+        <h2>최근 검색</h2>
+        <span on:click={deleteAllKeywords}>모두 지우기</span>
+    </div>
+    <div>
+        {#each items as item (item)}
+            <Keyword name={item} on:remove={()=>{deleteKeyword(item)}}/>
+        {/each}
+    </div>
+</div>
 
+<!-- 
 <div class="body">
     {#if items.length > 0}
         <div class="section" out:flyingFade={{duration: 500 }}>
             <div class="topic">
                 <h2>최근 검색어</h2>
-                 <!-- A11y: visible, non-interactive elements with an on:click event must be accompanied by an on:keydown, on:keyup, or on:keypress event. -->
                 <div class="delete" on:click={deleteAllKeywords}>
                     <img alt="이전 화면" src="/images/icons/autonext.png" />
                     <span>모두 지우기</span>
@@ -92,7 +107,7 @@
             </div>
             <div class="keywords">
                 {#each items as item (item)}
-                    <Keyword name={item} isDelete={true} on:remove={()=>{deleteKeyword(item)}}/>
+                    <Keyword name={item} on:remove={()=>{deleteKeyword(item)}}/>
                 {/each}
             </div>
         </div>
@@ -105,16 +120,84 @@
             </div>
         </div>
         <div class="keywords">
-            <!-- {#each items as item (item.id)}
+            {#each items as item (item.id)}
                 <Keyword name={item.name} isDelete={false} on:remove={removeItem} />
-            {/each} -->
+            {/each}
         </div>
     </div>
-</div>
-
+</div> -->
 
 
 <style>
+    .section-top > h2{
+        color: #1a202c;
+    }
+
+    .section-top > span{
+        font-size: var(--body-2);
+        color: #cbd5e0;
+    }
+
+    .section-top {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+
+    .section {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .search-container > img {
+        width: 2rem;
+        height: 2rem;    
+        margin-right: 0.5rem;
+    }
+
+    .search-container > input {
+        width: 100%;
+        border: none;
+        font-weight: 500;
+        background-color: transparent;
+    }
+
+    .search-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+        margin-top: 5rem;
+        border: 1px solid #cbd5e0;
+        border-radius: var(--radius);
+        padding : 0.5rem;
+        margin-top: 1rem;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    .search-container  input:focus {
+        outline: none;
+    }
+
+    .search-container:focus-within::before{
+        display: block;
+        content: "";
+        position:absolute;
+        top: -1px;
+        bottom: -1px;
+        left: -1px;
+        right: -1px;
+        border: 2px solid orange;
+        border-radius: var(--radius);
+    }
+
+
+
+
     .body {
         position: relative;
         width: 100%;
@@ -129,11 +212,6 @@
         flex-wrap: wrap;
     }
 
-    .section {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-    }
 
     .delete:hover {
         cursor: pointer;
