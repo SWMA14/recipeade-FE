@@ -48,6 +48,6 @@
         background-color: var(--c-background-lightdark);
         border-radius: var(--radius);
         overflow: hidden;
-        aspect-ratio: 1 / 0.75;
+        aspect-ratio: 1 / 1;
     }
 </style>

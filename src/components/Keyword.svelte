@@ -12,13 +12,19 @@
 </script>
 
 <span class="container" transition:fade>
-    {name}
+    <a href="/">
+        {name}
+    </a>
     <span on:click={handleDelete}>
-            X 
+        X 
     </span>
 </span>
 
 <style>
+    .container > a {
+        width: 100%;
+    }
+
     .container > span {
         color: #cbd5e0;
     }
