@@ -64,8 +64,14 @@
         previousPage = from?.url.pathname || previousPage;
     });
 
+    const handleSubmit = (event: any) => {
+        event.preventDefault();
+        addKeywords();
+        goto("/search/clicked/"+searchValue);
+    }
+
     onMount(()=>{   
-        getKeywords();
+        //getKeywords();
         input.focus();
     });
 </script>
@@ -74,7 +80,10 @@
     <a href="/search">
         <img alt="이전 화면" src="/images/icons/autonext.png" />
     </a>
-    <input type="search" bind:value={searchValue} bind:this={input} placeholder="어떤 요리를 해 볼까요?">
+    <form on:submit={handleSubmit}>
+        <input type="search" bind:value={searchValue} bind:this={input} placeholder="어떤 요리를 해 볼까요?">
+        <button type="submit"></button>
+    </form>
 </div>
 
 <div class="section">
@@ -148,12 +157,18 @@
     }
 
     .search-container > a > img {
-        width: 2rem;
-        height: 2rem;    
+        height: 1.25rem;
+        width: 1.25rem;
         margin-right: 0.5rem;
+        transform: scaleX(-1);
     }
 
-    .search-container > input {
+    .search-container > form > button {
+        display: none;
+    }
+
+    .search-container > form > input {
+        font-size: 1.25rem;
         width: 100%;
         border: none;
         font-weight: 500;
@@ -178,7 +193,7 @@
         outline: none;
     }
 
-    .search-container:focus-within::before{
+    /* .search-container:focus-within::before{
         display: block;
         content: "";
         position:absolute;
@@ -188,7 +203,7 @@
         right: -1px;
         border: 2px solid orange;
         border-radius: var(--radius);
-    }
+    } */
 
 
 
