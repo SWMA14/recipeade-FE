@@ -134,7 +134,7 @@
 
 <style>
     .section-top > h2{
-        color: #1a202c;
+        color: var(--gray-900);
     }
 
     .section-top > span{
@@ -181,7 +181,7 @@
         align-items: center;
         width: 100%;
         margin-top: 5rem;
-        border: 1px solid #cbd5e0;
+        border: 1px solid var(--gray-400);
         border-radius: var(--radius);
         padding : 0.5rem;
         margin-top: 1rem;

@@ -26,18 +26,18 @@
     }
 
     .container > span {
-        color: #cbd5e0;
+        color: var(--gray-400);
     }
 
     .container {
         width: 100%;
-        background-color: #f7fafc;
+        background-color: var(--gray-100);
         padding: 0.5rem 1rem;
         border-radius: var(--radius);
         justify-content: space-between;
         display: flex;
         flex-direction: row;
-        color: #1a202c;
+        color: var(--gray-900);
         margin-top: 1rem;
     }
 
