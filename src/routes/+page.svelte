@@ -56,6 +56,13 @@
         {/each}
     </div>
 </div>
+<a href="/search">
+    <h1>
+        검색하러 가기
+    </h1>
+</a>
+
+
 <div class="section">
     <h2>다른 레시피들도 있어요😯</h2>
     <div class="videos-container grid" class:desktop={!isMobile}>
