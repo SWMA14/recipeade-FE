@@ -12,9 +12,11 @@
 </script>
 
 <span class="container" transition:fade>
-    <a href="/">
+    <a href="/search/result?query={name}">
         {name}
     </a>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
     <span on:click={handleDelete}>
         X 
     </span>

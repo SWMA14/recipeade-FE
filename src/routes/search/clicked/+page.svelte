@@ -21,7 +21,7 @@
     ];
 
     let input : any;
-    let searchValue : string = "";
+    let searchValue : any = "";
     let previousPage : string = base;
 
     const deleteAllKeywords = () => {
@@ -50,7 +50,6 @@
             value: arrayToString(items)
         });
 
-        goto("/");
     }
 
     const getKeywords =async () => {
@@ -67,12 +66,16 @@
     const handleSubmit = (event: any) => {
         event.preventDefault();
         addKeywords();
-        goto("/search/clicked/"+searchValue);
+
+        const searchParmas = new URLSearchParams($page.url.searchParams);
+        searchParmas.set("query",searchValue);
+        goto(`/search/result?${searchParmas.toString()}`);
     }
 
     onMount(()=>{   
         //getKeywords();
         input.focus();
+        searchValue = $page.url.searchParams.get("query");
     });
 </script>
 
@@ -89,6 +92,8 @@
 <div class="section">
     <div class="section-top">
         <h2>최근 검색</h2>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
         <span on:click={deleteAllKeywords}>모두 지우기</span>
     </div>
     <div>
@@ -161,6 +166,10 @@
         width: 1.25rem;
         margin-right: 0.5rem;
         transform: scaleX(-1);
+    }
+
+    .search-container > form {
+        width: 100%;
     }
 
     .search-container > form > button {
