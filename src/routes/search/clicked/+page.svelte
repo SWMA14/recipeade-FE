@@ -38,11 +38,9 @@
     };
 
     const addKeywords = async () => {
-        if(searchValue.length >= 5 && !items.includes(searchValue)){
-            items.shift();
-            items.push(searchValue);
-        }
-        else if(searchValue.length > 0 && !items.includes(searchValue)){
+        if(searchValue.length > 0 && !items.includes(searchValue)){
+            if(items.length >= 5)
+                items.shift();
             items.push(searchValue);            
         }
 
