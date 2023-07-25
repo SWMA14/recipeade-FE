@@ -24,10 +24,10 @@
         <img alt="이전 화면" src="/images/icons/autonext.png" />
     </a>
     <a href="/search/clicked?query={value}" class="input">
-        <h2>{value}</h2> 
+        {value} 
     </a>
     <a href="/search/clicked">
-        <h2> X </h2>
+        X 
     </a>
 </div>
 
@@ -41,6 +41,10 @@
 <style>
     .input {
         width: 100%;
+        font-size: 1rem;
+        border: none;
+        font-weight: 500;
+        background-color: transparent;
     }
 
     .section {

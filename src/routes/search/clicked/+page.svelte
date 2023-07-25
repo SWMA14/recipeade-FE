@@ -177,7 +177,7 @@
     }
 
     .search-container > form > input {
-        font-size: 1.25rem;
+        font-size: 1rem;
         width: 100%;
         border: none;
         font-weight: 500;
