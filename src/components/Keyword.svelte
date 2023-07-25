@@ -12,7 +12,7 @@
 </script>
 
 <span class="container" transition:fade>
-    <a href="/search/result?query={name}">
+    <a href="/search/result?query={name}&sortby=최신">
         {name}
     </a>
     <!-- svelte-ignore a11y-click-events-have-key-events -->

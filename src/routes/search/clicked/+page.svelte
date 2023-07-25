@@ -69,7 +69,7 @@
 
         const searchParmas = new URLSearchParams($page.url.searchParams);
         searchParmas.set("query",searchValue);
-        goto(`/search/result?${searchParmas.toString()}`);
+        goto(`/search/result?${searchParmas.toString()}&sortby=최신`);
     }
 
     onMount(()=>{   
