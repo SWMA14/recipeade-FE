@@ -10,13 +10,16 @@
     const dispatch = createEventDispatcher();
 
     const handleClick = (event : any) => {
-        dispatch('click',event);
+        if(!isClicked){
+            dispatch('click',event);
 
-        const target = event.target;
+            const target = event.target;
 
-        const state = target.getAttribute('aria-checked');
+            const state = target.getAttribute('aria-checked');
 
-        isClicked = state === 'true' ? false : true;
+            isClicked = state === 'true' ? false : true;
+        }
+        
     };
 </script>
 
