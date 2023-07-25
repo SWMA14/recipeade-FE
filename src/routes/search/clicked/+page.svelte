@@ -7,7 +7,6 @@
     import { Preferences } from "@capacitor/preferences";   
     import { onMount } from "svelte";
 
-
     const arrayToString = (arr: string[]) : string =>{
         return arr.join("/");
     }
@@ -16,9 +15,7 @@
         return str.split("/");
     }
 
-    let items : string[] = [
-        "item1","item2","item3"
-    ];
+    let items : string[] = [];
 
     let input : any;
     let searchValue : any = "";
@@ -41,15 +38,18 @@
     };
 
     const addKeywords = async () => {
-        if(searchValue.length > 0){
+        if(searchValue.length >= 5 && !items.includes(searchValue)){
+            items.shift();
             items.push(searchValue);
+        }
+        else if(searchValue.length > 0 && !items.includes(searchValue)){
+            items.push(searchValue);            
         }
 
         await Preferences.set({ 
             key: "keywords", 
             value: arrayToString(items)
         });
-
     }
 
     const getKeywords =async () => {
@@ -73,9 +73,10 @@
     }
 
     onMount(()=>{   
-        //getKeywords();
+        getKeywords();
         input.focus();
-        searchValue = $page.url.searchParams.get("query");
+        if($page.url.searchParams.get("query"))
+            searchValue = $page.url.searchParams.get("query");
     });
 </script>
 
