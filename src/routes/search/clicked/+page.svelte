@@ -192,7 +192,7 @@
         border: 1px solid var(--gray-400);
         border-radius: var(--radius);
         padding : 0.5rem;
-        margin-top: 1rem;
+        margin-top: env(safe-area-inset-top) + 1rem;
         margin-bottom: 2rem;
         position: relative;
     }
