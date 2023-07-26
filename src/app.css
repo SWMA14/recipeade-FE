@@ -19,6 +19,7 @@
     --max-width: 40rem;
     --padding: 1rem;
     --radius: 10px;
+    --radius-big: 20px;
 
     --primary-100: #feebcc;
     --primary-200: #fed19a;
@@ -83,6 +84,16 @@
     --body-1: 1rem;
     --body-2: 0.85rem;
 
+    --space-xxxs: 0.25rem;
+    --space-xxs: 0.5rem;
+    --space-xs: 1rem;
+    --space-s: 1.5rem;
+    --space-m: 2rem;
+    --space-l: 2.5rem;
+    --space-xl: 3rem;
+    --space-xxl: 3.5rem;
+    --space-xxxl: 4rem;
+
     color: var(--c-foreground);
     background-color: var(--c-background);
     font-family: "Pretendard Variable", sans-serif;
@@ -94,6 +105,31 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+}
+
+.typo-heading-1 {
+    font-size: 2rem;
+    font-weight: 900;
+}
+
+.typo-heading-2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.typo-heading-3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.typo-body-1 {
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.typo-body-2 {
+    font-size: 0.75rem;
+    font-weight: 400;
 }
 
 h1 {
