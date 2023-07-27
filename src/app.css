@@ -17,9 +17,12 @@
     --c-background-lightdark: #f5f5f5;
     --c-background-dark: #2e2e2e;
     --max-width: 40rem;
+    --card-min-width: 80%;
+    --card-min-width-decimal: 0.8;
     --padding: 1rem;
     --radius: 10px;
     --radius-big: 20px;
+    --overlay-opacity: 0.4;
 
     --primary-100: #feebcc;
     --primary-200: #fed19a;
