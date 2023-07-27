@@ -1,8 +1,9 @@
 <script lang="ts">
-    import Video from "$components/Video.svelte";
     import { onMount } from "svelte";
     import Device from "svelte-device-info";
     import { MetaTags } from "svelte-meta-tags";
+    import Carousel from "$components/Carousel.svelte";
+    import Video from "$components/Video.svelte";
 
     export let data;
 
@@ -42,25 +43,25 @@
 
 <div class="section">
     <h2>유튜브에서 핫해요🔥</h2>
-    <div class="videos-container" class:desktop={!isMobile}>
+    <Carousel leftOverflow>
         {#each data.highViews as video, i (video.thumbnail)}
-            <Video {video} rightMargin={i < data.highViews.length - 1} />
+            <Video {video} leftMargin={i === 0} rightMargin />
         {/each}
-    </div>
+    </Carousel>
 </div>
 <div class="section">
     <h2>쉽게 따라해요😏</h2>
-    <div class="videos-container" class:desktop={!isMobile}>
+    <Carousel leftOverflow>
         {#each data.easy as video, i (video.thumbnail)}
-            <Video {video} rightMargin={i < data.easy.length - 1} />
+            <Video {video} leftMargin={i === 0} rightMargin />
         {/each}
-    </div>
+    </Carousel>
 </div>
 <div class="section">
     <h2>다른 레시피들도 있어요😯</h2>
-    <div class="videos-container grid" class:desktop={!isMobile}>
+    <div class="grid" class:desktop={!isMobile}>
         {#each data.others as video (video.thumbnail)}
-            <Video {video} bottomMargin />
+            <Video {video} verbose bottomMargin />
         {/each}
     </div>
 </div>
@@ -68,33 +69,15 @@
 <style>
     .section {
         width: 100%;
-        margin-bottom: 2rem;
+        margin-bottom: var(--space-m);
     }
 
-    .videos-container {
-        display: flex;
-        margin-top: 0.5rem;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        overflow-x: scroll;
-    }
-
-    .videos-container::-webkit-scrollbar {
-        display: none;
-    }
-
-    .videos-container.desktop {
-        padding-bottom: 1rem;
-    }
-
-    .videos-container.desktop::-webkit-scrollbar {
-        display: block;
+    .grid {
+        margin-top: var(--space-xs);
     }
 
     .grid {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        justify-content: center;
     }
 </style>

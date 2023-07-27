@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { fade } from "svelte/transition";
     import { getCategoryById } from "$lib/category";
     import { type DemoVideo, unitizeViews } from "$lib/video";
     import Badge from "$components/Badge.svelte";
     import Card from "$components/Card.svelte";
+    import Carousel from "$components/Carousel.svelte";
 
     export let video: DemoVideo;
     export let leftMargin = false;
@@ -19,8 +19,8 @@
 <Card visibleOverflow noPadding {leftMargin} {rightMargin} {bottomMargin} columnFlex scrollSnap>
     <a class:overflow={verbose} href="/{id}">
         {#if verbose}
-            <div class="images">
-                <div class="fitter left-margin">
+            <Carousel>
+                <div class="verbose fitter left-margin">
                     <div>
                         <img alt="영상 썸네일" src={video.thumbnail} />
                     </div>
@@ -35,7 +35,7 @@
                     <Card backgroundColor="primary-200" leftMargin={i === 0} rightMargin columnFlex scrollSnap
                         {modifier} {body} />
                 {/each}
-            </div>
+            </Carousel>
         {:else}
             <div class="fitter">
                 <div>
@@ -60,21 +60,7 @@
         margin: 0 calc(var(--space-xs) * -1);
     }
 
-    .images {
-        width: 100%;
-        margin-right: calc(var(--space-xs) * -1);
-        display: flex;
-        scroll-snap-type: x mandatory;
-        scroll-padding-left: var(--space-xs);
-        -webkit-overflow-scrolling: touch;
-        overflow-x: scroll;
-    }
-
-    .images::-webkit-scrollbar {
-        display: none;
-    }
-
-    .images .fitter {
+    .verbose.fitter {
         width: var(--card-min-width);
         padding-bottom: calc(56% * var(--card-min-width-decimal));
         scroll-snap-align: start;
