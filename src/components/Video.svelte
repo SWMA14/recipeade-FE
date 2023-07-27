@@ -1,77 +1,96 @@
 <script lang="ts">
+    import { fade } from "svelte/transition";
+    import { getCategoryById } from "$lib/category";
     import { type DemoVideo, unitizeViews } from "$lib/video";
-    import Category from "$components/Category.svelte";
+    import Badge from "$components/Badge.svelte";
+    import Card from "$components/Card.svelte";
 
     export let video: DemoVideo;
-    export let rightMargin: boolean = false;
-    export let bottomMargin: boolean = false;
-    export let onGrid: boolean = false;
-    export let showInfo: boolean = true;
+    export let leftMargin = false;
+    export let rightMargin = false;
+    export let bottomMargin = false;
+    export let verbose = false;
 
     const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
     const match = video.video.match(regex);
-
     const id = match ? match[1] : undefined;
 </script>
 
-<div class="container" class:right-margin={rightMargin} class:bottom-margin={bottomMargin} class:grid={onGrid}>
-    <a href="/{id}">
-        <div class="thumbnail-wrapper">
-            <div>
-                <img alt="영상 썸네일" src={video.thumbnail} />
-            </div>
-        </div>
-    </a>
-    {#if showInfo}
-        <div class="info">
-            <div class="title">
-                <a class="upper" href="/{id}">{video.title}</a>
-                <span class="lower">{video.channel} · 조회수 {unitizeViews(video.viewCount)}회</span>
-            </div>
-            {#if !onGrid}
-                <div class="categories">
-                    <Category id={video.difficulty} />
-                    <Category id={video.cateogry} />
+<Card visibleOverflow noPadding {leftMargin} {rightMargin} {bottomMargin} columnFlex scrollSnap>
+    <a class:overflow={verbose} href="/{id}">
+        {#if verbose}
+            <div class="images">
+                <div class="fitter left-margin">
+                    <div>
+                        <img alt="영상 썸네일" src={video.thumbnail} />
+                    </div>
                 </div>
-            {/if}
+                {#each [...Array(video.steps.length + 1).keys()] as i (i)}
+                    {@const modifier = i === 0 ? "재료 준비" : `${i}단계`}
+                    {@const body = i === 0 ?
+                        video.ingredients.map(x => 
+                            `${x.name}${[0, null].some(invalid => invalid === x.quantity) ? "" : ` ${x.quantity}`}${x.unit ?? ""}`
+                        ).join(", ") :
+                        video.steps[i - 1].description}
+                    <Card backgroundColor="primary-200" leftMargin={i === 0} rightMargin columnFlex scrollSnap
+                        {modifier} {body} />
+                {/each}
+            </div>
+        {:else}
+            <div class="fitter">
+                <div>
+                    <img alt="영상 썸네일" src={video.thumbnail} />
+                </div>
+            </div>
+        {/if}
+    </a>
+    <div class="info">
+        <a class="upper typo-body-1" href="/{id}">{video.title}</a>
+        <span class="lower typo-body-2">{video.channel} · 조회수 {unitizeViews(video.viewCount)}회</span>
+        <div class="badges">
+            <Badge rightMargin>{getCategoryById(video.difficulty)}</Badge>
+            <Badge rightMargin>{video.cateogry}</Badge>
+            <Badge>★ 5.0</Badge>
         </div>
-    {/if}
-</div>
+    </div>
+</Card>
 
 <style>
-    .container {
-        min-width: calc(100% - 3rem);
+    .overflow {
+        margin: 0 calc(var(--space-xs) * -1);
+    }
+
+    .images {
+        width: 100%;
+        margin-right: calc(var(--space-xs) * -1);
         display: flex;
-        flex-direction: column;
-        background-color: var(--c-background-lightdark);
-        border-radius: var(--radius);
+        scroll-snap-type: x mandatory;
+        scroll-padding-left: var(--space-xs);
+        -webkit-overflow-scrolling: touch;
+        overflow-x: scroll;
+    }
+
+    .images::-webkit-scrollbar {
+        display: none;
+    }
+
+    .images .fitter {
+        width: var(--card-min-width);
+        padding-bottom: calc(56% * var(--card-min-width-decimal));
         scroll-snap-align: start;
         scroll-snap-stop: always;
     }
 
-    .grid {
-        min-width: unset;
-        width: calc(50% - 0.5rem);
-        margin-bottom: 1rem;
-    }
-
-    .right-margin {
-        margin-right: 1rem;
-    }
-
-    .bottom-margin {
-        margin-bottom: 1rem;
-    }
-
-    .thumbnail-wrapper {
+    .fitter {
         width: 100%;
         padding-bottom: 56%;
         position: relative;
+        flex-shrink: 0;
         border-radius: var(--radius);
         overflow: hidden;
     }
 
-    .thumbnail-wrapper > div {
+    .fitter > div {
         position: absolute;
         top: -16.75%;
         bottom: 0;
@@ -79,40 +98,31 @@
         right: 0;
     }
 
+    .left-margin {
+        margin-left: var(--space-xs);
+    }
+
     .info {
         width: 100%;
-        padding: 1rem;
-        padding-top: 0.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-top: 0.5rem;
-    }
-
-    .title {
-        min-width: 0;
+        padding: var(--space-xs);
+        flex-shrink: 0;
         display: flex;
         flex-direction: column;
-        justify-content: center;
     }
 
-    .title .upper {
-        font-weight: 500;
+    .upper {
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
     }
 
-    .title .lower {
-        font-size: 0.75rem;
-        color: var(--c-foreground-gray);
+    .lower {
+        color: var(--gray-800);
     }
 
-    .categories {
-        flex: 0 0 auto;
-        padding-left: 0.25rem;
+    .badges {
+        margin-top: var(--space-xxs);
         display: flex;
         align-items: center;
-        justify-content: center;
     }
 </style>
