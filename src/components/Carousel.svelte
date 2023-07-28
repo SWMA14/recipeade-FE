@@ -1,6 +1,6 @@
 <script lang="ts">
     export let leftOverflow = false;
-    export let rightOverflow = true;
+    export let rightOverflow = false;
 </script>
 
 <div class="container" class:left-overflow={leftOverflow} class:right-overflow={rightOverflow}>

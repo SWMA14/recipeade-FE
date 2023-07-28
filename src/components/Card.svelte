@@ -8,6 +8,7 @@
     export let visibleOverflow = false;
     export let noRadius = false;
     export let noPadding = false;
+    export let noMinWidth = false;
     export let largePadding = false;
     export let columnFlex = false;
     export let leftMargin = false;
@@ -16,8 +17,8 @@
     export let scrollSnap = false;
 </script>
 
-<div class="container" style="--card-background-color: var(--{backgroundColor});"
-    class:visible-overflow={visibleOverflow} class:no-radius={noRadius} class:no-padding={noPadding}
+<div class="container" style="--card-background-color: var(--{backgroundColor});" class:visible-overflow={visibleOverflow}
+    class:no-radius={noRadius} class:no-padding={noPadding} class:no-min-width={noMinWidth}
     class:large-padding={largePadding} class:column-flex={columnFlex} class:scroll-snap={scrollSnap}
     class:left-margin={leftMargin} class:right-margin={rightMargin} class:bottom-margin={bottomMargin}>
     {#if heading || body || modifier}
@@ -44,6 +45,7 @@
 <style>
     .container {
         width: 100%;
+        height: inherit;
         min-width: var(--card-min-width);
         padding: var(--space-xs);
         display: flex;
@@ -103,6 +105,10 @@
 
     .no-padding {
         padding: 0;
+    }
+
+    .no-min-width {
+        min-width: 0;
     }
 
     .large-padding {
