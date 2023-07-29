@@ -1,16 +1,22 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { getContext, onMount } from "svelte";
+    import type { Writable } from "svelte/store";
     import { fade } from "svelte/transition";
     import PlayerStates from "youtube-player/dist/constants/PlayerStates.js";
     import type { YouTubePlayer } from "youtube-player/dist/types";
     import { MetaTags } from "svelte-meta-tags";
     import type { Step } from "$lib/step";
+    import type { DynamicBarContext } from "$lib/dynamicBar";
     import { pausableTweened } from "$lib/pausableTween";
     import { duration, flyingFade } from "$lib/transition";
     import { feedbackResult, sharedPlayer } from "../../../store";
     import Tooltip from "$components/Tooltip.svelte";
 
     export let data;
+
+    getContext<Writable<DynamicBarContext>>("dynamicBar").update(x => x = {
+        isHidden: true
+    });
 
     const progressDuration = 0;
     const title = data.video.title;

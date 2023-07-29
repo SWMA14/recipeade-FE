@@ -4,8 +4,16 @@
     import { MetaTags } from "svelte-meta-tags";
     import Carousel from "$components/Carousel.svelte";
     import Video from "$components/Video.svelte";
+    import { getContext } from "svelte";
+    import type { Writable } from "svelte/store";
+    import type { DynamicBarContext } from "$lib/dynamicBar";
+    import main from "./dynamicBarComponents/main.svelte";
 
     export let data;
+
+    getContext<Writable<DynamicBarContext>>("dynamicBar").update(x => x = {
+        main
+    });
 
     const title = "레시피에이드";
     const description = "";
@@ -43,7 +51,7 @@
 
 <div class="section">
     <h2>유튜브에서 핫해요🔥</h2>
-    <Carousel leftOverflow>
+    <Carousel leftOverflow rightOverflow>
         {#each data.highViews as video, i (video.thumbnail)}
             <Video {video} leftMargin={i === 0} rightMargin />
         {/each}
@@ -51,7 +59,7 @@
 </div>
 <div class="section">
     <h2>쉽게 따라해요😏</h2>
-    <Carousel leftOverflow>
+    <Carousel leftOverflow rightOverflow>
         {#each data.easy as video, i (video.thumbnail)}
             <Video {video} leftMargin={i === 0} rightMargin />
         {/each}

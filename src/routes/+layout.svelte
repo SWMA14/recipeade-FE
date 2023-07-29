@@ -1,64 +1,25 @@
 <script lang="ts">
     import "../app.css";
-    import { fade, fly } from "svelte/transition";
-    import { expoOut } from "svelte/easing";
-    import { questions } from "$lib/questions";
-    import { duration } from "$lib/transition";
-    import { feedbackResult } from "../store";
+    import { setContext } from "svelte";
+    import { writable } from "svelte/store";
+    import { flyingFade } from "$lib/transition";
+    import type { DynamicBarContext } from "$lib/dynamicBar";
+    import DynamicBar from "$components/DynamicBar.svelte";
 
-    const answerTexts = ["전혀 그렇지 않다", "그렇지 않다", "보통이다", "그렇다", "매우 그렇다"];
-
-    let isFeedbackShown = false;
-    let submitResult = "";
-
-    export const snapshot = {
-        capture: () => $feedbackResult,
-        restore: value => $feedbackResult = value
-    };
-
-    function number(x: any): number
-    {
-        return x as number;
-    }
-
-    function feedback()
-    {
-        isFeedbackShown = true;
-    }
-
-    function cancelFeedback()
-    {
-        isFeedbackShown = false;
-    }
-
-    function submitFeedback()
-    {
-        const isInvalid = $feedbackResult.overall.some((x, i) => questions[i].required && x == -1);
-        submitResult = isInvalid ? "필수 항목을 모두 입력해 주세요." : "소중한 피드백 감사드립니다 🙇";
-        setTimeout(() => submitResult = "", 1500);
-
-        if (!isInvalid)
-            fetch("/api/feedback", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify($feedbackResult)
-            });
-    }
-
-    function handleInput(i: number, value: any)
-    {
-        $feedbackResult.overall[i] = value;
-    }
+    let dynamicBarContext = writable({} as DynamicBarContext);
+    setContext("dynamicBar", dynamicBarContext);
 </script>
 
 <main>
     <slot />
-    <!-- <div class="main-content">
-    </div> -->
 </main>
-  
+{#if !$dynamicBarContext.isHidden}
+    <div class="navigation" transition:flyingFade={{ duration: 250 }}>
+        <DynamicBar leading={$dynamicBarContext.leading} main={$dynamicBarContext.main} trailing={$dynamicBarContext.trailing} />
+    </div>
+    <div class="overlay" />
+{/if}
+
 <style>
     main {
         width: 100%;
@@ -75,5 +36,23 @@
         main {
             padding: 0;
         }
+    }
+
+    .navigation {
+        width: calc(100% - var(--space-xs) * 2);
+        position: fixed;
+        bottom: var(--space-xs);
+        left: var(--space-xs);
+        z-index: 10;
+    }
+
+    .overlay {
+        width: 100%;
+        height: calc(var(--space-xl) * 2);
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 1;
+        background-image: linear-gradient(to top, var(--white) 15%, transparent);
     }
 </style>

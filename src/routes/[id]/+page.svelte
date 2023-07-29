@@ -1,13 +1,22 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { getContext, onMount } from "svelte";
+    import type { Writable } from "svelte/store";
     import Device from "svelte-device-info";
     import { duration, flyingFade } from "$lib/transition";
     import { unitizeViews } from "$lib/video";
+    import type { DynamicBarContext } from "$lib/dynamicBar.js";
     import Category from "$components/Category.svelte";
     import Review from "$components/Review.svelte";
     import Video from "$components/Video.svelte";
+    import main from "./dynamicBarComponents/main.svelte";
+    import leading from "./dynamicBarComponents/leading.svelte";
 
     export let data;
+
+    getContext<Writable<DynamicBarContext>>("dynamicBar").update(x => x = {
+        leading,
+        main
+    });
 
     let isMobile = true;
     let isRendered = false;

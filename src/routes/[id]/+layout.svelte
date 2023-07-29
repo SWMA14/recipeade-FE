@@ -42,13 +42,6 @@
 <div class="content">
     <slot />
 </div>
-<div class="lower">
-    <div class="buttons">
-        <button class="outline like">👍</button>
-        <button class="start" on:click={() => goto(`/${data.id}/cook`)}>요리 시작하기</button>
-    </div>
-    <div class="shadow" />
-</div>
 
 <style>
     .upper {
@@ -73,35 +66,5 @@
         width: 100%;
         margin-top: min(24rem, calc(calc(98vw * 9 / 16) + 1.5rem));
         margin-bottom: 5rem;
-    }
-
-    .buttons {
-        width: calc(100% - var(--padding) * 2);
-        max-width: var(--max-width);
-        margin-top: 2rem;
-        display: flex;
-        position: fixed;
-        left: 50%;
-        bottom: 1rem;
-        transform: translateX(-50%);
-        z-index: 1;
-    }
-
-    .buttons .like {
-        width: 3rem;
-        margin-right: 0.5rem;
-    }
-
-    .buttons .start {
-        width: 100%;
-    }
-
-    .shadow {
-        width: 100%;
-        height: 6rem;
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        background-image: linear-gradient(to top, var(--c-background) 15%, transparent 100%);
     }
 </style>
