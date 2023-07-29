@@ -6,12 +6,13 @@
     export let skeleton = false;
 </script>
 
-<button class="kind-{kind} size-{size}">
+<button class="kind-{kind} size-{size}" {...$$restProps} on:click on:focus on:mouseenter on:mousemove on:mouseleave>
     <slot />
 </button>
 
 <style lang="postcss">
     button {
+        width: 100%;
         height: 3rem;
         padding: 0 var(--space-xs);
         display: flex;
