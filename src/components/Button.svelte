@@ -1,12 +1,18 @@
 <script lang="ts">
+    import Fa from "svelte-fa";
+    import type { IconDefinition } from "@fortawesome/free-solid-svg-icons";
+
     export let kind:
-        "primary" | "primary-light" | "gray" | "info" | "success" | "warning" | "danger" = "primary";
+        "primary" | "primary-light" | "gray" | "info" | "success" | "warning" | "danger" | "white" = "primary";
     export let size: "default" | "small" = "default";
-    export let icon = undefined;
+    export let icon: IconDefinition | undefined = undefined;
     export let skeleton = false;
 </script>
 
 <button class="kind-{kind} size-{size}" {...$$restProps} on:click on:focus on:mouseenter on:mousemove on:mouseleave>
+    {#if icon}
+        <Fa {icon} />
+    {/if}
     <slot />
 </button>
 
@@ -81,6 +87,15 @@
 
             &:hover {
                 background-color: var(--danger-600);
+            }
+        }
+
+        &.kind-white {
+            color: var(--gray-900);
+            background-color: var(--white);
+
+            &:hover {
+                background-color: var(--gray-100);
             }
         }
     }

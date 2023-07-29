@@ -1,8 +1,10 @@
 <script lang="ts">
     import Player from "youtube-player";
     import type { Options, YouTubePlayer } from "youtube-player/dist/types";
+    import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
     import { beforeNavigate, goto } from "$app/navigation";
     import { sharedPlayer } from "../../store";
+    import Button from "$components/Button.svelte";
 
     export let data;
 
@@ -34,7 +36,9 @@
 </script>
 
 <div class="upper">
-    <div style="height: 3rem; background-color: var(--c-background);" />
+    <div class="back-button">
+        <Button kind="white" icon={faArrowLeft} />
+    </div>
     <div class="player-container">
         <div id="player" class="player" bind:this={player} />
     </div>
@@ -49,7 +53,13 @@
         max-width: var(--max-width);
         position: fixed;
         top: 0;
+        background-color: var(--white);
         z-index: 1;
+    }
+
+    .back-button {
+        width: var(--space-xl);
+        height: var(--space-xl);
     }
 
     .player-container {
@@ -59,12 +69,12 @@
 
     .player {
         width: 100%;
-        max-height: calc(calc(100vw - 15px) * 9 / 16);
+        max-height: calc(100vw * 9 / 16);
     }
 
     .content {
         width: 100%;
-        margin-top: min(24rem, calc(calc(98vw * 9 / 16) + 1.5rem));
-        margin-bottom: 5rem;
+        margin-top: min(24rem, calc(calc(98vw * 9 / 16) + var(--space-xs)));
+        margin-bottom: calc(var(--space-xl) + var(--space-xs) * 2);
     }
 </style>
