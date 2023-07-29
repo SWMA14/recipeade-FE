@@ -7,7 +7,7 @@
     import { getContext } from "svelte";
     import type { Writable } from "svelte/store";
     import type { DynamicBarContext } from "$lib/dynamicBar";
-    import main from "./dynamicBarComponents/main.svelte";
+    import main from "./__dynamicBarComponents/main.svelte";
 
     export let data;
 

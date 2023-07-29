@@ -8,8 +8,8 @@
     import Category from "$components/Category.svelte";
     import Review from "$components/Review.svelte";
     import Video from "$components/Video.svelte";
-    import main from "./dynamicBarComponents/main.svelte";
-    import leading from "./dynamicBarComponents/leading.svelte";
+    import main from "./__dynamicBarComponents/main.svelte";
+    import leading from "./__dynamicBarComponents/leading.svelte";
 
     export let data;
 
