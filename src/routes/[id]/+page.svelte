@@ -2,11 +2,14 @@
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
     import Device from "svelte-device-info";
+    import { getCategoryById } from "$lib/category";
     import { duration, flyingFade } from "$lib/transition";
     import { unitizeViews } from "$lib/video";
     import type { DynamicBarContext } from "$lib/dynamicBar.js";
-    import Category from "$components/Category.svelte";
-    import Review from "$components/Review.svelte";
+    import Badge from "$components/Badge.svelte";
+    import Button from "$components/Button.svelte";
+    import Card from "$components/Card.svelte";
+    import Carousel from "$components/Carousel.svelte";
     import Video from "$components/Video.svelte";
     import main from "./__dynamicBarComponents/main.svelte";
     import leading from "./__dynamicBarComponents/leading.svelte";
@@ -28,13 +31,14 @@
 </script>
 
 {#if isRendered}
-    <div class="info" in:flyingFade={{ delay: duration }}>
-        <div class="categories">
-            <Category id={data.video.difficulty} />
-            <Category id={data.video.cateogry} />
+    <div class="section first" in:flyingFade={{ delay: duration }}>
+        <div class="badges">
+            <Badge dark rightMargin>{getCategoryById(data.video.difficulty)}</Badge>
+            <Badge dark rightMargin>{data.video.cateogry}</Badge>
+            <Badge dark>★ 5.0</Badge>
         </div>
-        <h2 style="font-weight: 700;">{data.video.title}</h2>
-        <p class="statistics">
+        <h2>{data.video.title}</h2>
+        <p class="statistics typo-body-2">
             조회수 {unitizeViews(data.video.viewCount)}회 · {data.video.publishedAt}
         </p>
         <div class="channel">
@@ -42,80 +46,80 @@
                 <img src="https://i.namu.wiki/i/d1A_wD4kuLHmOOFqJdVlOXVt1TWA9NfNt_HA0CS0Y_N0zayUAX8olMuv7odG2FiDLDQZIRBqbPQwBSArXfEJlQ.webp" alt="채널 이미지" />
                 {data.video.channel}
             </div>
-            <button class="white subscribe">구독</button>
-        </div>
-        <div class="divider" />
-    </div>
-    <div class="reviews-container" in:flyingFade={{ delay: duration * 2 }}>
-        <h3>후기</h3>
-        <div class="reviews" class:desktop={!isMobile}>
-            {#each [...Array(5).keys()] as i}
-                <Review nickname="김*현" content="너무 맛있게 먹었어요! 감사합니다!" rightMargin
-                    image="https://i.namu.wiki/i/d1A_wD4kuLHmOOFqJdVlOXVt1TWA9NfNt_HA0CS0Y_N0zayUAX8olMuv7odG2FiDLDQZIRBqbPQwBSArXfEJlQ.webp" />
-            {/each}
-        </div>
-    </div>
-    <div class="ingredients" in:flyingFade={{ delay: duration * 2 }}>
-        <h3>재료</h3>
-        {#each data.video.ingredients as ingredient}
-            <div class="ingredient">
-                <span>{ingredient.name}</span>
-                <span>{ingredient.quantity ?? ""}{ingredient.unit ?? ""}</span>
+            <div>
+                <Button size="small">구독</Button>
             </div>
-            <!-- <div class="divider" /> -->
+        </div>
+    </div>
+    <div class="section" in:flyingFade={{ delay: duration * 2 }}>
+        <div class="title">
+            <h2>재료</h2>
+        </div>
+        {#each data.video.ingredients as ingredient}
+            <Card bottomMargin>
+                <div class="ingredient">
+                    <span>{ingredient.name}</span>
+                    <span>{ingredient.quantity ?? ""}{ingredient.unit ?? ""}</span>
+                </div>
+            </Card>
         {/each}
     </div>
-    <div class="steps" in:flyingFade={{ delay: duration * 2 }}>
-        <h3>단계 미리 보기</h3>
-        <ul>
-            {#each data.video.steps as step, i}
-                <li class:line={i < data.video.steps.length - 1}>
-                    {step.description}
-                </li>
-            {/each}
-        </ul>
-    </div>
-    <div class="videos-container" in:flyingFade={{ delay: duration * 2 }}>
-        <h3>이 레시피는 어때요?</h3>
-        <div class="videos" class:desktop={!isMobile}>
-            {#each [...Array(5).keys()] as i}
-                <Video video={data.video} rightMargin />
-            {/each}
+    <div class="section" in:flyingFade={{ delay: duration * 2 }}>
+        <div class="title">
+            <h2>단계 미리 보기</h2>
         </div>
+        {#each data.video.steps as step, i (step.description)}
+            <Card bottomMargin columnFlex scrollSnap modifier="{i + 1}단계" body={step.description}>
+                <div style="height: calc(var(--space-xxl) * 2);"></div>
+            </Card>
+        {/each}
+    </div>
+    <div class="section last" in:flyingFade={{ delay: duration * 2 }}>
+        <div class="title">
+            <h2>이 레시피는 어때요?</h2>
+        </div>
+        <Carousel leftOverflow rightOverflow>
+            {#each [...Array(5).keys()] as i}
+                <Video video={data.video} leftMargin={i === 0} rightMargin />
+            {/each}
+        </Carousel>
     </div>
 {/if}
 
-<style>
-    .divider {
-        margin: 0.5rem 0;
-        border-top: 1px solid var(--c-foreground-gray); 
-        opacity: 0.35;
+<style lang="postcss">
+    .section {
+        width: 100%;
+        margin-bottom: var(--space-m);
+
+        &.first {
+            margin-top: var(--space-xxl);
+        }
+
+        &.last {
+            margin-bottom: 0;
+        }
     }
 
-    .info {
+    .title {
+        margin-bottom: var(--space-xs);
         display: flex;
-        flex-direction: column;
-        align-items: flex-start;
+        justify-content: space-between;
+    }
+
+    .badges {
+        margin-bottom: var(--space-xxs);
+        display: flex;
+        align-items: center;
     }
 
     .statistics {
-        font-size: 0.75rem;
-        text-align: center;
         color: var(--c-foreground-gray);
-    }
-
-    .categories {
-        flex: 0 0 auto;
-        margin-top: 1rem;
-        margin-left: -0.15rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
     }
 
     .channel {
         width: 100%;
-        margin: 1rem 0;
+        margin-top: var(--space-xs);
+        padding-bottom: var(--space-xs);
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -127,94 +131,19 @@
     }
 
     .profile img {
-        width: 2rem;
-        height: 2rem;
-        margin-right: 0.5rem;
+        width: var(--space-m);
+        height: var(--space-m);
+        margin-right: var(--space-xxs);
         object-fit: cover;
-        border-radius: 20px;
-    }
-
-    .subscribe {
-        height: 1.5rem;
-        font-size: 0.75rem;
-    }
-
-    .reviews-container {
-        width: 100%;
-        margin-top: 2rem;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .reviews,
-    .videos {
-        width: 100%;
-        margin-top: 1rem;
-        display: flex;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        overflow-x: scroll;
-    }
-
-    .reviews::-webkit-scrollbar {
-        display: none;
-    }
-
-    .reviews.desktop {
-        padding-bottom: 1rem;
-    }
-
-    .reviews.desktop::-webkit-scrollbar {
-        display: block;
-    }
-
-    .ingredients,
-    .steps,
-    .videos-container {
-        width: 100%;
-        margin-top: 3rem;
-        display: flex;
-        flex-direction: column;
+        border-radius: var(--radius-big);
     }
 
     .ingredient {
-        width: 100%;
-        margin-bottom: 1rem;
-        padding: 1rem;
         display: flex;
         justify-content: space-between;
-        background-color: var(--c-background-lightdark);
-        border-radius: var(--radius);
     }
 
     .ingredient span:nth-child(2) {
         color: var(--c-primary);
-    }
-
-    .steps li {
-        margin-bottom: 3rem;
-        position: relative;
-    }
-
-    .steps li.line::after {
-        content: "";
-        position: absolute;
-        left: 0.115rem;
-        margin-top: 2rem;
-        padding: 1rem 0;
-        border: 1px solid var(--c-primary);
-        opacity: 0.2;
-    }
-
-    .videos::-webkit-scrollbar {
-        display: none;
-    }
-
-    .videos.desktop {
-        padding-bottom: 1rem;
-    }
-
-    .videos.desktop::-webkit-scrollbar {
-        display: block;
     }
 </style>

@@ -51,7 +51,7 @@
         position: fixed;
         top: 0;
         background-color: var(--white);
-        z-index: 1;
+        z-index: 9;
     }
 
     .back-button {
