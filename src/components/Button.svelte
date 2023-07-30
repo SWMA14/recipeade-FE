@@ -3,7 +3,7 @@
     import type { IconDefinition } from "@fortawesome/free-solid-svg-icons";
 
     export let kind:
-        "primary" | "primary-light" | "gray" | "info" | "success" | "warning" | "danger" | "white" = "primary";
+        "primary" | "primary-light" | "gray" | "info" | "success" | "warning" | "danger" | "white" | "transparent" = "primary";
     export let size: "default" | "small" = "default";
     export let icon: IconDefinition | undefined = undefined;
     export let noHover = false;
@@ -20,7 +20,7 @@
 <style lang="postcss">
     button {
         width: 100%;
-        height: 3rem;
+        height: var(--space-xl);
         padding: 0 var(--space-xs);
         display: flex;
         align-items: center;
@@ -98,6 +98,11 @@
             &:not(.no-hover):hover {
                 background-color: var(--gray-100);
             }
+        }
+
+        &.kind-transparent {
+            color: var(--gray-400);
+            background-color: transparent;
         }
     }
 </style>

@@ -56,7 +56,6 @@
 
     .back-button {
         width: var(--space-xl);
-        height: var(--space-xl);
     }
 
     .player-container {
