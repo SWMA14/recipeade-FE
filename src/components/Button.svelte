@@ -6,10 +6,11 @@
         "primary" | "primary-light" | "gray" | "info" | "success" | "warning" | "danger" | "white" = "primary";
     export let size: "default" | "small" = "default";
     export let icon: IconDefinition | undefined = undefined;
+    export let noHover = false;
     export let skeleton = false;
 </script>
 
-<button class="kind-{kind} size-{size}" {...$$restProps} on:click on:focus on:mouseenter on:mousemove on:mouseleave>
+<button class="kind-{kind} size-{size}" {...$$restProps} class:no-hover={noHover} on:click on:focus on:mouseenter on:mousemove on:mouseleave>
     {#if icon}
         <Fa {icon} />
     {/if}
@@ -31,7 +32,7 @@
             color: var(--white);
             background-color: var(--primary-500);
 
-            &:hover {
+            &:not(.no-hover):hover {
                 background-color: var(--primary-600);
             }
         }
@@ -40,7 +41,7 @@
             color: var(--primary-500);
             background-color: var(--primary-100);
 
-            &:hover {
+            &:not(.no-hover):hover {
                 background-color: var(--primary-200);
             }
         }
@@ -49,7 +50,7 @@
             color: var(--gray-900);
             background-color: var(--gray-200);
 
-            &:hover {
+            &:not(.no-hover):hover {
                 background-color: var(--gray-300);
             }
         }
@@ -58,7 +59,7 @@
             color: var(--white);
             background-color: var(--info-500);
 
-            &:hover {
+            &:not(.no-hover):hover {
                 background-color: var(--info-600);
             }
         }
@@ -67,7 +68,7 @@
             color: var(--white);
             background-color: var(--success-500);
 
-            &:hover {
+            &:not(.no-hover):hover {
                 background-color: var(--success-600);
             }
         }
@@ -76,7 +77,7 @@
             color: var(--white);
             background-color: var(--warning-500);
 
-            &:hover {
+            &:not(.no-hover):hover {
                 background-color: var(--warning-600);
             }
         }
@@ -85,7 +86,7 @@
             color: var(--white);
             background-color: var(--danger-500);
 
-            &:hover {
+            &:not(.no-hover):hover {
                 background-color: var(--danger-600);
             }
         }
@@ -94,7 +95,7 @@
             color: var(--gray-900);
             background-color: var(--white);
 
-            &:hover {
+            &:not(.no-hover):hover {
                 background-color: var(--gray-100);
             }
         }

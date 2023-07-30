@@ -2,7 +2,7 @@
     import Player from "youtube-player";
     import type { Options, YouTubePlayer } from "youtube-player/dist/types";
     import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-    import { beforeNavigate, goto } from "$app/navigation";
+    import { beforeNavigate } from "$app/navigation";
     import { sharedPlayer } from "../../store";
     import Button from "$components/Button.svelte";
 
@@ -28,16 +28,13 @@
 
     beforeNavigate(({ from }) => {
         if (from && from.url.pathname.endsWith("/cook"))
-        {
-            console.log("hi");
             (player as YouTubePlayer).seekTo(0, true);
-        }
     });
 </script>
 
 <div class="upper">
     <div class="back-button">
-        <Button kind="white" icon={faArrowLeft} />
+        <Button kind="white" icon={faArrowLeft} noHover on:click={() => history.back()} />
     </div>
     <div class="player-container">
         <div id="player" class="player" bind:this={player} />
