@@ -61,3 +61,12 @@ export function extractId(video: DemoVideo): string | undefined
 
     return match ? match[1] : undefined;
 }
+
+export function timestampToSeconds(timestamp: string): number
+{
+    const regex = /\d{1,}:\d{2}/;
+    const match = timestamp.match(regex)![0];
+    const [minute, second] = match.split(":").map((x) => parseInt(x));
+
+    return minute * 60 + second;
+}

@@ -9,6 +9,7 @@
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { pausableTweened } from "$lib/pausableTween";
     import { duration, flyingFade } from "$lib/transition";
+    import { timestampToSeconds } from "$lib/video";
     import { feedbackResult, sharedPlayer } from "../../../store";
     import Tooltip from "$components/Tooltip.svelte";
 
@@ -22,16 +23,10 @@
     const title = data.video.title;
     const description = "";
 
-    let steps: Step[] = data.video.steps.map(step => {
-        const regex = /\d{1,}:\d{2}/;
-        const match = step.timestamp.match(regex)![0];
-        const [minute, second] = match.split(":").map((x) => parseInt(x));
-
-        return {
-            seconds: minute * 60 + second,
+    let steps: Step[] = data.video.steps.map(step => ({
+            seconds: timestampToSeconds(step.timestamp),
             description: step.description
-        } as Step;
-    });
+        } as Step));
 
     let progress = pausableTweened(0, { duration: progressDuration });
     let player: YouTubePlayer = $sharedPlayer;
