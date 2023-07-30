@@ -53,3 +53,11 @@ export function unitizeViews(views: number): string
     else
         return `${(views / 10000000).toFixed(1)}천만`;
 }
+
+export function extractId(video: DemoVideo): string | undefined
+{
+    const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+    const match = video.video.match(regex);
+
+    return match ? match[1] : undefined;
+}

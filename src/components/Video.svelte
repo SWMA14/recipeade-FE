@@ -1,6 +1,6 @@
 <script lang="ts">
     import { getCategoryById } from "$lib/category";
-    import { type DemoVideo, unitizeViews } from "$lib/video";
+    import { type DemoVideo, extractId, unitizeViews } from "$lib/video";
     import Badge from "$components/Badge.svelte";
     import Card from "$components/Card.svelte";
     import Carousel from "$components/Carousel.svelte";
@@ -11,9 +11,7 @@
     export let bottomMargin = false;
     export let verbose = false;
 
-    const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
-    const match = video.video.match(regex);
-    const id = match ? match[1] : undefined;
+    const id = extractId(video);
 </script>
 
 <Card visibleOverflow noPadding {leftMargin} {rightMargin} {bottomMargin} columnFlex scrollSnap>
