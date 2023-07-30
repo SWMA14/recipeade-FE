@@ -14,7 +14,7 @@
     <slot />
 </main>
 {#if !$dynamicBarContext.isHidden}
-    <div class="navigation" transition:flyingFade={{ duration }}>
+    <div class="navigation" transition:flyingFade={{ duration: duration * 2 }}>
         <DynamicBar leading={$dynamicBarContext.leading} main={$dynamicBarContext.main} trailing={$dynamicBarContext.trailing} />
     </div>
     <div class="overlay" />
