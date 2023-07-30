@@ -8,7 +8,7 @@
     export let heading: string | undefined = undefined;
     export let body: string | undefined = undefined;
     export let modifier: string | undefined = undefined;
-    export let darkOverlay = false;
+    export let darkOverlay: number | undefined = undefined;
     export let visibleOverflow = false;
     export let noRadius = false;
     export let noPadding = false;
@@ -50,22 +50,22 @@
     class:column-flex={columnFlex} class:scroll-snap={scrollSnap} class:left-margin={leftMargin} class:right-margin={rightMargin}
     class:bottom-margin={bottomMargin} class:square>
     {#if heading || body || modifier}
-        <div class="texts" class:flex-end={!heading} class:dark-overlay={darkOverlay}>
+        <div class="texts" class:flex-end={!heading} class:large-padding={largePadding} class:dark-overlay={darkOverlay}>
             {#if heading}
-                <h1>{heading}</h1>
+                <h1>{@html heading}</h1>
             {/if}
             <div class="body">
                 {#if modifier}
-                    <span class="modifier-text typo-body-2" class:dark-overlay={darkOverlay}>{modifier}</span>
+                    <span class="modifier-text typo-body-2" class:dark-overlay={darkOverlay}>{@html modifier}</span>
                 {/if}
                 {#if body}
-                    <span class="body-text">{body}</span>
+                    <span class="body-text">{@html body}</span>
                 {/if}
             </div>
         </div>
     {/if}
     {#if darkOverlay}
-        <div class="overlay" />
+        <div class="overlay" style="--opacity: {darkOverlay};" />
     {/if}
     <slot />
     {#if video}
@@ -98,6 +98,10 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+
+        &.large-padding {
+            padding: var(--space-m);
+        }
 
         &.dark-overlay {
             color: var(--white);
@@ -136,7 +140,7 @@
         top: 0;
         left: 0;
         background-color: var(--gray-900);
-        opacity: var(--overlay-opacity);
+        opacity: var(--opacity);
         z-index: 1;
     }
 

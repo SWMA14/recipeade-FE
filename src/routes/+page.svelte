@@ -1,12 +1,13 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { getContext, onMount } from "svelte";
+    import type { Writable } from "svelte/store";
     import Device from "svelte-device-info";
     import { MetaTags } from "svelte-meta-tags";
+    import type { DynamicBarContext } from "$lib/dynamicBar";
+    import { extractId, timestampToSeconds } from "$lib/video";
     import Carousel from "$components/Carousel.svelte";
     import Video from "$components/Video.svelte";
-    import { getContext } from "svelte";
-    import type { Writable } from "svelte/store";
-    import type { DynamicBarContext } from "$lib/dynamicBar";
+    import Card from "$components/Card.svelte";
     import main from "./__dynamicBarComponents/main.svelte";
 
     export let data;
@@ -49,8 +50,15 @@
     ]}
 />
 
+<div class="intro">
+    <Card video={extractId(data.random)} start={timestampToSeconds(data.random.steps.slice(-1)[0].timestamp)}
+        noRadius largePadding darkOverlay={0.7} square
+        heading="이 레시피는<br>어때요?" modifier={data.random.channel} body={data.random.title} />
+</div>
 <div class="section">
-    <h2>유튜브에서 핫해요🔥</h2>
+    <div class="title">
+        <h2>유튜브에서 핫해요</h2>
+    </div>
     <Carousel leftOverflow rightOverflow>
         {#each data.highViews as video, i (video.thumbnail)}
             <Video {video} leftMargin={i === 0} rightMargin />
@@ -58,7 +66,9 @@
     </Carousel>
 </div>
 <div class="section">
-    <h2>쉽게 따라해요😏</h2>
+    <div class="title">
+        <h2>쉽게 따라해요</h2>
+    </div>
     <Carousel leftOverflow rightOverflow>
         {#each data.easy as video, i (video.thumbnail)}
             <Video {video} leftMargin={i === 0} rightMargin />
@@ -66,7 +76,9 @@
     </Carousel>
 </div>
 <div class="section">
-    <h2>다른 레시피들도 있어요😯</h2>
+    <div class="title">
+        <h2>다른 레시피들도 있어요</h2>
+    </div>
     <div class="grid" class:desktop={!isMobile}>
         {#each data.others as video (video.thumbnail)}
             <Video {video} verbose bottomMargin />
@@ -74,14 +86,22 @@
     </div>
 </div>
 
-<style>
+<style lang="postcss">
+    .intro {
+        width: -webkit-fill-available;
+        margin: 0 calc(var(--space-xs) * -1);
+        margin-bottom: var(--space-m);
+    }
+
     .section {
         width: 100%;
         margin-bottom: var(--space-m);
     }
 
-    .grid {
-        margin-top: var(--space-xs);
+    .title {
+        margin-bottom: var(--space-xs);
+        display: flex;
+        justify-content: space-between;
     }
 
     .grid {
