@@ -10,7 +10,8 @@
     export let skeleton = false;
 </script>
 
-<button class="kind-{kind} size-{size}" {...$$restProps} class:no-hover={noHover} on:click on:focus on:mouseenter on:mousemove on:mouseleave>
+<button class="kind-{kind} size-{size}" {...$$restProps} class:no-hover={noHover} class:typo-body-2={size === "small"}
+    on:click on:focus on:mouseenter on:mousemove on:mouseleave>
     {#if icon}
         <Fa {icon} />
     {/if}
@@ -103,6 +104,10 @@
         &.kind-transparent {
             color: var(--gray-400);
             background-color: transparent;
+        }
+
+        &.size-small {
+            height: var(--space-s);
         }
     }
 </style>
