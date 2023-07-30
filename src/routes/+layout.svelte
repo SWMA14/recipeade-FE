@@ -2,7 +2,7 @@
     import "../app.css";
     import { setContext } from "svelte";
     import { writable } from "svelte/store";
-    import { flyingFade } from "$lib/transition";
+    import { duration, flyingFade } from "$lib/transition";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import DynamicBar from "$components/DynamicBar.svelte";
 
@@ -14,7 +14,7 @@
     <slot />
 </main>
 {#if !$dynamicBarContext.isHidden}
-    <div class="navigation" transition:flyingFade={{ duration: 250 }}>
+    <div class="navigation" transition:flyingFade={{ duration }}>
         <DynamicBar leading={$dynamicBarContext.leading} main={$dynamicBarContext.main} trailing={$dynamicBarContext.trailing} />
     </div>
     <div class="overlay" />

@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { growingFade } from "$lib/transition";
-    import { quartIn } from "svelte/easing";
+    import { duration, growingFade } from "$lib/transition";
+    import { quartIn, backOut } from "svelte/easing";
 
     export let leading: any = undefined;
     export let leadingWidth = "var(--space-xxl)";
@@ -11,8 +11,8 @@
 
 <div class="container">
     {#if leading}
-        <div class="leading" in:growingFade={{ width: leadingWidth, rightMargin: "var(--space-xs)", duration: 500 }}
-            out:growingFade={{ width: leadingWidth, rightMargin: "var(--space-xs)", easing: quartIn, duration: 500 }}>
+        <div class="leading" in:growingFade={{ width: leadingWidth, easing: backOut, rightMargin: "var(--space-xs)", duration: duration * 3 }}
+            out:growingFade={{ width: leadingWidth, rightMargin: "var(--space-xs)", easing: quartIn, duration: duration * 3 }}>
             <svelte:component this={leading} />
         </div>
     {/if}
@@ -20,8 +20,8 @@
         <svelte:component this={main} />
     </div>
     {#if trailing}
-        <div class="trailing" in:growingFade={{ width: trailingWidth, leftMargin: "var(--space-xs)", duration: 500 }}
-            out:growingFade={{ width: trailingWidth, leftMargin: "var(--space-xs)", easing: quartIn, duration: 500 }}>
+        <div class="trailing" in:growingFade={{ width: trailingWidth, easing: backOut, leftMargin: "var(--space-xs)", duration: duration * 3 }}
+            out:growingFade={{ width: trailingWidth, leftMargin: "var(--space-xs)", easing: quartIn, duration: duration * 3 }}>
             <svelte:component this={trailing} />
         </div>
     {/if}
