@@ -1,10 +1,12 @@
 <script lang="ts">
     import { page } from "$app/stores";
-    import { onMount } from "svelte";
     import FilterModal from "$components/FilterModal.svelte";
     import { goto } from "$app/navigation";
+    
+    export let data;
 
-    let value: any;
+    $: value = $page.url.searchParams.get("query");
+    $: sortby = $page.url.searchParams.get("sortby");
 
     const updateSearchParams = (key: string, value: string) =>{
         const searchParams = new URLSearchParams($page.url.search);
@@ -12,10 +14,6 @@
         goto('/search/result?'+searchParams.toString());
     }
 
-
-    onMount(()=>{
-        value = $page.url.searchParams.get("query")
-    })
 </script>
 
 
@@ -32,13 +30,32 @@
 </div>
 
 <div class="section">
-    <FilterModal name="최신" on:click={()=>{updateSearchParams("sortby","최신")}}/>
-    <FilterModal name="평점" on:click={()=>{updateSearchParams("sortby","평점")}}/>
-    <FilterModal name="조회" on:click={()=>{updateSearchParams("sortby","조회")}}/>
+    {#if data.response_current !== null}
+    <FilterModal name="최신" on:click={()=>{updateSearchParams("sortby","current")}}/>
+    <FilterModal name="평점" on:click={()=>{updateSearchParams("sortby","rating")}}/>
+    <FilterModal name="조회" on:click={()=>{updateSearchParams("sortby","viewCount")}}/>
+    {/if}
+</div>
+<div class="video-section">
+    {#if data.response_current === null}
+        <h1>검색하신 결과가 없습니다</h1>
+    {:else}
+        {#if sortby === "current"}
+        {:else if sortby === "rating"}
+        {:else if sortby === "viewCount"}
+        {/if}
+    {/if}
+   
 </div>
 
 
 <style>
+    .video-section {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
     .input {
         width: 100%;
         font-size: 1rem;
