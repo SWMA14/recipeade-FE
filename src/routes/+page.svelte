@@ -63,6 +63,11 @@
         {#each data.highViews as video, i (video.thumbnail)}
             <Video {video} leftMargin={i === 0} rightMargin />
         {/each}
+        <svelte:fragment slot="grid">
+            {#each data.highViews as video (video.thumbnail)}
+                <Video {video} verbose bottomMargin />
+            {/each}
+        </svelte:fragment>
     </Carousel>
 </div>
 <div class="section">
@@ -70,6 +75,11 @@
         {#each data.easy as video, i (video.thumbnail)}
             <Video {video} leftMargin={i === 0} rightMargin />
         {/each}
+        <svelte:fragment slot="grid">
+            {#each data.easy as video (video.thumbnail)}
+                <Video {video} verbose bottomMargin />
+            {/each}
+        </svelte:fragment>
     </Carousel>
 </div>
 <div class="section">

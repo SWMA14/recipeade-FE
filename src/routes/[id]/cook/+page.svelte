@@ -16,6 +16,7 @@
     export let data;
 
     getContext<Writable<DynamicBarContext>>("dynamicBar").update(x => x = {
+        ...x,
         isHidden: true
     });
 

@@ -42,7 +42,7 @@
         position: fixed;
         bottom: var(--space-xs);
         left: var(--space-xs);
-        z-index: 10;
+        z-index: 1000;
     }
 
     .overlay {
@@ -51,7 +51,7 @@
         position: fixed;
         bottom: 0;
         left: 0;
-        z-index: 1;
+        z-index: 999;
         background-image: linear-gradient(to top, var(--white) 15%, transparent);
     }
 </style>

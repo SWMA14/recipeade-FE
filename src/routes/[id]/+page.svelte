@@ -65,23 +65,25 @@
         {/each}
     </div>
     <div class="section" in:flyingFade={{ delay: duration * 2 }}>
-        <div class="title">
-            <h2>단계 미리 보기</h2>
-        </div>
-        {#each data.video.steps as step, i (step.description)}
-            <Card bottomMargin columnFlex scrollSnap modifier="{i + 1}단계" body={step.description}>
-                <div style="height: calc(var(--space-xxl) * 2);"></div>
-            </Card>
-        {/each}
+        <Carousel leftOverflow rightOverflow heading="단계 미리 보기">
+            {#each data.video.steps as step, i (step.description)}
+                <Card leftMargin={i === 0} rightMargin columnFlex scrollSnap
+                    modifier="{i + 1}단계" body={step.description}>
+                    <div style="height: calc(var(--space-xxxl) * 2);"></div>
+                </Card>
+            {/each}
+        </Carousel>
     </div>
     <div class="section last" in:flyingFade={{ delay: duration * 2 }}>
-        <div class="title">
-            <h2>이 레시피는 어때요?</h2>
-        </div>
-        <Carousel leftOverflow rightOverflow>
+        <Carousel leftOverflow rightOverflow heading="이 레시피는 어때요?" canShowAll>
             {#each [...Array(5).keys()] as i}
                 <Video video={data.video} leftMargin={i === 0} rightMargin />
             {/each}
+            <svelte:fragment slot="grid">
+                {#each [...Array(5).keys()] as _}
+                    <Video video={data.video} verbose bottomMargin />
+                {/each}
+            </svelte:fragment>
         </Carousel>
     </div>
 {/if}
