@@ -3,10 +3,10 @@
     import { quartIn, backOut } from "svelte/easing";
 
     export let leading: any = undefined;
-    export let leadingWidth = "var(--space-xxl)";
+    export let leadingWidth = "var(--space-2xl)";
     export let main: any = undefined;
     export let trailing: any = undefined;
-    export let trailingWidth = "var(--space-xxl)";
+    export let trailingWidth = "var(--space-2xl)";
 </script>
 
 <div class="container">
@@ -38,7 +38,7 @@
     }
 
     .leading {
-        width: var(--space-xxl);
+        width: var(--space-2xl);
         margin-right: var(--space-xs);
         display: inline-block;
         overflow: hidden;
@@ -50,7 +50,7 @@
     }
 
     .trailing {
-        width: var(--space-xxl);
+        width: var(--space-2xl);
         margin-left: var(--space-xs);
         display: inline-block;
         overflow: hidden;

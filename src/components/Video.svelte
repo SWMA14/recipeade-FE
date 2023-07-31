@@ -105,7 +105,7 @@
     }
 
     .badges {
-        margin-top: var(--space-xxs);
+        margin-top: var(--space-2xs);
         display: flex;
         align-items: center;
     }

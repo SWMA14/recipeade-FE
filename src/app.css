@@ -87,15 +87,15 @@
     --body-1: 1rem;
     --body-2: 0.85rem;
 
-    --space-xxxs: 0.25rem;
-    --space-xxs: 0.5rem;
+    --space-3xs: 0.25rem;
+    --space-2xs: 0.5rem;
     --space-xs: 1rem;
     --space-s: 1.5rem;
     --space-m: 2rem;
     --space-l: 2.5rem;
     --space-xl: 3rem;
-    --space-xxl: 3.5rem;
-    --space-xxxl: 4rem;
+    --space-2xl: 3.5rem;
+    --space-3xl: 4rem;
 
     color: var(--c-foreground);
     background-color: var(--c-background);

@@ -9,7 +9,7 @@
 
 <style>
     div {
-        padding: var(--space-xxxs) var(--space-xs);
+        padding: var(--space-3xs) var(--space-xs);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -23,6 +23,6 @@
     }
 
     .rightMargin {
-        margin-right: var(--space-xxs);
+        margin-right: var(--space-2xs);
     }
 </style>

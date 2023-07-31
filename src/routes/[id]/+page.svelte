@@ -69,7 +69,7 @@
             {#each data.video.steps as step, i (step.description)}
                 <Card leftMargin={i === 0} rightMargin columnFlex scrollSnap
                     modifier="{i + 1}단계" body={step.description}>
-                    <div style="height: calc(var(--space-xxxl) * 2);"></div>
+                    <div style="height: calc(var(--space-3xl) * 2);"></div>
                 </Card>
             {/each}
         </Carousel>
@@ -94,7 +94,7 @@
         margin-bottom: var(--space-m);
 
         &.first {
-            margin-top: var(--space-xxl);
+            margin-top: var(--space-2xl);
         }
 
         &.last {
@@ -109,7 +109,7 @@
     }
 
     .badges {
-        margin-bottom: var(--space-xxs);
+        margin-bottom: var(--space-2xs);
         display: flex;
         align-items: center;
     }
@@ -135,7 +135,7 @@
     .profile img {
         width: var(--space-m);
         height: var(--space-m);
-        margin-right: var(--space-xxs);
+        margin-right: var(--space-2xs);
         object-fit: cover;
         border-radius: var(--radius-big);
     }

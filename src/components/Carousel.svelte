@@ -93,7 +93,7 @@
     }
 
     .back-button {
-        width: var(--space-xxl);
+        width: var(--space-2xl);
     }
 
     .container {
@@ -129,7 +129,7 @@
     }
 
     .grid {
-        margin-top: var(--space-xxxl);
+        margin-top: var(--space-3xl);
         padding: 0 var(--space-xs);
         display: flex;
         flex-direction: column;

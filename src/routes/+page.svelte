@@ -103,7 +103,7 @@
         margin-bottom: var(--space-m);
 
         & .grid-title {
-            margin-bottom: var(--space-xxs);
+            margin-bottom: var(--space-2xs);
         }
     }
 
