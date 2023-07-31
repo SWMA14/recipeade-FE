@@ -12,9 +12,11 @@
 </script>
 
 <span class="container" transition:fade>
-    <a href="/">
+    <a href="/search/result?query={name}&sortby=최신">
         {name}
     </a>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
     <span on:click={handleDelete}>
         X 
     </span>
@@ -26,18 +28,18 @@
     }
 
     .container > span {
-        color: #cbd5e0;
+        color: var(--gray-400);
     }
 
     .container {
         width: 100%;
-        background-color: #f7fafc;
+        background-color: var(--gray-100);
         padding: 0.5rem 1rem;
         border-radius: var(--radius);
         justify-content: space-between;
         display: flex;
         flex-direction: row;
-        color: #1a202c;
+        color: var(--gray-900);
         margin-top: 1rem;
     }
 

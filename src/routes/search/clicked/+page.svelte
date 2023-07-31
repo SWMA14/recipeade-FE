@@ -7,7 +7,6 @@
     import { Preferences } from "@capacitor/preferences";   
     import { onMount } from "svelte";
 
-
     const arrayToString = (arr: string[]) : string =>{
         return arr.join("/");
     }
@@ -16,12 +15,10 @@
         return str.split("/");
     }
 
-    let items : string[] = [
-        "item1","item2","item3"
-    ];
+    let items : string[] = [];
 
     let input : any;
-    let searchValue : string = "";
+    let searchValue : any = "";
     let previousPage : string = base;
 
     const deleteAllKeywords = () => {
@@ -41,16 +38,16 @@
     };
 
     const addKeywords = async () => {
-        if(searchValue.length > 0){
-            items.push(searchValue);
+        if(searchValue.length > 0 && !items.includes(searchValue)){
+            if(items.length >= 5)
+                items.shift();
+            items.push(searchValue);            
         }
 
         await Preferences.set({ 
             key: "keywords", 
             value: arrayToString(items)
         });
-
-        goto("/");
     }
 
     const getKeywords =async () => {
@@ -67,12 +64,17 @@
     const handleSubmit = (event: any) => {
         event.preventDefault();
         addKeywords();
-        goto("/search/clicked/"+searchValue);
+
+        const searchParmas = new URLSearchParams($page.url.searchParams);
+        searchParmas.set("query",searchValue);
+        goto(`/search/result?${searchParmas.toString()}&sortby=current`);
     }
 
     onMount(()=>{   
-        //getKeywords();
+        getKeywords();
         input.focus();
+        if($page.url.searchParams.get("query"))
+            searchValue = $page.url.searchParams.get("query");
     });
 </script>
 
@@ -89,6 +91,8 @@
 <div class="section">
     <div class="section-top">
         <h2>최근 검색</h2>
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
         <span on:click={deleteAllKeywords}>모두 지우기</span>
     </div>
     <div>
@@ -134,7 +138,7 @@
 
 <style>
     .section-top > h2{
-        color: #1a202c;
+        color: var(--gray-900);
     }
 
     .section-top > span{
@@ -163,12 +167,16 @@
         transform: scaleX(-1);
     }
 
+    .search-container > form {
+        width: 100%;
+    }
+
     .search-container > form > button {
         display: none;
     }
 
     .search-container > form > input {
-        font-size: 1.25rem;
+        font-size: 1rem;
         width: 100%;
         border: none;
         font-weight: 500;
@@ -181,10 +189,10 @@
         align-items: center;
         width: 100%;
         margin-top: 5rem;
-        border: 1px solid #cbd5e0;
+        border: 1px solid var(--gray-400);
         border-radius: var(--radius);
         padding : 0.5rem;
-        margin-top: 1rem;
+        margin-top: env(safe-area-inset-top) + 1rem;
         margin-bottom: 2rem;
         position: relative;
     }
