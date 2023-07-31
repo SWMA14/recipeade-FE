@@ -1,17 +1,21 @@
 <script lang="ts">
     import { getCategoryById } from "$lib/category";
+    import type { SpaceType } from "$lib/types";
     import { type DemoVideo, extractId, unitizeViews } from "$lib/video";
     import Badge from "$components/Badge.svelte";
     import Card from "$components/Card.svelte";
     import Carousel from "$components/Carousel.svelte";
 
     export let video: DemoVideo;
-    export let leftMargin = false;
-    export let rightMargin = false;
+    export let leftMargin: SpaceType | undefined = undefined;
+    export let rightMargin: SpaceType | undefined = undefined;
     export let bottomMargin = false;
     export let verbose = false;
 
     const id = extractId(video);
+
+    let leftMarginValue = leftMargin ? `var(--space-${leftMargin})` : undefined;
+    let rightMarginValue = rightMargin ? `var(--space-${rightMargin})` : undefined;
 </script>
 
 <Card visibleOverflow noPadding {leftMargin} {rightMargin} {bottomMargin} columnFlex scrollSnap>
@@ -30,7 +34,8 @@
                             `${x.name}${[0, null].some(invalid => invalid === x.quantity) ? "" : ` ${x.quantity}`}${x.unit ?? ""}`
                         ).join(", ") :
                         video.steps[i - 1].description}
-                    <Card backgroundColor="primary-200" leftMargin={i === 0} rightMargin columnFlex scrollSnap
+                    <Card backgroundColor="primary-200" leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs"
+                        columnFlex scrollSnap
                         {modifier} {body} />
                 {/each}
             </Carousel>

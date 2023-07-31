@@ -1,16 +1,25 @@
 <script lang="ts">
     import Fa from "svelte-fa";
     import type { IconDefinition } from "@fortawesome/free-solid-svg-icons";
+    import type { ButtonType, SpaceType } from "$lib/types";
 
-    export let kind:
-        "primary" | "primary-light" | "gray" | "info" | "success" | "warning" | "danger" | "white" | "transparent" = "primary";
+    export let kind: ButtonType = "primary";
     export let size: "default" | "small" = "default";
     export let icon: IconDefinition | undefined = undefined;
+    export let leftMargin: SpaceType | undefined = undefined;
+    export let rightMargin: SpaceType | undefined = undefined;
     export let noHover = false;
+    export let selected = false;
+    export let progress: number | undefined = undefined;
     export let skeleton = false;
+
+    let leftMarginValue = leftMargin ? `var(--space-${leftMargin})` : undefined;
+    let rightMarginValue = rightMargin ? `var(--space-${rightMargin})` : undefined;
 </script>
 
 <button class="kind-{kind} size-{size}" {...$$restProps} class:no-hover={noHover} class:typo-body-2={size === "small"}
+    class:left-margin={leftMargin} class:right-margin={rightMargin} class:selected
+    class:progress style="--progress: {progress ?? 0}%; --left-margin: {leftMarginValue}; --right-margin: {rightMarginValue};"
     on:click on:focus on:mouseenter on:mousemove on:mouseleave>
     {#if icon}
         <Fa {icon} />
@@ -109,5 +118,23 @@
         &.size-small {
             height: var(--space-s);
         }
+
+        &.selected {
+            color: var(--gray-900);
+            background-color: var(--white);
+
+            &.progress {
+                background-image: linear-gradient(to right, var(--c-primary-light) var(--progress), var(--white) 0%);
+                /* TODO: match original color */
+            }
+        }
+    }
+
+    .left-margin {
+        margin-left: var(--left-margin);
+    }
+
+    .right-margin {
+        margin-right: var(--right-margin);
     }
 </style>

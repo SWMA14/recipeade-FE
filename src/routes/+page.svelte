@@ -61,7 +61,7 @@
 <div class="section">
     <Carousel leftOverflow rightOverflow heading="유튜브에서 핫해요" canShowAll>
         {#each data.highViews as video, i (video.thumbnail)}
-            <Video {video} leftMargin={i === 0} rightMargin />
+            <Video {video} leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" />
         {/each}
         <svelte:fragment slot="grid">
             {#each data.highViews as video (video.thumbnail)}
@@ -73,7 +73,7 @@
 <div class="section">
     <Carousel leftOverflow rightOverflow heading="쉽게 따라해요" canShowAll>
         {#each data.easy as video, i (video.thumbnail)}
-            <Video {video} leftMargin={i === 0} rightMargin />
+            <Video {video} leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" />
         {/each}
         <svelte:fragment slot="grid">
             {#each data.easy as video (video.thumbnail)}
