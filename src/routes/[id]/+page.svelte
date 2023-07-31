@@ -1,7 +1,6 @@
 <script lang="ts">
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
-    import Device from "svelte-device-info";
     import { getCategoryById } from "$lib/category";
     import { duration, flyingFade } from "$lib/transition";
     import { unitizeViews } from "$lib/video";
@@ -21,11 +20,9 @@
         main
     });
 
-    let isMobile = true;
     let isRendered = false;
 
     onMount(() => {
-        isMobile = Device.isMobile;
         isRendered = true;
     });
 </script>
