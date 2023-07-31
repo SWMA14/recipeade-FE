@@ -1,28 +1,9 @@
 <script lang="ts">
-    import Player from "youtube-player";
-    import type { Options, YouTubePlayer } from "youtube-player/dist/types";
-
-    let options: Options = {
-        playerVars: {
-            autoplay: 1,
-            modestbranding: 1,
-            controls: 0,
-            fs: 0,
-            rel: 0,
-            loop: 1, // 반복 재생 여부를 설정
-        },
-    };
     export let name: string;
-
-    let player: YouTubePlayer | HTMLElement;
-    $: if (player) {
-        player = Player(player, options);
-        player.loadVideoById("c5it8ttzJuY");
-    }
 </script>
 
-
-<div class="container">
+  <div class="container">
+    <a href="/search/result/?query={name}&sortby=current">
     <div class="image-thumbanil">
       <div class="video-container">
         <iframe
@@ -30,14 +11,16 @@
           src="https://www.youtube.com/embed/c5it8ttzJuY?autoplay=1&mute=1&loop=1"
           title="YouTube video player"
           frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allow="accelerometer; autoplay; clipboard-write; gyroscope; picture-in-picture"
           allowfullscreen
         ></iframe>
       </div>
       <div class="overlay"></div>
     </div>
     <div class="info">{name}</div>
+    </a>
   </div>
+
   
   <style>
     .info {
