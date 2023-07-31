@@ -1,7 +1,6 @@
 <script lang="ts">
-    import { getContext, onMount } from "svelte";
+    import { getContext } from "svelte";
     import type { Writable } from "svelte/store";
-    import Device from "svelte-device-info";
     import { MetaTags } from "svelte-meta-tags";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { extractId, timestampToSeconds } from "$lib/video";
@@ -19,11 +18,14 @@
     const title = "레시피에이드";
     const description = "";
 
-    let isMobile = true;
+    const curatedId = extractId(data.random);
 
-    onMount(() => {
-        isMobile = Device.isMobile;
-    })
+    let test: HTMLElement;
+
+    export const snapshot = {
+        capture: () => test,
+        restore: value => test = value
+    };
 </script>
 
 <MetaTags
@@ -50,36 +52,29 @@
     ]}
 />
 
-<div class="intro">
-    <Card video={extractId(data.random)} start={timestampToSeconds(data.random.steps.slice(-1)[0].timestamp)}
-        noRadius largePadding darkOverlay={0.7} square
-        heading="이 레시피는<br>어때요?" modifier={data.random.channel} body={data.random.title} />
+<div class="intro" bind:this={test}>
+    <a href="/{curatedId}">
+        <Card video={curatedId} noRadius largePadding darkOverlay={0.7} square
+            heading="이 레시피는<br>어때요?" modifier={data.random.channel} body={data.random.title} />
+    </a>
 </div>
 <div class="section">
-    <div class="title">
-        <h2>유튜브에서 핫해요</h2>
-    </div>
-    <Carousel leftOverflow rightOverflow>
+    <Carousel leftOverflow rightOverflow heading="유튜브에서 핫해요" canShowAll>
         {#each data.highViews as video, i (video.thumbnail)}
             <Video {video} leftMargin={i === 0} rightMargin />
         {/each}
     </Carousel>
 </div>
 <div class="section">
-    <div class="title">
-        <h2>쉽게 따라해요</h2>
-    </div>
-    <Carousel leftOverflow rightOverflow>
+    <Carousel leftOverflow rightOverflow heading="쉽게 따라해요" canShowAll>
         {#each data.easy as video, i (video.thumbnail)}
             <Video {video} leftMargin={i === 0} rightMargin />
         {/each}
     </Carousel>
 </div>
 <div class="section">
-    <div class="title">
-        <h2>다른 레시피들도 있어요</h2>
-    </div>
-    <div class="grid" class:desktop={!isMobile}>
+    <h2 class="grid-title">다른 레시피들도 있어요</h2>
+    <div class="grid">
         {#each data.others as video (video.thumbnail)}
             <Video {video} verbose bottomMargin />
         {/each}
@@ -96,12 +91,10 @@
     .section {
         width: 100%;
         margin-bottom: var(--space-m);
-    }
 
-    .title {
-        margin-bottom: var(--space-xs);
-        display: flex;
-        justify-content: space-between;
+        & .grid-title {
+            margin-bottom: var(--space-xxs);
+        }
     }
 
     .grid {

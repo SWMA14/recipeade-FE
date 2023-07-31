@@ -4,7 +4,6 @@
 
     export let backgroundColor = "gray-100";
     export let video: string | undefined = undefined;
-    export let start = 0;
     export let heading: string | undefined = undefined;
     export let body: string | undefined = undefined;
     export let modifier: string | undefined = undefined;
@@ -28,7 +27,6 @@
             controls: 0,
             disablekb: 1,
             fs: 0,
-            start,
             loop: 1,
             playlist: video
         }
@@ -39,9 +37,9 @@
     $: if (video && player)
     {
         player = Player(player, options);
-        player.loadVideoById(video, start, "small");
+        player.loadVideoById(video, 0, "small");
         player.mute();
-        player.seekTo(start, true); // 다시 버퍼해서 변경된 동영상 화질 적용
+        player.seekTo(0, true); // 다시 버퍼해서 변경된 동영상 화질 적용
     }
 </script>
 
