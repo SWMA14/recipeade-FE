@@ -82,7 +82,7 @@
         </svelte:fragment>
     </Carousel>
 </div>
-<div class="section">
+<div class="section last">
     <h2 class="grid-title">다른 레시피들도 있어요</h2>
     <div class="grid">
         {#each data.others as video (video.thumbnail)}
@@ -104,6 +104,10 @@
 
         & .grid-title {
             margin-bottom: var(--space-2xs);
+        }
+
+        &.last {
+            margin-bottom: var(--space-3xl);
         }
     }
 
