@@ -1,8 +1,10 @@
 <script lang="ts">
     import Player from "youtube-player";
     import type { Options, YouTubePlayer } from "youtube-player/dist/types";
-    import { beforeNavigate, goto } from "$app/navigation";
+    import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+    import { beforeNavigate } from "$app/navigation";
     import { sharedPlayer } from "../../store";
+    import Button from "$components/Button.svelte";
 
     export let data;
 
@@ -26,28 +28,20 @@
 
     beforeNavigate(({ from }) => {
         if (from && from.url.pathname.endsWith("/cook"))
-        {
-            console.log("hi");
             (player as YouTubePlayer).seekTo(0, true);
-        }
     });
 </script>
 
 <div class="upper">
-    <div style="height: 3rem; background-color: var(--c-background);" />
+    <div class="back-button">
+        <Button kind="white" icon={faArrowLeft} noHover on:click={() => history.back()} />
+    </div>
     <div class="player-container">
         <div id="player" class="player" bind:this={player} />
     </div>
 </div>
 <div class="content">
     <slot />
-</div>
-<div class="lower">
-    <div class="buttons">
-        <button class="outline like">👍</button>
-        <button class="start" on:click={() => goto(`/${data.id}/cook`)}>요리 시작하기</button>
-    </div>
-    <div class="shadow" />
 </div>
 
 <style>
@@ -56,7 +50,12 @@
         max-width: var(--max-width);
         position: fixed;
         top: 0;
-        z-index: 1;
+        background-color: var(--white);
+        z-index: 9;
+    }
+
+    .back-button {
+        width: var(--space-xl);
     }
 
     .player-container {
@@ -66,42 +65,12 @@
 
     .player {
         width: 100%;
-        max-height: calc(calc(100vw - 15px) * 9 / 16);
+        max-height: calc(100vw * 9 / 16);
     }
 
     .content {
         width: 100%;
-        margin-top: min(24rem, calc(calc(98vw * 9 / 16) + 1.5rem));
-        margin-bottom: 5rem;
-    }
-
-    .buttons {
-        width: calc(100% - var(--padding) * 2);
-        max-width: var(--max-width);
-        margin-top: 2rem;
-        display: flex;
-        position: fixed;
-        left: 50%;
-        bottom: 1rem;
-        transform: translateX(-50%);
-        z-index: 1;
-    }
-
-    .buttons .like {
-        width: 3rem;
-        margin-right: 0.5rem;
-    }
-
-    .buttons .start {
-        width: 100%;
-    }
-
-    .shadow {
-        width: 100%;
-        height: 6rem;
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        background-image: linear-gradient(to top, var(--c-background) 15%, transparent 100%);
+        margin-top: min(24rem, calc(calc(98vw * 9 / 16) + var(--space-xs)));
+        margin-bottom: calc(var(--space-xl) + var(--space-xs) * 2);
     }
 </style>

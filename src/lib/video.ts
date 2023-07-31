@@ -53,3 +53,20 @@ export function unitizeViews(views: number): string
     else
         return `${(views / 10000000).toFixed(1)}천만`;
 }
+
+export function extractId(video: DemoVideo): string | undefined
+{
+    const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+    const match = video.video.match(regex);
+
+    return match ? match[1] : undefined;
+}
+
+export function timestampToSeconds(timestamp: string): number
+{
+    const regex = /\d{1,}:\d{2}/;
+    const match = timestamp.match(regex)![0];
+    const [minute, second] = match.split(":").map((x) => parseInt(x));
+
+    return minute * 60 + second;
+}
