@@ -1,7 +1,6 @@
 <script lang="ts">
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
-    import Device from "svelte-device-info";
     import { getCategoryById } from "$lib/category";
     import { duration, flyingFade } from "$lib/transition";
     import { unitizeViews } from "$lib/video";
@@ -21,11 +20,9 @@
         main
     });
 
-    let isMobile = true;
     let isRendered = false;
 
     onMount(() => {
-        isMobile = Device.isMobile;
         isRendered = true;
     });
 </script>
@@ -67,7 +64,7 @@
     <div class="section" in:flyingFade={{ delay: duration * 2 }}>
         <Carousel leftOverflow rightOverflow heading="단계 미리 보기">
             {#each data.video.steps as step, i (step.description)}
-                <Card leftMargin={i === 0} rightMargin columnFlex scrollSnap
+                <Card leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" columnFlex scrollSnap
                     modifier="{i + 1}단계" body={step.description}>
                     <div style="height: calc(var(--space-3xl) * 2);"></div>
                 </Card>
@@ -77,7 +74,7 @@
     <div class="section last" in:flyingFade={{ delay: duration * 2 }}>
         <Carousel leftOverflow rightOverflow heading="이 레시피는 어때요?" canShowAll>
             {#each [...Array(5).keys()] as i}
-                <Video video={data.video} leftMargin={i === 0} rightMargin />
+                <Video video={data.video} leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" />
             {/each}
             <svelte:fragment slot="grid">
                 {#each [...Array(5).keys()] as _}

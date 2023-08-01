@@ -101,7 +101,7 @@
     }
 
     .title {
-        margin-bottom: var(--space-xxs);
+        margin-bottom: var(--space-2xs);
         display: flex;
         flex-direction: column;
     }

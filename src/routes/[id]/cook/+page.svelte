@@ -5,12 +5,16 @@
     import PlayerStates from "youtube-player/dist/constants/PlayerStates.js";
     import type { YouTubePlayer } from "youtube-player/dist/types";
     import { MetaTags } from "svelte-meta-tags";
+    import { faArrowRight, faThumbsUp, faThumbsDown, faRepeat } from "@fortawesome/free-solid-svg-icons";
     import type { Step } from "$lib/step";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { pausableTweened } from "$lib/pausableTween";
     import { duration, flyingFade } from "$lib/transition";
     import { timestampToSeconds } from "$lib/video";
     import { feedbackResult, sharedPlayer } from "../../../store";
+    import Button from "$components/Button.svelte";
+    import Card from "$components/Card.svelte";
+    import Carousel from "$components/Carousel.svelte";
     import Tooltip from "$components/Tooltip.svelte";
 
     export let data;
@@ -162,108 +166,65 @@
 />
 
 {#if isRendered}
-    <div class="step-buttons">
-        {#each [...Array(steps.length).keys()] as i}
-            {@const percentage = $progress * 100}
-            <button in:flyingFade|global={{ delay: duration * i }} on:click={() => selectStep(i)}
-                id="step-button-{i}" class:selected={i === selectedStep} class:margin={i < steps.length - 1} 
-                style="--progress: {i === selectedStep ? percentage : 0}%;">
-                {i + 1}
-            </button>
-        {/each}
-    </div>
-    <div class="alert step-description" in:flyingFade={{ delay: duration * 2 }}>
-        {@html steps[selectedStep].description
-            .replace(/^\*/g, "<strong>")
-            .replace(/\s\*/g, " <strong>")
-            .replace(/\*/g, "</strong>")}
-        <div class="button-groups">
-            <div class="group">
-                <button class="vote" class:selected={isUpvoted}
-                    on:click={() => vote(1)}>👍</button>
-                <button class="vote" class:selected={isUpvoted === false}
-                    on:click={() => vote(-1)}>👎</button>
-                <Tooltip>
-                    <div class="help" slot="content">?</div>
-                    <div class="alert help-tooltip" slot="tooltip">
-                        더욱 정확한 레시피를 제공해 드리기 위해 여러분의 도움이 필요해요 🙇
-                        <ul>
-                            <li>이 단계의 설명이 <strong>정확하다면</strong> 👍을 눌러 주세요.</li>
-                            <li><strong>정확하지 않거나 모호한</strong> 부분이 있다면 👎을 눌러 주세요.</li>
-                        </ul>
+    <div class="section">
+        <Card visibleOverflow noPadding>
+            <div style="margin-top: 1rem;">
+                <Carousel leftOverflow rightOverflow>
+                    {#each [...Array(steps.length).keys()] as i}
+                        <Button id="step-button-{i}" on:click={() => selectStep(i)} selected={i === selectedStep}
+                            leftMargin={i === 0 ? "m" : undefined} rightMargin={i < steps.length - 1 ? "xs" : "m"}
+                            progress={i === selectedStep ? $progress * 100 : 0}>
+                            <div style="width: var(--space-3xl);">{i + 1}</div>
+                        </Button>
+                    {/each}
+                </Carousel>
+            </div>
+            <div class="content">
+                {@html steps[selectedStep].description
+                    .replace(/^\*/g, "<strong>")
+                    .replace(/\s\*/g, " <strong>")
+                    .replace(/\*/g, "</strong>")}
+                <div class="button-groups">
+                    <div class="group">
+                        <Button kind="white" icon={faThumbsUp} rightMargin="xs" on:click={() => vote(1)} />
+                        <Button kind="white" icon={faThumbsDown} rightMargin="xs" on:click={() => vote(-1)} />
+                        <Tooltip>
+                            <div class="help" slot="content">?</div>
+                            <div class="alert help-tooltip" slot="tooltip">
+                                더욱 정확한 레시피를 제공해 드리기 위해 여러분의 도움이 필요해요 🙇
+                                <ul>
+                                    <li>이 단계의 설명이 <strong>정확하다면</strong> 👍을 눌러 주세요.</li>
+                                    <li><strong>정확하지 않거나 모호한</strong> 부분이 있다면 👎을 눌러 주세요.</li>
+                                </ul>
+                            </div>
+                        </Tooltip>
                     </div>
-                </Tooltip>
+                    <div class="group">
+                        <Button kind="white" icon={faArrowRight} rightMargin="xs" selected={isAutoNext}
+                            on:click={() => isAutoNext = !isAutoNext} />
+                        <Button kind="white" icon={faRepeat} selected={isRepeating} on:click={() => isRepeating = !isRepeating} />
+                    </div>
+                </div>
             </div>
-            <div class="group">
-                <button class="control" class:selected={isAutoNext} on:click={() => isAutoNext = !isAutoNext}>
-                    {#if isAutoNext}
-                        <img transition:fade={{ duration }} alt="다음 단계 자동 재생" src="/images/icons/autonext-selected.png" />
-                    {:else}
-                        <img transition:fade={{ duration }} alt="다음 단계 자동 재생" src="/images/icons/autonext.png" />
-                    {/if}
-                </button>
-                <button class="control" class:selected={isRepeating} on:click={() => isRepeating = !isRepeating}>
-                    {#if isRepeating}
-                        <img transition:fade={{ duration }} alt="현재 단계 반복" src="/images/icons/loop-selected.png" />
-                    {:else}
-                        <img transition:fade={{ duration }} alt="현재 단계 반복" src="/images/icons/loop.png" />
-                    {/if}
-                </button>
-            </div>
-        </div>
+        </Card>
     </div>
 {/if}
 
 <style>
+    .content {
+        padding: var(--space-xs);
+    }
+
+    .section {
+        margin-top: var(--space-2xl);
+    }
+
     .alert {
         margin-top: 1rem;
         padding: 0.5rem var(--padding);
         color: var(--c-secondary);
         background-color: var(--c-background-dark);
         text-align: center;
-    }
-
-    .step-buttons {
-        width: 100%;
-        margin-top: 1rem;
-        display: flex;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        overflow-x: scroll;
-    }
-
-    .step-buttons::-webkit-scrollbar {
-        display: none;
-    }
-
-    .step-buttons button {
-        padding: 0.5rem 3rem;
-        scroll-snap-align: start;
-        scroll-snap-stop: always;
-        transition: all 0.25s;
-    }
-
-    .step-buttons .margin {
-        margin-right: 0.65rem;
-    }
-
-    .step-buttons button:hover {
-        color: var(--c-foreground);
-        background-color: var(--c-secondary);
-    }
-
-    .step-buttons .selected {
-        color: var(--c-foreground);
-        background-image: linear-gradient(to right, var(--c-primary-light) var(--progress), var(--c-secondary) 0%);
-    }
-
-    .step-description {
-        width: 100%;
-        padding: 1.5rem var(--padding);
-        color: var(--c-foreground);
-        background-color: var(--c-background-lightdark);
-        border-radius: var(--radius);
-        text-align: left;
     }
 
     .button-groups {
@@ -279,13 +240,13 @@
         justify-content: left;
     }
 
-    .group button {
+    /* .group button {
         width: 3rem;
         margin-right: 0.65rem;
         background-color: var(--c-background);
         position: relative;
         transition: all 0.25s;
-    }
+    } */
 
     .vote.selected {
         text-shadow: 0 0 0 var(--c-primary);

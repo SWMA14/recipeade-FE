@@ -1,6 +1,7 @@
 <script lang="ts">
     import Player from "youtube-player";
     import type { Options, YouTubePlayer } from "youtube-player/dist/types";
+    import type { SpaceType } from "$lib/types";
 
     export let backgroundColor = "gray-100";
     export let video: string | undefined = undefined;
@@ -14,8 +15,8 @@
     export let noMinWidth = false;
     export let largePadding = false;
     export let columnFlex = false;
-    export let leftMargin = false;
-    export let rightMargin = false;
+    export let leftMargin: SpaceType | undefined = undefined;
+    export let rightMargin: SpaceType | undefined = undefined;
     export let bottomMargin = false;
     export let scrollSnap = false;
     export let square = false;
@@ -41,12 +42,16 @@
         player.mute();
         player.seekTo(0, true); // 다시 버퍼해서 변경된 동영상 화질 적용
     }
+
+    let leftMarginValue = leftMargin ? `var(--space-${leftMargin})` : undefined;
+    let rightMarginValue = rightMargin ? `var(--space-${rightMargin})` : undefined;
 </script>
 
-<div class="container" style="--card-background-color: var(--{backgroundColor});" class:visible-overflow={visibleOverflow}
+<div class="container" 
+    style="--card-background-color: var(--{backgroundColor}); --left-margin: {leftMarginValue}; --right-margin: {rightMarginValue};"
     class:no-radius={noRadius} class:no-padding={noPadding} class:no-min-width={noMinWidth} class:large-padding={largePadding}
     class:column-flex={columnFlex} class:scroll-snap={scrollSnap} class:left-margin={leftMargin} class:right-margin={rightMargin}
-    class:bottom-margin={bottomMargin} class:square>
+    class:bottom-margin={bottomMargin} class:square class:visible-overflow={visibleOverflow}>
     {#if heading || body || modifier}
         <div class="texts" class:flex-end={!heading} class:large-padding={largePadding} class:dark-overlay={darkOverlay}>
             {#if heading}
@@ -178,11 +183,11 @@
     }
 
     .left-margin {
-        margin-left: var(--space-xs);
+        margin-left: var(--left-margin);
     }
 
     .right-margin {
-        margin-right: var(--space-xs);
+        margin-right: var(--right-margin);
     }
 
     .bottom-margin {
