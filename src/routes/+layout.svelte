@@ -19,12 +19,12 @@
     <slot />
 </main>
 {#if !$upperBarContext.isHidden}
-    <div class="navigation title" transition:flyingFade={{ duration: duration * 2 }}>
+    <div class="navigation title" class:background={$upperBarContext.isBackgroundShown}
+        transition:flyingFade={{ y: -20, duration: duration * 2 }}>
         <DynamicBar leading={$upperBarContext.leading} leadingProps={$upperBarContext.leadingProps}
             main={$upperBarContext.main} mainProps={$upperBarContext.mainProps}
             trailing={$upperBarContext.trailing} trailingProps={$upperBarContext.trailingProps} />
     </div>
-    <div class="background" />
 {/if}
 {#if !$lowerBarContext.isHidden}
     <div class="navigation bottom" transition:flyingFade={{ duration: duration * 2 }}>
@@ -61,7 +61,10 @@
             padding: var(--space-3xs) var(--space-xs);
             top: 0;
             left: 0;
-            background-color: var(--white);
+
+            &.background {
+                background-color: var(--white);
+            }
         }
 
         &.bottom {

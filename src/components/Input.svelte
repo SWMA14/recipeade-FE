@@ -4,17 +4,20 @@
 
     export let placeholder = "";
     export let icon: IconDefinition | undefined = undefined;
+    export let iconClicked: () => void = () => {};
+    export let valueChanged: (value: string) => void = () => {};
 
     let value: string;
+    $: valueChanged(value);
 </script>
 
 <div class="container">
     {#if icon}
         <div class="button">
-            <Button kind="transparent" {icon} on:click />
+            <Button kind="transparent" {icon} on:click={iconClicked} />
         </div>
     {/if}
-    <input type="text" class:padding-left={icon} {placeholder} bind:value />
+    <input type="text" class:padding-left={icon} {placeholder} bind:value on:click />
     {#if value}
         <div class="button right">
             <Button kind="transparent" icon={faXmark} on:click={() => value = ""} />
@@ -44,8 +47,8 @@
         height: var(--space-xl);
         padding: var(--space-xs);
         padding-right: var(--space-l);
-        border: 1px solid var(--gray-200);
         border-radius: var(--radius);
+        background-color: var(--gray-100);
     }
 
     input::placeholder {

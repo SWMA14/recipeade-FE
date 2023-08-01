@@ -29,7 +29,8 @@
             leadingProps: {
                 onClick: hide
             },
-            isHidden: false
+            isHidden: false,
+            isBackgroundShown: true
         };
         $lowerBarContext.isHidden = true;
     }
