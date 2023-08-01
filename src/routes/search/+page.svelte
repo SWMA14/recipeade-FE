@@ -1,5 +1,13 @@
 <script lang="ts">
+    import { getContext } from "svelte";
+    import type { Writable } from "svelte/store";
+    import type { DynamicBarContext } from "$lib/dynamicBar";
     import SearchModal from "$components/SearchModal.svelte";
+    import main from "./__upperBarComponents/main.svelte";
+
+    getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
+        main
+    });
 </script>
 
 

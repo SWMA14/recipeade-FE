@@ -6,27 +6,41 @@
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import DynamicBar from "$components/DynamicBar.svelte";
 
-    let dynamicBarContext = writable({} as DynamicBarContext);
-    setContext("dynamicBar", dynamicBarContext);
+    let upperBarContext = writable({
+        isHidden: true
+    } as DynamicBarContext);
+    let lowerBarContext = writable({} as DynamicBarContext);
+
+    setContext("upperBar", upperBarContext);
+    setContext("lowerBar", lowerBarContext);
 </script>
 
 <main>
     <slot />
 </main>
-{#if !$dynamicBarContext.isHidden}
-    <div class="navigation" transition:flyingFade={{ duration: duration * 2 }}>
-        <DynamicBar leading={$dynamicBarContext.leading} main={$dynamicBarContext.main} trailing={$dynamicBarContext.trailing} />
+{#if !$upperBarContext.isHidden}
+    <div class="navigation title" transition:flyingFade={{ duration: duration * 2 }}>
+        <DynamicBar leading={$upperBarContext.leading} leadingProps={$upperBarContext.leadingProps}
+            main={$upperBarContext.main} mainProps={$upperBarContext.mainProps}
+            trailing={$upperBarContext.trailing} trailingProps={$upperBarContext.trailingProps} />
+    </div>
+    <div class="background" />
+{/if}
+{#if !$lowerBarContext.isHidden}
+    <div class="navigation bottom" transition:flyingFade={{ duration: duration * 2 }}>
+        <DynamicBar leading={$lowerBarContext.leading} leadingProps={$lowerBarContext.leadingProps}
+            main={$lowerBarContext.main} mainProps={$lowerBarContext.mainProps}
+            trailing={$lowerBarContext.trailing} trailingProps={$lowerBarContext.trailingProps} />
     </div>
     <div class="overlay" />
 {/if}
 
-<style>
+<style lang="postcss">
     main {
         width: 100%;
         max-width: var(--max-width);
         margin: 0 auto;
-        margin-top: max(2rem,env(safe-area-inset-top) + 1rem);
-        padding: 0 var(--padding);
+        padding: 0 var(--space-xs);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -39,11 +53,22 @@
     }
 
     .navigation {
-        width: calc(100% - var(--space-xs) * 2);
         position: fixed;
-        bottom: var(--space-xs);
-        left: var(--space-xs);
         z-index: 1000;
+
+        &.title {
+            width: 100%;
+            padding: var(--space-3xs) var(--space-xs);
+            top: 0;
+            left: 0;
+            background-color: var(--white);
+        }
+
+        &.bottom {
+            width: calc(100% - var(--space-xs) * 2);
+            bottom: var(--space-xs);
+            left: var(--space-xs);
+        }
     }
 
     .overlay {

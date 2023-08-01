@@ -7,11 +7,14 @@
     import Carousel from "$components/Carousel.svelte";
     import Video from "$components/Video.svelte";
     import Card from "$components/Card.svelte";
-    import main from "./__dynamicBarComponents/main.svelte";
+    import main from "./__lowerBarComponents/main.svelte";
 
     export let data;
 
-    getContext<Writable<DynamicBarContext>>("dynamicBar").update(x => x = {
+    getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
+        isHidden: true
+    });
+    getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
         main
     });
 

@@ -2,9 +2,9 @@
     import { getContext } from "svelte";
     import type { Writable } from "svelte/store";
     import type { DynamicBarContext } from "$lib/dynamicBar";
-    import Button from "./Button.svelte";
-    import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
     import { duration, flyingFade } from "$lib/transition";
+    import main from "./__carouselUpperBarComponents/main.svelte";
+    import leading from "./__carouselUpperBarComponents/leading.svelte";
 
     export let leftOverflow = false;
     export let rightOverflow = false;
@@ -13,18 +13,32 @@
     export let canShowAll = false;
 
     let shown = false;
-    let dynamicBarContext = getContext<Writable<DynamicBarContext>>("dynamicBar");
+    let upperBarContext = getContext<Writable<DynamicBarContext>>("upperBar");
+    let cachedUpperBarContext = $upperBarContext;
+    let lowerBarContext = getContext<Writable<DynamicBarContext>>("lowerBar");
 
     function show()
     {
         shown = true;
-        $dynamicBarContext.isHidden = true;
+        $upperBarContext = {
+            main,
+            mainProps: {
+                heading
+            },
+            leading,
+            leadingProps: {
+                onClick: hide
+            },
+            isHidden: false
+        };
+        $lowerBarContext.isHidden = true;
     }
 
     function hide()
     {
         shown = false;
-        $dynamicBarContext.isHidden = false;
+        $upperBarContext = cachedUpperBarContext;
+        $lowerBarContext.isHidden = false;
     }
 </script>
 
@@ -50,14 +64,6 @@
 </div>
 {#if shown}
     <div class="panel" transition:flyingFade={{ duration: duration * 2, y: 50 }}>
-        <div class="title-bar">
-            <div class="back-button">
-                <Button kind="white" icon={faArrowLeft} on:click={hide} />
-            </div>
-            {#if heading}
-                <h2>{heading}</h2>
-            {/if}
-        </div>
         <div class="grid">
             <slot name="grid" />
         </div>

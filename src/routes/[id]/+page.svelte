@@ -10,12 +10,12 @@
     import Card from "$components/Card.svelte";
     import Carousel from "$components/Carousel.svelte";
     import Video from "$components/Video.svelte";
-    import main from "./__dynamicBarComponents/main.svelte";
-    import leading from "./__dynamicBarComponents/leading.svelte";
+    import main from "./__lowerBarComponents/main.svelte";
+    import leading from "./__lowerBarComponents/leading.svelte";
 
     export let data;
 
-    getContext<Writable<DynamicBarContext>>("dynamicBar").update(x => x = {
+    getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
         leading,
         main
     });

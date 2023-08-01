@@ -19,7 +19,7 @@
 
     export let data;
 
-    getContext<Writable<DynamicBarContext>>("dynamicBar").update(x => x = {
+    getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
         ...x,
         isHidden: true
     });
