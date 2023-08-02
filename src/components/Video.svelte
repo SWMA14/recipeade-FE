@@ -13,9 +13,6 @@
     export let verbose = false;
 
     const id = extractId(video);
-
-    let leftMarginValue = leftMargin ? `var(--space-${leftMargin})` : undefined;
-    let rightMarginValue = rightMargin ? `var(--space-${rightMargin})` : undefined;
 </script>
 
 <Card visibleOverflow noPadding {leftMargin} {rightMargin} {bottomMargin} columnFlex scrollSnap>

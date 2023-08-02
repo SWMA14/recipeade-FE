@@ -1,10 +1,8 @@
 <script lang="ts">
     import Player from "youtube-player";
     import type { Options, YouTubePlayer } from "youtube-player/dist/types";
-    import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
     import { beforeNavigate } from "$app/navigation";
     import { sharedPlayer } from "../../store";
-    import Button from "$components/Button.svelte";
 
     export let data;
 
@@ -32,33 +30,22 @@
     });
 </script>
 
-<div class="upper">
-    <div class="back-button">
-        <Button kind="white" icon={faArrowLeft} noHover on:click={() => history.back()} />
-    </div>
-    <div class="player-container">
-        <div id="player" class="player" bind:this={player} />
-    </div>
+<div class="player-container">
+    <div id="player" class="player" bind:this={player} />
 </div>
 <div class="content">
     <slot />
 </div>
 
 <style>
-    .upper {
+    .player-container {
         width: 100%;
         max-width: var(--max-width);
+        margin-top: var(--space-2xl);
         position: fixed;
         top: 0;
-        background-color: var(--white);
         z-index: 9;
-    }
-
-    .back-button {
-        width: var(--space-xl);
-    }
-
-    .player-container {
+        background-color: var(--white);
         border-radius: 0 0 var(--radius) var(--radius);
         overflow: hidden;
     }

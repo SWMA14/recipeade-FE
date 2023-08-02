@@ -1,10 +1,12 @@
+import type { ComponentType } from "svelte";
+
 export interface DynamicBarContext
 {
-    main?: any;
+    main?: ComponentType;
     mainProps?: object;
-    leading?: any;
+    leading?: ComponentType;
     leadingProps?: object;
-    trailing?: any;
+    trailing?: ComponentType;
     trailingProps?: object;
     isHidden?: boolean;
     isBackgroundShown?: boolean;

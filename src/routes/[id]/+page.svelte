@@ -10,14 +10,22 @@
     import Card from "$components/Card.svelte";
     import Carousel from "$components/Carousel.svelte";
     import Video from "$components/Video.svelte";
-    import main from "./__lowerBarComponents/main.svelte";
-    import leading from "./__lowerBarComponents/leading.svelte";
+    import upperLeading from "./__upperBarComponents/leading.svelte";
+    import lowerMain from "./__lowerBarComponents/main.svelte";
+    import lowerLeading from "./__lowerBarComponents/leading.svelte";
 
     export let data;
 
+    getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
+        leading: upperLeading,
+        leadingProps: {
+            onClick: () => history.back()
+        },
+        isBackgroundShown: true
+    });
     getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
-        leading,
-        main
+        leading: lowerLeading,
+        main: lowerMain
     });
 
     let isRendered = false;

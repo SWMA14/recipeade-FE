@@ -14,7 +14,7 @@
 
 <div class="container">
     {#if leading}
-        <div class="leading" in:growingFade={{ width: leadingWidth, easing: backOut, rightMargin: "var(--space-xs)", duration: duration * 3 }}
+        <div class="leading" in:growingFade={{ width: leadingWidth, easing: quartIn, rightMargin: "var(--space-xs)", duration: duration * 3 }}
             out:growingFade={{ width: leadingWidth, rightMargin: "var(--space-xs)", easing: quartIn, duration: duration * 3 }}>
             <svelte:component this={leading} {...leadingProps} />
         </div>
@@ -23,7 +23,7 @@
         <svelte:component this={main} {...mainProps} />
     </div>
     {#if trailing}
-        <div class="trailing" in:growingFade={{ width: trailingWidth, easing: backOut, leftMargin: "var(--space-xs)", duration: duration * 3 }}
+        <div class="trailing" in:growingFade={{ width: trailingWidth, easing: quartIn, leftMargin: "var(--space-xs)", duration: duration * 3 }}
             out:growingFade={{ width: trailingWidth, leftMargin: "var(--space-xs)", easing: quartIn, duration: duration * 3 }}>
             <svelte:component this={trailing} {...trailingProps} />
         </div>
