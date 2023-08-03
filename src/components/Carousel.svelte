@@ -3,6 +3,7 @@
     import type { Writable } from "svelte/store";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { duration, flyingFade } from "$lib/transition";
+    import Stack from "$components/Stack.svelte";
     import main from "./__carouselUpperBarComponents/main.svelte";
     import leading from "./__carouselUpperBarComponents/leading.svelte";
 
@@ -12,34 +13,27 @@
     export let body: string | undefined = undefined;
     export let canShowAll = false;
 
+    const dynamicBarContext: DynamicBarContext = {
+        main,
+        mainProps: {
+            heading
+        },
+        leading,
+        leadingProps: {
+            onClick: hide
+        }
+    };
+
     let shown = false;
-    let upperBarContext = getContext<Writable<DynamicBarContext>>("upperBar");
-    let cachedUpperBarContext = $upperBarContext;
-    let lowerBarContext = getContext<Writable<DynamicBarContext>>("lowerBar");
 
     function show()
     {
         shown = true;
-        $upperBarContext = {
-            main,
-            mainProps: {
-                heading
-            },
-            leading,
-            leadingProps: {
-                onClick: hide
-            },
-            isHidden: false,
-            isBackgroundShown: true
-        };
-        $lowerBarContext.isHidden = true;
     }
 
     function hide()
     {
         shown = false;
-        $upperBarContext = cachedUpperBarContext;
-        $lowerBarContext.isHidden = false;
     }
 </script>
 
@@ -64,45 +58,14 @@
     </div>
 </div>
 {#if shown}
-    <div class="panel" transition:flyingFade={{ duration: duration * 2, y: 50 }}>
+    <Stack {dynamicBarContext} onBack={hide}>
         <div class="grid">
             <slot name="grid" />
         </div>
-    </div>
+    </Stack>
 {/if}
 
 <style>
-    .panel {
-        width: 100%;
-        height: 100%;
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 10;
-        background-color: var(--white);
-        overflow-y: scroll;
-    }
-
-    .panel::-webkit-scrollbar {
-        display: none;
-    }
-
-    .title-bar {
-        width: 100%;
-        height: var(--space-xl);
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 11;
-        display: flex;
-        align-items: center;
-        background-color: var(--white);
-    }
-
-    .back-button {
-        width: var(--space-2xl);
-    }
-
     .container {
         width: auto;
     }

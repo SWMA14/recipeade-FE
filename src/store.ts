@@ -17,3 +17,5 @@ export const feedbackResult = writable({
 });
 
 export const sharedPlayer = writable<YouTubePlayer>();
+
+export const stacks = writable([] as (() => void)[]);
