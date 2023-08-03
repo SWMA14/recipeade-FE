@@ -23,7 +23,7 @@
 <Card backgroundColor="primary-500">
     <div class="content">
         {#each tabs as { href, icon } (href)}
-            <a {href} class:selected={href === $page.url.pathname}><Fa {icon} /></a>
+            <a {href} class:selected={href === $page.route.id}><Fa {icon} /></a>
         {/each}
     </div>
 </Card>
