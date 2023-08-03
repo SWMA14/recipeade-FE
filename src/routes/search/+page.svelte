@@ -127,7 +127,7 @@
         padding: var(--space-xs);
         padding-top: 0;
         position: fixed;
-        top: calc(var(--space-3xl) + var(--space-xs));
+        top: calc(var(--space-3xl) + var(--space-xs) + env(safe-area-inset-top));
         left: 0;
         display: flex;
         background-color: var(--white);
@@ -148,7 +148,10 @@
     .search-bar {
         width: 100%;
         padding: var(--space-xs);
+        padding-top: calc(var(--space-xs) + env(safe-area-inset-top));
         position: fixed;
+        top: 0;
+        left: 0;
         background-color: var(--white);
         z-index: 999;
     }

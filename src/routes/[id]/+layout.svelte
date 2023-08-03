@@ -41,7 +41,7 @@
     .player-container {
         width: 100%;
         max-width: var(--max-width);
-        margin-top: var(--space-2xl);
+        margin-top: calc(var(--space-2xl) + env(safe-area-inset-top));
         position: fixed;
         top: 0;
         z-index: 9;
@@ -57,7 +57,7 @@
 
     .content {
         width: 100%;
-        margin-top: min(24rem, calc(calc(98vw * 9 / 16) + var(--space-xs)));
+        margin-top: calc(calc(98vw * 9 / 16) + var(--space-xs));
         margin-bottom: calc(var(--space-xl) + var(--space-xs) * 2);
     }
 </style>

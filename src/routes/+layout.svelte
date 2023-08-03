@@ -1,7 +1,9 @@
 <script lang="ts">
     import "../app.css";
-    import { setContext } from "svelte";
+    import { App } from "@capacitor/app";
+    import { onMount, setContext } from "svelte";
     import { writable } from "svelte/store";
+    import { stacks } from "../store";
     import { duration, flyingFade } from "$lib/transition";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import DynamicBar from "$components/DynamicBar.svelte";
@@ -13,6 +15,16 @@
 
     setContext("upperBar", upperBarContext);
     setContext("lowerBar", lowerBarContext);
+
+    onMount(() => {
+        App.addListener("backButton", () => {
+            console.log("as");
+            const length = $stacks.length;
+
+            if (length > 0)
+                $stacks[length - 1]();
+        });
+    });
 </script>
 
 <main>
@@ -40,6 +52,7 @@
         width: 100%;
         max-width: var(--max-width);
         margin: 0 auto;
+        margin-top: env(safe-area-inset-top);
         padding: 0 var(--space-xs);
         display: flex;
         flex-direction: column;
@@ -59,6 +72,7 @@
         &.title {
             width: 100%;
             padding: var(--space-3xs) var(--space-xs);
+            padding-top: calc(var(--space-3xs) + env(safe-area-inset-top));
             top: 0;
             left: 0;
 

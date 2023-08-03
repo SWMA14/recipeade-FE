@@ -5,6 +5,8 @@ const config: CapacitorConfig = {
   appName: 'recipeade',
   webDir: '.svelte-kit/cloudflare',
   server: {
+    // url: "http://172.16.101.141:5173",
+    // cleartext: true,
     androidScheme: 'https'
   }
 };
