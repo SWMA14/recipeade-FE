@@ -45,7 +45,7 @@
     .upper-bar {
         width: 100%;
         padding: var(--space-3xs) var(--space-xs);
-        padding-top: calc(var(--space-xs) + env(safe-area-inset-top));
+        padding-top: calc(var(--space-3xs) + env(safe-area-inset-top));
         position: fixed;
         top: 0;
         left: 0;
