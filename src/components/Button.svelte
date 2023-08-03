@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { Device } from "@capacitor/device";
     import Fa from "svelte-fa";
     import type { IconDefinition } from "@fortawesome/free-solid-svg-icons";
     import type { ButtonType, SpaceType } from "$lib/types";
@@ -15,9 +16,14 @@
 
     let leftMarginValue = leftMargin ? `var(--space-${leftMargin})` : undefined;
     let rightMarginValue = rightMargin ? `var(--space-${rightMargin})` : undefined;
+    let device: "ios" | "android" | "web";
+
+    Device.getInfo()
+        .then(x => device = x.platform)
+        .catch(() => device = "web");
 </script>
 
-<button class="kind-{kind} size-{size}" {...$$restProps} class:no-hover={noHover} class:typo-body-2={size === "small"}
+<button class="kind-{kind} size-{size}" {...$$restProps} class:no-hover={noHover || device !== "web"} class:typo-body-2={size === "small"}
     class:left-margin={leftMargin} class:right-margin={rightMargin} class:selected class:progress
     style="--progress: {progress ?? 0}%; --left-margin: {leftMarginValue}; --right-margin: {rightMarginValue};
     --color: var(--kind-{kind}-color); --background-color: var(--kind-{kind}-background-color);

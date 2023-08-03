@@ -96,17 +96,17 @@
         <div class="result">
             <div class="sort-buttons">
                 <div class="wrapper">
-                    <Button size="small" noHover selected={selectedSort === "latest"} on:click={() => selectedSort = "latest"}>
+                    <Button size="small" selected={selectedSort === "latest"} on:click={() => selectedSort = "latest"}>
                         최신
                     </Button>
                 </div>
                 <div class="wrapper">
-                    <Button size="small" noHover selected={selectedSort === "rate"} on:click={() => selectedSort = "rate"}>
+                    <Button size="small" selected={selectedSort === "rate"} on:click={() => selectedSort = "rate"}>
                         평점
                     </Button>
                 </div>
                 <div class="wrapper">
-                    <Button size="small" noHover selected={selectedSort === "popular"} on:click={() => selectedSort = "popular"}>
+                    <Button size="small" selected={selectedSort === "popular"} on:click={() => selectedSort = "popular"}>
                         조회
                     </Button>
                 </div>

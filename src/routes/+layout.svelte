@@ -1,28 +1,37 @@
 <script lang="ts">
     import "../app.css";
+    import { Device } from "@capacitor/device";
     import { App } from "@capacitor/app";
     import { onMount, setContext } from "svelte";
     import { writable } from "svelte/store";
     import { stacks } from "../store";
+    import { page } from "$app/stores";
     import { duration, flyingFade } from "$lib/transition";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import DynamicBar from "$components/DynamicBar.svelte";
 
+    $: console.log($page.route.id);
+
+    let device: "ios" | "android" | "web";
     let upperBarContext = writable({
         isHidden: true
     } as DynamicBarContext);
     let lowerBarContext = writable({} as DynamicBarContext);
 
+    Device.getInfo()
+        .then(x => device = x.platform)
+        .catch(() => device = "web");
     setContext("upperBar", upperBarContext);
     setContext("lowerBar", lowerBarContext);
 
     onMount(() => {
         App.addListener("backButton", () => {
-            console.log("as");
             const length = $stacks.length;
 
             if (length > 0)
                 $stacks[length - 1]();
+            else if ($page.route.id !== "/")
+                history.back();
         });
     });
 </script>
@@ -39,12 +48,12 @@
     </div>
 {/if}
 {#if !$lowerBarContext.isHidden}
-    <div class="navigation bottom" transition:flyingFade={{ duration: duration * 2 }}>
+    <div class="navigation bottom" class:ios={device === "ios"} transition:flyingFade={{ duration: duration * 2 }}>
         <DynamicBar leading={$lowerBarContext.leading} leadingProps={$lowerBarContext.leadingProps}
             main={$lowerBarContext.main} mainProps={$lowerBarContext.mainProps}
             trailing={$lowerBarContext.trailing} trailingProps={$lowerBarContext.trailingProps} />
     </div>
-    <div class="overlay" />
+    <div class="overlay" class:ios={device === "ios"} />
 {/if}
 
 <style lang="postcss">
@@ -85,6 +94,10 @@
             width: calc(100% - var(--space-xs) * 2);
             bottom: var(--space-xs);
             left: var(--space-xs);
+
+            &.ios {
+                bottom: var(--space-s);
+            }
         }
     }
 
@@ -96,5 +109,9 @@
         left: 0;
         z-index: 999;
         background-image: linear-gradient(to top, var(--white) 15%, transparent);
+
+        &.ios {
+            height: calc(var(--space-xl) * 2 + var(--space-s));
+        }
     }
 </style>
