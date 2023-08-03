@@ -1,6 +1,7 @@
 <script lang="ts">
     import Player from "youtube-player";
     import type { Options, YouTubePlayer } from "youtube-player/dist/types";
+    import { onMount } from "svelte";
     import type { SpaceType } from "$lib/types";
 
     export let backgroundColor = "gray-100";
@@ -22,33 +23,62 @@
     export let square = false;
     export let squareOverflowSafeArea = false;
 
-    let options: Options = {
-        playerVars: {
-            autoplay: 1,
-            modestbranding: 1,
-            controls: 0,
-            disablekb: 1,
-            fs: 0,
-            loop: 1,
-            playlist: video
-        }
-    };
-
+    let container: HTMLElement;
     let player: YouTubePlayer | HTMLElement;
-
-    $: if (video && player)
-    {
-        player = Player(player, options);
-        player.loadVideoById(video, 0, "small");
-        player.mute();
-        player.seekTo(0, true); // 다시 버퍼해서 변경된 동영상 화질 적용
-    }
-
     let leftMarginValue = leftMargin ? `var(--space-${leftMargin})` : undefined;
     let rightMarginValue = rightMargin ? `var(--space-${rightMargin})` : undefined;
+
+    onMount(() => {
+        if (video)
+        {
+            let options: Options = {
+            playerVars: {
+                    autoplay: 1,
+                    modestbranding: 1,
+                    controls: 0,
+                    disablekb: 1,
+                    fs: 0,
+                }
+            };
+            let duration: number = 0;
+
+            player = Player(player, options);
+            player.loadVideoById(video, 0, "small");
+            player.mute();
+            player.seekTo(0, true); // 다시 버퍼해서 변경된 동영상 화질 적용
+
+            setInterval(async () => {
+                player = player as YouTubePlayer;
+
+                if (!duration)
+                    duration = await player.getDuration();
+
+                if (player && await player.getCurrentTime() >= duration - 10)
+                    player.seekTo(0, true);
+            }, 500);
+        }
+    });
+
+    function checkVideoVisible()
+    {
+        if (video && player)
+        {
+            const rect = container.getBoundingClientRect();
+            const viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
+            const yThreshold = 30;
+
+            player = player as YouTubePlayer;
+            if (rect.bottom >= yThreshold && rect.top - viewHeight < yThreshold)
+                player.playVideo();
+            else
+                player.pauseVideo();
+        }
+    }
 </script>
 
-<div class="container" 
+<svelte:window on:scroll={checkVideoVisible} />
+
+<div class="container" bind:this={container}
     style="--card-background-color: var(--{backgroundColor}); --left-margin: {leftMarginValue}; --right-margin: {rightMarginValue};"
     class:no-radius={noRadius} class:no-padding={noPadding} class:no-min-width={noMinWidth} class:large-padding={largePadding}
     class:column-flex={columnFlex} class:scroll-snap={scrollSnap} class:left-margin={leftMargin} class:right-margin={rightMargin}
