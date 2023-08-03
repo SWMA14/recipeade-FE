@@ -1,9 +1,10 @@
 <script lang="ts">
+    import { Device } from "@capacitor/device";
     import { getContext } from "svelte";
     import type { Writable } from "svelte/store";
     import { MetaTags } from "svelte-meta-tags";
     import type { DynamicBarContext } from "$lib/dynamicBar";
-    import { extractId, timestampToSeconds } from "$lib/video";
+    import { extractId } from "$lib/video";
     import Carousel from "$components/Carousel.svelte";
     import Video from "$components/Video.svelte";
     import Card from "$components/Card.svelte";
@@ -20,15 +21,13 @@
 
     const title = "레시피에이드";
     const description = "";
-
     const curatedId = extractId(data.random);
 
-    let test: HTMLElement;
+    let device: "ios" | "android" | "web";
 
-    export const snapshot = {
-        capture: () => test,
-        restore: value => test = value
-    };
+    Device.getInfo()
+        .then(x => device = x.platform)
+        .catch(() => device = "web");
 </script>
 
 <MetaTags
@@ -55,9 +54,10 @@
     ]}
 />
 
-<div class="intro" bind:this={test}>
-    <a href="/{curatedId}">
-        <Card video={curatedId} noRadius largePadding darkOverlay={0.7} square
+<div class="intro">
+    <a href="/{curatedId}" style="height: 120%;">
+        <Card video={curatedId} noRadius largePadding darkOverlay={0.7}
+            square squareOverflowSafeArea={device === "ios"}
             heading="이 레시피는<br>어때요?" modifier={data.random.channel} body={data.random.title} />
     </a>
 </div>

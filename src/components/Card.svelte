@@ -20,6 +20,7 @@
     export let bottomMargin = false;
     export let scrollSnap = false;
     export let square = false;
+    export let squareOverflowSafeArea = false;
 
     let options: Options = {
         playerVars: {
@@ -51,9 +52,10 @@
     style="--card-background-color: var(--{backgroundColor}); --left-margin: {leftMarginValue}; --right-margin: {rightMarginValue};"
     class:no-radius={noRadius} class:no-padding={noPadding} class:no-min-width={noMinWidth} class:large-padding={largePadding}
     class:column-flex={columnFlex} class:scroll-snap={scrollSnap} class:left-margin={leftMargin} class:right-margin={rightMargin}
-    class:bottom-margin={bottomMargin} class:square class:visible-overflow={visibleOverflow}>
+    class:bottom-margin={bottomMargin} class:square class:overflow-safe-area={squareOverflowSafeArea} class:visible-overflow={visibleOverflow}>
     {#if heading || body || modifier}
-        <div class="texts" class:flex-end={!heading} class:large-padding={largePadding} class:dark-overlay={darkOverlay}>
+        <div class="texts" class:flex-end={!heading} class:large-padding={largePadding}
+            class:dark-overlay={darkOverlay} class:overflow-safe-area={squareOverflowSafeArea}>
             {#if heading}
                 <h1>{@html heading}</h1>
             {/if}
@@ -104,10 +106,18 @@
 
         &.large-padding {
             padding: var(--space-m);
+
+            &.overflow-safe-area {
+               padding-top: calc(var(--space-m) + env(safe-area-inset-top));
+            }
         }
 
         &.dark-overlay {
             color: var(--white);
+        }
+
+        &.overflow-safe-area {
+            padding-top: calc(var(--space-xs) + env(safe-area-inset-top));
         }
     }
 
@@ -204,6 +214,11 @@
 
         &.no-padding {
             padding-bottom: 100%;
+        }
+
+        &.overflow-safe-area {
+            margin-top: calc(env(safe-area-inset-top) * -1);
+            padding-bottom: calc(100% - var(--space-xs) + env(safe-area-inset-top));
         }
     }
 </style>
