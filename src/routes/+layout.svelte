@@ -10,8 +10,6 @@
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import DynamicBar from "$components/DynamicBar.svelte";
 
-    $: console.log($page.route.id);
-
     let device: "ios" | "android" | "web";
     let upperBarContext = writable({
         isHidden: true

@@ -1,5 +1,7 @@
 import { data } from "$lib/rawData";
 
+export const prerender = true;
+
 export async function load()
 {
     const random = data.sort(() => 0.5 - Math.random())[0];
