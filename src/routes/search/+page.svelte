@@ -2,6 +2,7 @@
     import { faXmark } from "@fortawesome/free-solid-svg-icons";
     import { getContext, type ComponentType } from "svelte";
     import type { Writable } from "svelte/store";
+    import { PUBLIC_API_ENDPOINT } from "$env/static/public";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { getHistory, saveHistory, removeHistory, clearHistory } from "$lib/search";
     import Button from "$components/Button.svelte";
@@ -11,8 +12,6 @@
     import lowerMain from "../__lowerBarComponents/main.svelte";
     import upperMain from "./__upperBarComponents/main.svelte";
     import leading from "./__upperBarComponents/leading.svelte";
-
-    export let data;
 
     let lowerBarContext = getContext<Writable<DynamicBarContext>>("lowerBar");
     $lowerBarContext = {
@@ -55,10 +54,10 @@
             saveHistory(word);
 
             resultVideos = {
-                latest: fetch(`${data.apiEndpoint}/search/${word}?current`)
+                latest: fetch(`${PUBLIC_API_ENDPOINT}/search/${word}?current`)
                     .then(response => response.json())
                     .then(result => result as Video[]),
-                popular: fetch(`${data.apiEndpoint}/search/${word}?viewCount`)
+                popular: fetch(`${PUBLIC_API_ENDPOINT}/search/${word}?viewCount`)
                     .then(response => response.json())
                     .then(result => result as Video[])
             };

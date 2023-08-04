@@ -1,11 +1,11 @@
-import { API_ENDPOINT } from "$env/static/private";
+import { PUBLIC_API_ENDPOINT } from "$env/static/public";
 import type { Video } from "$lib/video";
 
 export const prerender = true;
 
 export async function load({ fetch })
 {
-    const all = await fetch(`${API_ENDPOINT}/recipe`)
+    const all = await fetch(`${PUBLIC_API_ENDPOINT}/recipe`)
         .then(response => response.json())
         .then(result => result as Video[]);
 
@@ -21,7 +21,6 @@ export async function load({ fetch })
         random,
         highViews,
         easy,
-        others,
-        apiEndpoint: API_ENDPOINT
+        others
     };
 }

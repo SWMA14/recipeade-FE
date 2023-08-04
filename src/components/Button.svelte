@@ -12,7 +12,7 @@
     export let noHover = false;
     export let selected = false;
     export let progress: number | undefined = undefined;
-    export let skeleton = false;
+    // export let skeleton = false;
 
     let leftMarginValue = leftMargin ? `var(--space-${leftMargin})` : undefined;
     let rightMarginValue = rightMargin ? `var(--space-${rightMargin})` : undefined;
