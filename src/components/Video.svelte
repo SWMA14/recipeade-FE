@@ -1,36 +1,34 @@
 <script lang="ts">
     import { getCategoryById } from "$lib/category";
     import type { SpaceType } from "$lib/types";
-    import { type DemoVideo, extractId, unitizeViews } from "$lib/video";
+    import { type Video, unitizeViews } from "$lib/video";
     import Badge from "$components/Badge.svelte";
     import Card from "$components/Card.svelte";
     import Carousel from "$components/Carousel.svelte";
 
-    export let video: DemoVideo;
+    export let video: Video;
     export let leftMargin: SpaceType | undefined = undefined;
     export let rightMargin: SpaceType | undefined = undefined;
     export let bottomMargin = false;
     export let verbose = false;
-
-    const id = extractId(video);
 </script>
 
 <Card visibleOverflow noPadding {leftMargin} {rightMargin} {bottomMargin} columnFlex scrollSnap>
-    <a class:overflow={verbose} href="/{id}">
+    <a class:overflow={verbose} href="/{video.youtubeVideoId}">
         {#if verbose}
             <Carousel>
                 <div class="verbose fitter left-margin">
                     <div>
-                        <img alt="영상 썸네일" src={video.thumbnail} />
+                        <img alt="영상 썸네일" src={video.youtubeThumbnail.replace("/default", "/sddefault")} />
                     </div>
                 </div>
-                {#each [...Array(video.steps.length + 1).keys()] as i (i)}
+                {#each [...Array(video.recipesteps.length + 1).keys()] as i (i)}
                     {@const modifier = i === 0 ? "재료 준비" : `${i}단계`}
                     {@const body = i === 0 ?
                         video.ingredients.map(x => 
                             `${x.name}${[0, null].some(invalid => invalid === x.quantity) ? "" : ` ${x.quantity}`}${x.unit ?? ""}`
                         ).join(", ") :
-                        video.steps[i - 1].description}
+                        video.recipesteps[i - 1].description}
                     <Card backgroundColor="primary-200" leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs"
                         columnFlex scrollSnap
                         {modifier} {body} />
@@ -39,17 +37,17 @@
         {:else}
             <div class="fitter">
                 <div>
-                    <img alt="영상 썸네일" src={video.thumbnail} />
+                    <img alt="영상 썸네일" src={video.youtubeThumbnail.replace("/default", "/sddefault")} />
                 </div>
             </div>
         {/if}
     </a>
     <div class="info">
-        <a class="upper typo-body-1" href="/{id}">{video.title}</a>
-        <span class="lower typo-body-2">{video.channel} · 조회수 {unitizeViews(video.viewCount)}회</span>
+        <a class="upper typo-body-1" href="/{video.youtubeVideoId}">{video.youtubeTitle}</a>
+        <span class="lower typo-body-2">{video.channel.ChannelName} · 조회수 {unitizeViews(video.youtubeViewCount)}회</span>
         <div class="badges">
             <Badge rightMargin>{getCategoryById(video.difficulty)}</Badge>
-            <Badge rightMargin>{video.cateogry}</Badge>
+            <Badge rightMargin>{video.category}</Badge>
             <Badge>★ 5.0</Badge>
         </div>
     </div>

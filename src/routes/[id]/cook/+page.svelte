@@ -25,10 +25,10 @@
     });
 
     const progressDuration = 0;
-    const title = data.video.title;
+    const title = data.video.youtubeTitle;
     const description = "";
 
-    let steps: Step[] = data.video.steps.map(step => ({
+    let steps: Step[] = data.video.recipesteps.map(step => ({
             seconds: timestampToSeconds(step.timestamp),
             description: step.description
         } as Step));

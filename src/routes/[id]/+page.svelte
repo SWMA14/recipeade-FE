@@ -45,22 +45,22 @@
     <div class="section first" in:flyingFade={{ delay: duration }}>
         <div class="badges">
             <Badge dark rightMargin>{getCategoryById(data.video.difficulty)}</Badge>
-            <Badge dark rightMargin>{data.video.cateogry}</Badge>
+            <Badge dark rightMargin>{data.video.category}</Badge>
             <Badge dark>★ 5.0</Badge>
         </div>
-        <h2>{data.video.title}</h2>
+        <h2>{data.video.youtubeTitle}</h2>
         <p class="statistics typo-body-2">
-            조회수 {unitizeViews(data.video.viewCount)}회 · {data.video.publishedAt}
-        </p>
-        <div class="channel">
+            조회수 {unitizeViews(data.video.youtubeViewCount)}회 · {data.video.channel.ChannelName}
+        </p> <!-- TODO: 업로드 날짜 -->
+        <!-- <div class="channel">
             <div class="profile">
                 <img src="https://i.namu.wiki/i/d1A_wD4kuLHmOOFqJdVlOXVt1TWA9NfNt_HA0CS0Y_N0zayUAX8olMuv7odG2FiDLDQZIRBqbPQwBSArXfEJlQ.webp" alt="채널 이미지" />
-                {data.video.channel}
+                {data.video.channel.ChannelName}
             </div>
             <div>
                 <Button size="small">구독</Button>
             </div>
-        </div>
+        </div> -->
     </div>
     <div class="section" in:flyingFade={{ delay: duration * 2 }}>
         <div class="title">
@@ -76,26 +76,35 @@
         {/each}
     </div>
     <div class="section" in:flyingFade={{ delay: duration * 2 }}>
-        <Carousel leftOverflow rightOverflow heading="단계 미리 보기">
-            {#each data.video.steps as step, i (step.description)}
+        <Carousel leftOverflow rightOverflow heading="단계 미리 보기" canShowAll>
+            {#each data.video.recipesteps as step, i (step.description)}
                 <Card leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" columnFlex scrollSnap
                     modifier="{i + 1}단계" body={step.description}>
                     <div style="height: calc(var(--space-3xl) * 2);"></div>
                 </Card>
             {/each}
-        </Carousel>
-    </div>
-    <div class="section last" in:flyingFade={{ delay: duration * 2 }}>
-        <Carousel leftOverflow rightOverflow heading="이 레시피는 어때요?" canShowAll>
-            {#each [...Array(5).keys()] as i}
-                <Video video={data.video} leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" />
-            {/each}
             <svelte:fragment slot="grid">
-                {#each [...Array(5).keys()] as _}
-                    <Video video={data.video} verbose bottomMargin />
+                {#each data.video.recipesteps as step, i (step.description)}
+                    <Card bottomMargin modifier="{i + 1}단계" body={step.description}>
+                        <div style="height: calc(var(--space-3xl) * 2);"></div>
+                    </Card>
                 {/each}
             </svelte:fragment>
         </Carousel>
+    </div>
+    <div class="section last" in:flyingFade={{ delay: duration * 2 }}>
+        {#if data.recommended.length > 0}
+            <Carousel leftOverflow rightOverflow heading="이 레시피는 어때요?" canShowAll>
+                {#each data.recommended as video, i (video.youtubeThumbnail)}
+                    <Video {video} leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" />
+                {/each}
+                <svelte:fragment slot="grid">
+                    {#each data.recommended as video (video.youtubeThumbnail)}
+                        <Video {video} verbose bottomMargin />
+                    {/each}
+                </svelte:fragment>
+            </Carousel>
+        {/if}
     </div>
 {/if}
 
@@ -129,7 +138,7 @@
         color: var(--c-foreground-gray);
     }
 
-    .channel {
+    /* .channel {
         width: 100%;
         margin-top: var(--space-xs);
         padding-bottom: var(--space-xs);
@@ -149,7 +158,7 @@
         margin-right: var(--space-2xs);
         object-fit: cover;
         border-radius: var(--radius-big);
-    }
+    } */
 
     .ingredient {
         display: flex;

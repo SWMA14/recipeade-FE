@@ -4,7 +4,6 @@
     import type { Writable } from "svelte/store";
     import { MetaTags } from "svelte-meta-tags";
     import type { DynamicBarContext } from "$lib/dynamicBar";
-    import { extractId } from "$lib/video";
     import Carousel from "$components/Carousel.svelte";
     import Video from "$components/Video.svelte";
     import Card from "$components/Card.svelte";
@@ -21,7 +20,6 @@
 
     const title = "레시피에이드";
     const description = "";
-    const curatedId = extractId(data.random);
 
     let device: "ios" | "android" | "web";
 
@@ -55,19 +53,19 @@
 />
 
 <div class="intro">
-    <a href="/{curatedId}" style="height: 120%;">
-        <Card video={curatedId} noRadius largePadding darkOverlay={0.7}
+    <a href="/{data.random.youtubeVideoId}" style="height: 120%;">
+        <Card video={data.random.youtubeVideoId} noRadius largePadding darkOverlay={0.7}
             square squareOverflowSafeArea={device === "ios"}
-            heading="이 레시피는<br>어때요?" modifier={data.random.channel} body={data.random.title} />
+            heading="이 레시피는<br>어때요?" modifier={data.random.channel.ChannelName} body={data.random.youtubeTitle} />
     </a>
 </div>
 <div class="section">
     <Carousel leftOverflow rightOverflow heading="유튜브에서 핫해요" canShowAll>
-        {#each data.highViews as video, i (video.thumbnail)}
+        {#each data.highViews as video, i (video.youtubeThumbnail)}
             <Video {video} leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" />
         {/each}
         <svelte:fragment slot="grid">
-            {#each data.highViews as video (video.thumbnail)}
+            {#each data.highViews as video (video.youtubeThumbnail)}
                 <Video {video} verbose bottomMargin />
             {/each}
         </svelte:fragment>
@@ -75,11 +73,11 @@
 </div>
 <div class="section">
     <Carousel leftOverflow rightOverflow heading="쉽게 따라해요" canShowAll>
-        {#each data.easy as video, i (video.thumbnail)}
+        {#each data.easy as video, i (video.youtubeThumbnail)}
             <Video {video} leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" />
         {/each}
         <svelte:fragment slot="grid">
-            {#each data.easy as video (video.thumbnail)}
+            {#each data.easy as video (video.youtubeThumbnail)}
                 <Video {video} verbose bottomMargin />
             {/each}
         </svelte:fragment>
@@ -88,7 +86,7 @@
 <div class="section last">
     <h2 class="grid-title">다른 레시피들도 있어요</h2>
     <div class="grid">
-        {#each data.others as video (video.thumbnail)}
+        {#each data.others as video (video.youtubeThumbnail)}
             <Video {video} verbose bottomMargin />
         {/each}
     </div>

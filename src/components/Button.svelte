@@ -12,7 +12,7 @@
     export let noHover = false;
     export let selected = false;
     export let progress: number | undefined = undefined;
-    export let skeleton = false;
+    // export let skeleton = false;
 
     let leftMarginValue = leftMargin ? `var(--space-${leftMargin})` : undefined;
     let rightMarginValue = rightMargin ? `var(--space-${rightMargin})` : undefined;
@@ -64,6 +64,9 @@
         --kind-transparent-color: var(--gray-400);
         --kind-transparent-background-color: transparent;
         --kind-transparent-hover-background-color: transparent;
+        --kind-badge-color: var(--primary-500);
+        --kind-badge-background-color: var(--white);
+        --kind-badge-hover-background-color: var(--gray-100);
 
         width: 100%;
         height: var(--space-xl);
@@ -78,6 +81,11 @@
         
         &:not(.no-hover):hover {
             background-color: var(--hover);
+        }
+
+        &.kind-badge {
+            border: 1px solid var(--kind-badge-color);
+            border-radius: var(--radius-big);
         }
 
         &.size-small {

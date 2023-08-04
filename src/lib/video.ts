@@ -1,16 +1,16 @@
 export interface Video
 {
-    author: string;
-    channelUrl: string;
-    publishDate: string;
-    title: string;
-    views: number;
-    description: string;
-    transcript: string;
-    generated: boolean;
-    thumbnail: string;
+    youtubeVideoId: string;
+    youtubeTitle: string;
+    youtubeViewCount: number;
     difficulty: number;
-    kind: string;
+    category: string;
+    youtubeThumbnail: string;
+    id: number;
+    rating: number;
+    ingredients: Ingredient[];
+    recipesteps: Step[];
+    channel: Channel;
 }
 
 interface Ingredient
@@ -26,18 +26,11 @@ interface Step
     timestamp: string;
 }
 
-export interface DemoVideo
+interface Channel
 {
-    video: string;
-    thumbnail: string;
-    title: string;
-    viewCount: number;
-    channel: string;
-    publishedAt: string;
-    ingredients: Ingredient[];
-    steps: Step[];
-    difficulty: number;
-    cateogry: string;
+    channelID: string;
+    ChannelName: string;
+    id: number;
 }
 
 export function unitizeViews(views: number): string
@@ -52,14 +45,6 @@ export function unitizeViews(views: number): string
         return `${(views / 1000000).toFixed(1)}백만`;
     else
         return `${(views / 10000000).toFixed(1)}천만`;
-}
-
-export function extractId(video: DemoVideo): string | undefined
-{
-    const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
-    const match = video.video.match(regex);
-
-    return match ? match[1] : undefined;
 }
 
 export function timestampToSeconds(timestamp: string): number
