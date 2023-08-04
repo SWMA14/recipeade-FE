@@ -70,13 +70,20 @@
         {/each}
     </div>
     <div class="section" in:flyingFade={{ delay: duration * 2 }}>
-        <Carousel leftOverflow rightOverflow heading="단계 미리 보기">
+        <Carousel leftOverflow rightOverflow heading="단계 미리 보기" canShowAll>
             {#each data.video.recipesteps as step, i (step.description)}
                 <Card leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" columnFlex scrollSnap
                     modifier="{i + 1}단계" body={step.description}>
                     <div style="height: calc(var(--space-3xl) * 2);"></div>
                 </Card>
             {/each}
+            <svelte:fragment slot="grid">
+                {#each data.video.recipesteps as step, i (step.description)}
+                    <Card bottomMargin modifier="{i + 1}단계" body={step.description}>
+                        <div style="height: calc(var(--space-3xl) * 2);"></div>
+                    </Card>
+                {/each}
+            </svelte:fragment>
         </Carousel>
     </div>
     <div class="section last" in:flyingFade={{ delay: duration * 2 }}>
