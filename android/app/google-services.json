@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "273092375018",
+    "project_id": "recipeade-85add",
+    "storage_bucket": "recipeade-85add.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:273092375018:android:74f0c517b63685be8a8293",
+        "android_client_info": {
+          "package_name": "com.recipeade.svelte"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "273092375018-rq78a62vff3egbda7k2ed2k2gb823ttg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMbrEbAVt9Lt8HCmcBm5QdxSlV_hklDN8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "273092375018-rq78a62vff3egbda7k2ed2k2gb823ttg.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "273092375018-mefrsjn8o8rsh2c8omjo4qqhmpotk6ck.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.recipeade.svelte"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
