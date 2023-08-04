@@ -80,16 +80,18 @@
         </Carousel>
     </div>
     <div class="section last" in:flyingFade={{ delay: duration * 2 }}>
-        <Carousel leftOverflow rightOverflow heading="이 레시피는 어때요?" canShowAll>
-            {#each [...Array(5).keys()] as i}
-                <Video video={data.video} leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" />
-            {/each}
-            <svelte:fragment slot="grid">
-                {#each [...Array(5).keys()] as _}
-                    <Video video={data.video} verbose bottomMargin />
+        {#if data.recommended.length > 0}
+            <Carousel leftOverflow rightOverflow heading="이 레시피는 어때요?" canShowAll>
+                {#each data.recommended as video, i (video.youtubeThumbnail)}
+                    <Video {video} leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" />
                 {/each}
-            </svelte:fragment>
-        </Carousel>
+                <svelte:fragment slot="grid">
+                    {#each data.recommended as video (video.youtubeThumbnail)}
+                        <Video {video} verbose bottomMargin />
+                    {/each}
+                </svelte:fragment>
+            </Carousel>
+        {/if}
     </div>
 {/if}
 
@@ -123,7 +125,7 @@
         color: var(--c-foreground-gray);
     }
 
-    .channel {
+    /* .channel {
         width: 100%;
         margin-top: var(--space-xs);
         padding-bottom: var(--space-xs);
@@ -143,7 +145,7 @@
         margin-right: var(--space-2xs);
         object-fit: cover;
         border-radius: var(--radius-big);
-    }
+    } */
 
     .ingredient {
         display: flex;
