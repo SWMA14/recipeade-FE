@@ -17,7 +17,9 @@
             <Button kind="transparent" {icon} on:click={iconClicked} />
         </div>
     {/if}
-    <input type="text" class:padding-left={icon} {placeholder} bind:value on:click />
+    <form on:submit|preventDefault={iconClicked}>
+        <input type="text" class:padding-left={icon} {placeholder} bind:value on:click />
+    </form>
     {#if value}
         <div class="button right">
             <Button kind="transparent" icon={faXmark} on:click={() => value = ""} />
