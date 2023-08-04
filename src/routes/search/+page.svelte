@@ -1,9 +1,10 @@
 <script lang="ts">
-    import { getContext } from "svelte";
-    import type { Writable } from "svelte/store";
     import { faXmark } from "@fortawesome/free-solid-svg-icons";
+    import { getContext, type ComponentType } from "svelte";
+    import type { Writable } from "svelte/store";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { data } from "$lib/rawData";
+    import { getHistory, saveHistory, removeHistory, clearHistory } from "$lib/search";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
     import DynamicBar from "$components/DynamicBar.svelte";
@@ -17,36 +18,61 @@
         main: lowerMain
     };
 
-    let leadingValue: any = undefined;
+    let leadingValue: ComponentType | undefined = undefined;
     let leadingProps = {
         onClick: endActualSearch
     };
-    let mainProps = {
-        onValueChanged: handleInput,
-        onClick: startActualSearch
+    // main의 value props를 "" 또는 undefined로 설정해서 입력 초기화
+    // 두 개를 번갈아가면서 주지 않으면 최초 1회만 초기화됨
+    let inputResettingValue: "" | undefined = undefined;
+    $: mainProps = {
+        onValueChanged: updateWord,
+        onIconClicked: searchClick,
+        onClick: startActualSearch,
+        value: inputResettingValue
     };
 
+    let word: string;
+    let updateSearchHistory = {}; // clearHistory() 호출 시 화면 업데이트를 위해
     let resultShown = false;
     let selectedSort: "latest" | "rate" | "popular" = "latest";
     let videos = data.sort(() => 0.5 - Math.random()).slice(0, 10);
 
     $: selectedSort, videos = data.sort(() => 0.5 - Math.random()).slice(0, 10);
 
+    function updateWord(value: string)
+    {
+        word = value;
+    }
+
+    function searchClick()
+    {
+        if (word !== "" && word !== undefined)
+        {
+            resultShown = true;
+            saveHistory(word);
+        }
+    }
+
     function startActualSearch()
     {
+        inputResettingValue = undefined;
         $lowerBarContext.isHidden = true;
         leadingValue = leading;
     }
 
     function endActualSearch()
     {
+        resultShown = false;
+        inputResettingValue = "";
         $lowerBarContext.isHidden = false;
         leadingValue = undefined;
     }
 
-    function handleInput(value: string)
+    function clearAndUpdateHistory()
     {
-        resultShown = value !== "" && value !== undefined;
+        clearHistory();
+        updateSearchHistory = {};
     }
 </script>
 
@@ -77,19 +103,23 @@
         <div class="actual-search">
             <div class="heading">
                 <h2>최근 검색</h2>
-                <span class="erase-all typo-body-2">모두 지우기</span>
+                <span class="erase-all typo-body-2" on:click={clearAndUpdateHistory}>모두 지우기</span>
             </div>
             <div class="words">
-                {#each [...Array(10).keys()] as i}
-                    <Card bottomMargin>
-                        <div style="height: var(--space-xl); display: flex; align-items: center; justify-content: space-between;">
-                            다진 마늘
-                            <div style="width: var(--space-xl);">
-                                <Button kind="transparent" icon={faXmark} on:click={() => console.log("Happy happy happy")} />
-                            </div>
-                        </div>
-                    </Card>
-                {/each}
+                {#key updateSearchHistory}
+                    {#await getHistory() then histories}
+                        {#each histories as history}
+                            <Card bottomMargin>
+                                <div style="height: var(--space-xl); display: flex; align-items: center; justify-content: space-between;">
+                                    {history.word}
+                                    <div style="width: var(--space-xl);">
+                                        <Button kind="transparent" icon={faXmark} on:click={() => removeHistory(history.word)} />
+                                    </div>
+                                </div>
+                            </Card>
+                        {/each}
+                    {/await}
+                {/key}
             </div>
         </div>
     {:else}

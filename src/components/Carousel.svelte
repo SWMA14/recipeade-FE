@@ -45,7 +45,9 @@
                     <h2>{heading}</h2>
                 {/if}
                 {#if canShowAll}
-                    <span class="show-all typo-body-2" on:click={show}>모두 보기</span>
+                    <span class="show-all typo-body-2" role="button" tabindex="0" on:click={show} on:keydown={show}>
+                        모두 보기
+                    </span>
                 {/if}
             </div>
             {#if body}

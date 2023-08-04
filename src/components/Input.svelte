@@ -6,8 +6,8 @@
     export let icon: IconDefinition | undefined = undefined;
     export let iconClicked: () => void = () => {};
     export let valueChanged: (value: string) => void = () => {};
+    export let value: string;
 
-    let value: string;
     $: valueChanged(value);
 </script>
 
