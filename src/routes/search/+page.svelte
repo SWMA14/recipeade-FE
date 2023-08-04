@@ -98,12 +98,17 @@
         });
     }
 
-    function clearAndUpdateHistory()
+    async function removeAndUpdateHistory(word: string)
     {
-        clearHistory();
+        await removeHistory(word);
         updateSearchHistory = {};
     }
-    
+
+    async function clearAndUpdateHistory()
+    {
+        await clearHistory();
+        updateSearchHistory = {};
+    }
 
     onMount(() => {
         analyticsService.setScreenName("search");
@@ -149,11 +154,12 @@
                     {#await getHistory() then histories}
                         {#each histories as history}
                             <Card bottomMargin>
-                                <div class="search-history" role="button" tabindex="0"
-                                    on:click={() => historyClick(history.word)} on:keydown={() => historyClick(history.word)}>
-                                    {history.word}
+                                <div class="search-history">
+                                    <span role="button" tabindex="0" on:click={() => historyClick(history.word)} on:keydown={() => historyClick(history.word)}>
+                                        {history.word}
+                                    </span>
                                     <div class="search-history-remove">
-                                        <Button kind="transparent" icon={faXmark} on:click={() => removeHistory(history.word)} />
+                                        <Button kind="transparent" icon={faXmark} on:click={() => removeAndUpdateHistory(history.word)} />
                                     </div>
                                 </div>
                             </Card>
