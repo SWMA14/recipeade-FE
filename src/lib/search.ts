@@ -8,7 +8,7 @@ interface SearchHistory
 export async function getHistory(): Promise<SearchHistory[]>
 {
     const result = await Preferences.get({
-        key: "searchHistory"
+        key: "searchHistories"
     });
 
     return JSON.parse(result.value ?? "[]") as SearchHistory[];
@@ -20,7 +20,7 @@ export async function saveHistory(value: string)
     const rest = histories.some(x => x.word === value) ? histories.filter(x => x.word !== value) : histories;
 
     await Preferences.set({
-        key: "searchHistory",
+        key: "searchHistories",
         value: JSON.stringify([
             {
                 word: value
@@ -35,7 +35,7 @@ export async function removeHistory(value: string)
     const histories = await getHistory();
 
     await Preferences.set({
-        key: "searchHistory",
+        key: "searchHistories",
         value: JSON.stringify(histories.filter(history => history.word !== value))
     });
 }
@@ -43,6 +43,6 @@ export async function removeHistory(value: string)
 export async function clearHistory()
 {
     await Preferences.remove({
-        key: "searchHistory"
+        key: "searchHistories"
     });
 }

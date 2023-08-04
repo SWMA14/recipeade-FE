@@ -2,7 +2,7 @@
     import { faXmark } from "@fortawesome/free-solid-svg-icons";
     import { getContext, type ComponentType } from "svelte";
     import type { Writable } from "svelte/store";
-    import { PUBLIC_API_ENDPOINT, PUBLIC_RECOMMENDED_SEARCH_PLACEHOLDER } from "$env/static/public";
+    import { PUBLIC_API_ENDPOINT } from "$env/static/public";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { getHistory, saveHistory, removeHistory, clearHistory } from "$lib/search";
     import { flyingFade } from "$lib/transition";
@@ -146,30 +146,39 @@
         </div>
     {:else if !resultShown}
         <div class="actual-search" in:flyingFade={{ delay: 0 }}>
-            <div class="heading">
-                <h2>최근 검색</h2>
-                <span class="erase-all typo-body-2" role="button" tabindex="0" on:click={clearAndUpdateHistory} on:keydown={clearAndUpdateHistory}
-                    >모두 지우기
-                </span>
-            </div>
-            <div class="words">
-                {#key updateSearchHistory}
-                    {#await getHistory() then histories}
-                        {#each histories as history}
-                            <Card bottomMargin>
-                                <div class="search-history">
-                                    <span role="button" tabindex="0" on:click={() => historyClick(history.word)} on:keydown={() => historyClick(history.word)}>
-                                        {history.word}
-                                    </span>
-                                    <div class="search-history-remove">
-                                        <Button kind="transparent" icon={faXmark} on:click={() => removeAndUpdateHistory(history.word)} />
+            {#key updateSearchHistory}
+                {#await getHistory() then histories}
+                    <div class="heading">
+                        <h2>최근 검색</h2>
+                        {#if histories.length > 0}
+                            <span class="erase-all typo-body-2" role="button" tabindex="0"
+                                on:click={clearAndUpdateHistory} on:keydown={clearAndUpdateHistory}>
+                                모두 지우기
+                            </span>
+                        {/if}
+                    </div>
+                    <div class="words">
+                        {#if histories.length > 0}
+                            {#each histories as history}
+                                <Card bottomMargin>
+                                    <div class="search-history">
+                                        <span role="button" tabindex="0" on:click={() => historyClick(history.word)}
+                                            on:keydown={() => historyClick(history.word)}>
+                                            {history.word}
+                                        </span>
+                                        <div class="search-history-remove">
+                                            <Button kind="transparent" icon={faXmark} on:click={() => removeAndUpdateHistory(history.word)} />
+                                        </div>
                                     </div>
-                                </div>
-                            </Card>
-                        {/each}
-                    {/await}
-                {/key}
-            </div>
+                                </Card>
+                            {/each}
+                        {:else}
+                            <img src="/images/no-result.png" alt="최근 검색어 없음" />
+                            <span class="no-result">최근 검색어가 없어요.</span>
+                        {/if}
+                    </div>
+                {/await}
+            {/key}
         </div>
     {:else}
         <div class="result">

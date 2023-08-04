@@ -2,8 +2,8 @@
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
     import { getCategoryById } from "$lib/category";
-    import { duration, flyingFade } from "$lib/transition";
-    import { unitizeViews } from "$lib/video";
+    import { flyingFade } from "$lib/transition";
+    import { unitizeViews, getLikedVideos, saveLikedVideo, removeLikedVideo } from "$lib/video";
     import type { DynamicBarContext } from "$lib/dynamicBar.js";
     import Badge from "$components/Badge.svelte";
     import Button from "$components/Button.svelte";
@@ -24,8 +24,13 @@
         },
         isBackgroundShown: true
     });
-    getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
+    let liked = isLiked();
+    $: getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
         leading: lowerLeading,
+        leadingProps: {
+            liked,
+            onClick: () => likeClick()
+        },
         main: lowerMain
     });
 
@@ -38,6 +43,25 @@
             page_title: "recipeview_page"
         });
     });
+
+    async function isLiked()
+    {
+        return (await getLikedVideos()).some(x => x.id === data.id);
+    }
+
+    async function likeClick()
+    {
+        if (await liked)
+        {
+            await removeLikedVideo(data.id);
+            liked = Promise.resolve(false);
+        }
+        else
+        {
+            await saveLikedVideo(data.id);
+            liked = Promise.resolve(true);
+        }
+    }
 </script>
 
 
@@ -46,7 +70,7 @@
         <div class="badges">
             <Badge dark rightMargin>{getCategoryById(data.video.difficulty)}</Badge>
             <Badge dark rightMargin>{data.video.category}</Badge>
-            <Badge dark>★ 5.0</Badge>
+            <!-- <Badge dark>★ 5.0</Badge> -->
         </div>
         <h2>{data.video.youtubeTitle}</h2>
         <p class="statistics typo-body-2">

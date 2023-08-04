@@ -48,7 +48,7 @@
         <div class="badges">
             <Badge rightMargin>{getCategoryById(video.difficulty)}</Badge>
             <Badge rightMargin>{video.category}</Badge>
-            <Badge>★ 5.0</Badge>
+            <!-- <Badge>★ 5.0</Badge> -->
         </div>
     </div>
 </Card>
