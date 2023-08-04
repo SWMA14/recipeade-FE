@@ -124,17 +124,19 @@
         <div class="actual-search">
             <div class="heading">
                 <h2>최근 검색</h2>
-                <span class="erase-all typo-body-2" on:click={clearAndUpdateHistory}>모두 지우기</span>
+                <span class="erase-all typo-body-2" role="button" tabindex="0" on:click={clearAndUpdateHistory} on:keydown={clearAndUpdateHistory}
+                    >모두 지우기
+                </span>
             </div>
             <div class="words">
                 {#key updateSearchHistory}
                     {#await getHistory() then histories}
                         {#each histories as history}
                             <Card bottomMargin>
-                                <div style="height: var(--space-xl); display: flex; align-items: center; justify-content: space-between;"
-                                    on:click={() => historyClick(history.word)}>
+                                <div class="search-history" role="button" tabindex="0"
+                                    on:click={() => historyClick(history.word)} on:keydown={() => historyClick(history.word)}>
                                     {history.word}
-                                    <div style="width: var(--space-xl);">
+                                    <div class="search-history-remove">
                                         <Button kind="transparent" icon={faXmark} on:click={() => removeHistory(history.word)} />
                                     </div>
                                 </div>
@@ -148,13 +150,13 @@
         <div class="result">
             <div class="sort-buttons">
                 <div class="wrapper">
-                    <Button size="small" selected={selectedSort === "latest"} on:click={() => selectedSort = "latest"}>
-                        최신
+                    <Button kind="badge" size="small" selected={selectedSort === "latest"} on:click={() => selectedSort = "latest"}>
+                        최신순
                     </Button>
                 </div>
                 <div class="wrapper">
-                    <Button size="small" selected={selectedSort === "popular"} on:click={() => selectedSort = "popular"}>
-                        조회
+                    <Button kind="badge" size="small" selected={selectedSort === "popular"} on:click={() => selectedSort = "popular"}>
+                        조회순
                     </Button>
                 </div>
             </div>
@@ -223,7 +225,6 @@
         display: flex;
         flex-direction: column;
         width: 100%;
-
     }
 
     .grid {
@@ -247,5 +248,16 @@
         margin-top: var(--space-xs);
         display: flex;
         flex-direction: column;
+    }
+
+    .search-history {
+        height: var(--space-xl);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .search-history-remove {
+        width: var(--space-xl);
     }
 </style>
