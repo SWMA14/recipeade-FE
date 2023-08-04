@@ -1,9 +1,7 @@
-import { data } from "$lib/rawData";
-
-export async function load({ params })
+export async function load({ parent, params })
 {
     return {
-        video: data.find(x => x.video.includes(params.id))!,
+        video: (await parent()).all.find(x => x.youtubeVideoId === params.id)!,
         id: params.id
     };
 }

@@ -3,7 +3,6 @@
     import { getContext, type ComponentType } from "svelte";
     import type { Writable } from "svelte/store";
     import type { DynamicBarContext } from "$lib/dynamicBar";
-    import { data } from "$lib/rawData";
     import { getHistory, saveHistory, removeHistory, clearHistory } from "$lib/search";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
@@ -12,6 +11,8 @@
     import lowerMain from "../__lowerBarComponents/main.svelte";
     import upperMain from "./__upperBarComponents/main.svelte";
     import leading from "./__upperBarComponents/leading.svelte";
+
+    export let data;
 
     let lowerBarContext = getContext<Writable<DynamicBarContext>>("lowerBar");
     $lowerBarContext = {
@@ -22,23 +23,24 @@
     let leadingProps = {
         onClick: endActualSearch
     };
-    // main의 value props를 "" 또는 undefined로 설정해서 입력 초기화
-    // 두 개를 번갈아가면서 주지 않으면 최초 1회만 초기화됨
-    let inputResettingValue: "" | undefined = undefined;
+
+    let value: string | undefined = undefined;
     $: mainProps = {
         onValueChanged: updateWord,
         onIconClicked: searchClick,
         onClick: startActualSearch,
-        value: inputResettingValue
+        value
     };
 
     let word: string;
     let updateSearchHistory = {}; // clearHistory() 호출 시 화면 업데이트를 위해
     let resultShown = false;
-    let selectedSort: "latest" | "rate" | "popular" = "latest";
-    let videos = data.sort(() => 0.5 - Math.random()).slice(0, 10);
-
-    $: selectedSort, videos = data.sort(() => 0.5 - Math.random()).slice(0, 10);
+    let selectedSort: "latest" | "popular" = "latest";
+    let resultVideos: {
+        latest: Promise<Video[]>;
+        popular: Promise<Video[]>;
+    } | undefined = undefined;
+    $: selectedResultVideos = selectedSort === "latest" ? resultVideos?.latest : resultVideos?.popular;
 
     function updateWord(value: string)
     {
@@ -51,12 +53,30 @@
         {
             resultShown = true;
             saveHistory(word);
+
+            resultVideos = {
+                latest: fetch(`${data.apiEndpoint}/search/${word}?current`)
+                    .then(response => response.json())
+                    .then(result => result as Video[]),
+                popular: fetch(`${data.apiEndpoint}/search/${word}?viewCount`)
+                    .then(response => response.json())
+                    .then(result => result as Video[])
+            };
         }
+    }
+
+    function historyClick(historyWord: string)
+    {
+        word = historyWord;
+        value = historyWord;
+        searchClick();
     }
 
     function startActualSearch()
     {
-        inputResettingValue = undefined;
+        // main의 value props를 "" 또는 undefined로 설정해서 입력 초기화
+        // 두 개를 번갈아가면서 주지 않으면 최초 1회만 초기화됨
+        value = undefined;
         $lowerBarContext.isHidden = true;
         leadingValue = leading;
     }
@@ -64,9 +84,10 @@
     function endActualSearch()
     {
         resultShown = false;
-        inputResettingValue = "";
+        value = "";
         $lowerBarContext.isHidden = false;
         leadingValue = undefined;
+        resultVideos = undefined;
     }
 
     function clearAndUpdateHistory()
@@ -110,7 +131,8 @@
                     {#await getHistory() then histories}
                         {#each histories as history}
                             <Card bottomMargin>
-                                <div style="height: var(--space-xl); display: flex; align-items: center; justify-content: space-between;">
+                                <div style="height: var(--space-xl); display: flex; align-items: center; justify-content: space-between;"
+                                    on:click={() => historyClick(history.word)}>
                                     {history.word}
                                     <div style="width: var(--space-xl);">
                                         <Button kind="transparent" icon={faXmark} on:click={() => removeHistory(history.word)} />
@@ -131,20 +153,21 @@
                     </Button>
                 </div>
                 <div class="wrapper">
-                    <Button size="small" selected={selectedSort === "rate"} on:click={() => selectedSort = "rate"}>
-                        평점
-                    </Button>
-                </div>
-                <div class="wrapper">
                     <Button size="small" selected={selectedSort === "popular"} on:click={() => selectedSort = "popular"}>
                         조회
                     </Button>
                 </div>
             </div>
             <div class="videos">
-                {#each videos as video (video.thumbnail)}
-                    <Video {video} verbose bottomMargin />
-                {/each}
+                {#key selectedResultVideos}
+                {#await selectedResultVideos then videos}
+                    {#if videos !== undefined}
+                        {#each videos as video (video.youtubeThumbnail)}
+                            <Video {video} verbose bottomMargin />
+                        {/each}
+                    {/if}
+                {/await}
+                {/key}
             </div>
         </div>
     {/if}
