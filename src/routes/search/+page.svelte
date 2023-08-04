@@ -12,6 +12,8 @@
     import lowerMain from "../__lowerBarComponents/main.svelte";
     import upperMain from "./__upperBarComponents/main.svelte";
     import leading from "./__upperBarComponents/leading.svelte";
+    import { analyticsService } from "$lib/analytics";
+    import { onMount } from "svelte";
 
     let lowerBarContext = getContext<Writable<DynamicBarContext>>("lowerBar");
     $lowerBarContext = {
@@ -87,6 +89,10 @@
         $lowerBarContext.isHidden = false;
         leadingValue = undefined;
         resultVideos = undefined;
+
+        analyticsService.logEvent("search_cancel", {
+            search_word: word
+        });
     }
 
     function clearAndUpdateHistory()
@@ -94,6 +100,14 @@
         clearHistory();
         updateSearchHistory = {};
     }
+    
+
+    onMount(() => {
+        analyticsService.setScreenName("search");
+        analyticsService.logEvent("search_view", {
+            page_title: "search_view"
+        });
+    });
 </script>
 
 <div class="search-bar">

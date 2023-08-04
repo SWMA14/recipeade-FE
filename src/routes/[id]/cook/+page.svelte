@@ -15,6 +15,7 @@
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
     import Carousel from "$components/Carousel.svelte";
+    import { analyticsService } from "$lib/analytics";
 
     export let data;
 
@@ -55,6 +56,10 @@
     let isRepeating = false;
 
     onMount(async () => {
+        analyticsService.setScreenName("recipe_cook");
+        analyticsService.logEvent("recipe_cook_page", {
+            page_title: "recipe_cook_page"
+        });
         isRendered = true;
 
         window.addEventListener("message", event => {

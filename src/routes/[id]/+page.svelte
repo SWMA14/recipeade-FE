@@ -13,6 +13,7 @@
     import upperLeading from "./__upperBarComponents/leading.svelte";
     import lowerMain from "./__lowerBarComponents/main.svelte";
     import lowerLeading from "./__lowerBarComponents/leading.svelte";
+    import { analyticsService } from "$lib/analytics.js";
 
     export let data;
 
@@ -32,8 +33,13 @@
 
     onMount(() => {
         isRendered = true;
+        analyticsService.setScreenName("recipe");
+        analyticsService.logEvent("recipeview_page", {
+            page_title: "recipeview_page"
+        });
     });
 </script>
+
 
 {#if isRendered}
     <div class="section first" in:flyingFade={{ delay: duration }}>
