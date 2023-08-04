@@ -11,16 +11,13 @@ export async function getHistory(): Promise<SearchHistory[]>
         key: "searchHistory"
     });
 
-    const a = JSON.parse(result.value ?? "[]") as SearchHistory[];
-    console.log(a);
-
-    return a;
+    return JSON.parse(result.value ?? "[]") as SearchHistory[];
 }
 
 export async function saveHistory(value: string)
 {
     const histories = await getHistory();
-    console.log(histories, value);
+    const rest = histories.some(x => x.word === value) ? histories.filter(x => x.word !== value) : histories;
 
     await Preferences.set({
         key: "searchHistory",
@@ -28,7 +25,7 @@ export async function saveHistory(value: string)
             {
                 word: value
             },
-            ...histories
+            ...rest
         ])
     });
 }
