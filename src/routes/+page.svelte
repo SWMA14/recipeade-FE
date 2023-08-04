@@ -4,7 +4,7 @@
     import type { Writable } from "svelte/store";
     import { MetaTags } from "svelte-meta-tags";
     import type { DynamicBarContext } from "$lib/dynamicBar";
-    import { duration, flyingFade } from "$lib/transition";
+    import { flyingFade } from "$lib/transition";
     import Carousel from "$components/Carousel.svelte";
     import Video from "$components/Video.svelte";
     import Card from "$components/Card.svelte";

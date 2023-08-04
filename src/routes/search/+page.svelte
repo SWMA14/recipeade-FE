@@ -2,7 +2,7 @@
     import { faXmark } from "@fortawesome/free-solid-svg-icons";
     import { getContext, type ComponentType } from "svelte";
     import type { Writable } from "svelte/store";
-    import { PUBLIC_API_ENDPOINT } from "$env/static/public";
+    import { PUBLIC_API_ENDPOINT, PUBLIC_RECOMMENDED_SEARCH_PLACEHOLDER } from "$env/static/public";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { getHistory, saveHistory, removeHistory, clearHistory } from "$lib/search";
     import { flyingFade } from "$lib/transition";
@@ -15,6 +15,8 @@
     import leading from "./__upperBarComponents/leading.svelte";
     import { analyticsService } from "$lib/analytics";
     import { onMount } from "svelte";
+
+    export let data;
 
     let lowerBarContext = getContext<Writable<DynamicBarContext>>("lowerBar");
     $lowerBarContext = {
@@ -42,6 +44,7 @@
         latest: Promise<Video[]>;
         popular: Promise<Video[]>;
     } | undefined = undefined;
+
     $: selectedResultVideos = selectedSort === "latest" ? resultVideos?.latest : resultVideos?.popular;
 
     function updateWord(value: string)
@@ -57,11 +60,11 @@
             saveHistory(word);
 
             resultVideos = {
-                latest: fetch(`${PUBLIC_API_ENDPOINT}/search/${word}?current`)
+                latest: fetch(`${PUBLIC_API_ENDPOINT}/search/${word}?sort=current`)
                     .then(response => response.json())
                     .catch(() => [])
                     .then(result => result as Video[]),
-                popular: fetch(`${PUBLIC_API_ENDPOINT}/search/${word}?viewCount`)
+                popular: fetch(`${PUBLIC_API_ENDPOINT}/search/${word}?sort=viewCount`)
                     .then(response => response.json())
                     .catch(() => [])
                     .then(result => result as Video[])
@@ -74,6 +77,12 @@
         word = historyWord;
         value = historyWord;
         searchClick();
+    }
+
+    function recommendedWordClick(word: string)
+    {
+        startActualSearch();
+        historyClick(word);
     }
 
     function startActualSearch()
@@ -123,20 +132,14 @@
 </div>
 <div class="container">
     {#if !leadingValue}
-        <div class="intro" in:flyingFade={{ delay: 0 }}>
-            <div class="section first">
-                <h2>지금 인기 있어요</h2>
-                <div class="grid">
-                    {#each [...Array(5).keys()] as i}
-                        <Card square darkOverlay={0.7} body="감자" />
-                    {/each}
-                </div>
-            </div>
-            <div class="section last">
+        <div class="intro" in:flyingFade|global={{ delay: 0 }}>
+            <div class="section first last">
                 <h2>추천 검색어</h2>
                 <div class="grid">
-                    {#each [...Array(5).keys()] as i}
-                        <Card square darkOverlay={0.7} body="감자" />
+                    {#each data.recommendedWords as { word, video } (word)}
+                        <div role="button" tabindex="0" on:click={() => recommendedWordClick(word)} on:keydown={() => recommendedWordClick(word)}>
+                            <Card noPadding square darkOverlay={0.7} body={word} {video} />
+                        </div>
                     {/each}
                 </div>
             </div>
