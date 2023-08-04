@@ -4,6 +4,7 @@
     import type { Writable } from "svelte/store";
     import { MetaTags } from "svelte-meta-tags";
     import type { DynamicBarContext } from "$lib/dynamicBar";
+    import { duration, flyingFade } from "$lib/transition";
     import Carousel from "$components/Carousel.svelte";
     import Video from "$components/Video.svelte";
     import Card from "$components/Card.svelte";
@@ -59,19 +60,19 @@
             heading="이 레시피는<br>어때요?" modifier={data.random.channel.ChannelName} body={data.random.youtubeTitle} />
     </a>
 </div>
-<div class="section">
+<div class="section" in:flyingFade={{ delay: 0 }}>
     <Carousel leftOverflow rightOverflow heading="유튜브에서 핫해요" canShowAll>
         {#each data.highViews as video, i (video.youtubeThumbnail)}
             <Video {video} leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" />
         {/each}
         <svelte:fragment slot="grid">
-            {#each data.highViews as video (video.youtubeThumbnail)}
+            {#each data.highViews as video, i (video.youtubeThumbnail)}
                 <Video {video} verbose bottomMargin />
             {/each}
         </svelte:fragment>
     </Carousel>
 </div>
-<div class="section">
+<div class="section" in:flyingFade={{ delay: 0 }}>
     <Carousel leftOverflow rightOverflow heading="쉽게 따라해요" canShowAll>
         {#each data.easy as video, i (video.youtubeThumbnail)}
             <Video {video} leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" />
@@ -83,7 +84,7 @@
         </svelte:fragment>
     </Carousel>
 </div>
-<div class="section last">
+<div class="section last" in:flyingFade={{ delay: 0 }}>
     <h2 class="grid-title">다른 레시피들도 있어요</h2>
     <div class="grid">
         {#each data.others as video (video.youtubeThumbnail)}

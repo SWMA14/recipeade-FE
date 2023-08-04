@@ -5,6 +5,7 @@
     import { PUBLIC_API_ENDPOINT } from "$env/static/public";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { getHistory, saveHistory, removeHistory, clearHistory } from "$lib/search";
+    import { flyingFade } from "$lib/transition";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
     import DynamicBar from "$components/DynamicBar.svelte";
@@ -58,9 +59,11 @@
             resultVideos = {
                 latest: fetch(`${PUBLIC_API_ENDPOINT}/search/${word}?current`)
                     .then(response => response.json())
+                    .catch(() => [])
                     .then(result => result as Video[]),
                 popular: fetch(`${PUBLIC_API_ENDPOINT}/search/${word}?viewCount`)
                     .then(response => response.json())
+                    .catch(() => [])
                     .then(result => result as Video[])
             };
         }
@@ -115,7 +118,7 @@
 </div>
 <div class="container">
     {#if !leadingValue}
-        <div class="intro">
+        <div class="intro" in:flyingFade={{ delay: 0 }}>
             <div class="section first">
                 <h2>지금 인기 있어요</h2>
                 <div class="grid">
@@ -134,7 +137,7 @@
             </div>
         </div>
     {:else if !resultShown}
-        <div class="actual-search">
+        <div class="actual-search" in:flyingFade={{ delay: 0 }}>
             <div class="heading">
                 <h2>최근 검색</h2>
                 <span class="erase-all typo-body-2" role="button" tabindex="0" on:click={clearAndUpdateHistory} on:keydown={clearAndUpdateHistory}
@@ -161,29 +164,39 @@
         </div>
     {:else}
         <div class="result">
-            <div class="sort-buttons">
-                <div class="wrapper">
-                    <Button kind="badge" size="small" selected={selectedSort === "latest"} on:click={() => selectedSort = "latest"}>
-                        최신순
-                    </Button>
-                </div>
-                <div class="wrapper">
-                    <Button kind="badge" size="small" selected={selectedSort === "popular"} on:click={() => selectedSort = "popular"}>
-                        조회순
-                    </Button>
-                </div>
-            </div>
-            <div class="videos">
-                {#key selectedResultVideos}
+            {#key selectedResultVideos}
                 {#await selectedResultVideos then videos}
-                    {#if videos !== undefined}
-                        {#each videos as video (video.youtubeThumbnail)}
-                            <Video {video} verbose bottomMargin />
-                        {/each}
+                    {#if videos !== undefined && videos.length > 0}
+                        <div class="sort-buttons">
+                            <div class="wrapper">
+                                <Button kind="badge" size="small" selected={selectedSort === "latest"} on:click={() => selectedSort = "latest"}>
+                                    최신순
+                                </Button>
+                            </div>
+                            <div class="wrapper">
+                                <Button kind="badge" size="small" selected={selectedSort === "popular"} on:click={() => selectedSort = "popular"}>
+                                    조회순
+                                </Button>
+                            </div>
+                        </div>
                     {/if}
                 {/await}
-                {/key}
-            </div>
+                <div class="videos" in:flyingFade|global={{ delay: 0 }}>
+                    {#await selectedResultVideos then videos}
+                        {#if videos !== undefined && videos.length > 0}
+                            {#each videos as video (video.youtubeThumbnail)}
+                                <Video {video} verbose bottomMargin />
+                            {/each}
+                        {:else}
+                            <img src="/images/no-result.png" alt="결과 없음" />
+                            <span class="no-result">결과가 없어요.</span>
+                        {/if}
+                    {:catch}
+                        <img src="/images/no-result.png" alt="결과 없음" />
+                        <span class="no-result">결과가 없어요.</span>
+                    {/await}
+                </div>
+            {/key}
         </div>
     {/if}
 </div>
@@ -272,5 +285,10 @@
 
     .search-history-remove {
         width: var(--space-xl);
+    }
+
+    .no-result {
+        text-align: center;
+        color: var(--gray-400);
     }
 </style>

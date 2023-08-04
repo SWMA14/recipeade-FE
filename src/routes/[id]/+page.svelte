@@ -42,7 +42,7 @@
 
 
 {#if isRendered}
-    <div class="section first" in:flyingFade={{ delay: duration }}>
+    <div class="section first" in:flyingFade={{ delay: 0 }}>
         <div class="badges">
             <Badge dark rightMargin>{getCategoryById(data.video.difficulty)}</Badge>
             <Badge dark rightMargin>{data.video.category}</Badge>
@@ -62,7 +62,7 @@
             </div>
         </div> -->
     </div>
-    <div class="section" in:flyingFade={{ delay: duration * 2 }}>
+    <div class="section" in:flyingFade={{ delay: 0 }}>
         <div class="title">
             <h2>재료</h2>
         </div>
@@ -75,7 +75,7 @@
             </Card>
         {/each}
     </div>
-    <div class="section" in:flyingFade={{ delay: duration * 2 }}>
+    <div class="section" in:flyingFade={{ delay: 0 }}>
         <Carousel leftOverflow rightOverflow heading="단계 미리 보기" canShowAll>
             {#each data.video.recipesteps as step, i (step.description)}
                 <Card leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" columnFlex scrollSnap
@@ -92,7 +92,7 @@
             </svelte:fragment>
         </Carousel>
     </div>
-    <div class="section last" in:flyingFade={{ delay: duration * 2 }}>
+    <div class="section last" in:flyingFade={{ delay: 0 }}>
         {#if data.recommended.length > 0}
             <Carousel leftOverflow rightOverflow heading="이 레시피는 어때요?" canShowAll>
                 {#each data.recommended as video, i (video.youtubeThumbnail)}

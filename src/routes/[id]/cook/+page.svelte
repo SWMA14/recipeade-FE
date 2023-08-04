@@ -145,7 +145,7 @@
 />
 
 {#if isRendered}
-    <div class="section">
+    <div class="section" in:flyingFade={{ delay: 0 }}>
         <Card visibleOverflow noPadding>
             <div style="margin-top: 1rem;">
                 <Carousel leftOverflow rightOverflow>

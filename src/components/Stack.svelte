@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onDestroy } from "svelte";
+    import { quartIn } from "svelte/easing";
     import { stacks } from "../store";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { duration, flyingFade } from "$lib/transition";
@@ -19,7 +20,7 @@
     });
 </script>
 
-<div class="panel" transition:flyingFade={{ duration: duration * 2, y: 50 }}>
+<div class="panel" in:flyingFade={{ duration: duration * 3, y: 50 }} out:flyingFade={{ duration: duration * 3, easing: quartIn, y: 50}}>
     <div class="upper-bar">
         <DynamicBar {...dynamicBarContext} />
     </div>
