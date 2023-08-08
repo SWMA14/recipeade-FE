@@ -1,6 +1,6 @@
 import { Preferences } from "@capacitor/preferences";
 
-export interface Video
+export interface VideoData
 {
     youtubeVideoId: string;
     youtubeTitle: string;

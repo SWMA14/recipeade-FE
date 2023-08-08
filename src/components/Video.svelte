@@ -1,12 +1,12 @@
 <script lang="ts">
     import { getCategoryById } from "$lib/category";
     import type { SpaceType } from "$lib/types";
-    import { type Video, unitizeViews } from "$lib/video";
+    import { type VideoData, unitizeViews } from "$lib/video";
     import Badge from "$components/Badge.svelte";
     import Card from "$components/Card.svelte";
     import Carousel from "$components/Carousel.svelte";
 
-    export let video: Video;
+    export let video: VideoData;
     export let leftMargin: SpaceType | undefined = undefined;
     export let rightMargin: SpaceType | undefined = undefined;
     export let bottomMargin = false;

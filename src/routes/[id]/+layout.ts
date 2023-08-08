@@ -1,9 +1,12 @@
+import { get } from "svelte/store";
+import { allVideos } from "../../store";
+
 export const prerender = false;
 
-export async function load({ parent, params })
+export async function load({ params })
 {
     return {
-        video: (await parent()).all.find(x => x.youtubeVideoId === params.id)!,
+        video: get(allVideos).find(x => x.youtubeVideoId === params.id)!,
         id: params.id
     };
 }

@@ -1,9 +1,8 @@
 <script lang="ts">
-    import { flyingFade } from '$lib/transition';
-    import { getLikedVideos, clearLikedVideos } from '$lib/video';
-    import Video from '$components/Video.svelte';
-
-    export let data;
+    import { allVideos } from "../../store";
+    import { flyingFade } from "$lib/transition";
+    import { getLikedVideos, clearLikedVideos } from "$lib/video";
+    import Video from "$components/Video.svelte";
 
     let updateVidoes = {};
 
@@ -22,7 +21,7 @@
 <div class="section" in:flyingFade={{ delay: 0 }}>
     {#key updateVidoes}
         {#await getLikedVideos() then likedVideos}
-            {@const videos = likedVideos.map(video => confident(data.all.find(x => x.youtubeVideoId === video.id)))}
+            {@const videos = likedVideos.map(video => confident($allVideos.find(x => x.youtubeVideoId === video.id)))}
             <div class="heading">
                 <h2>좋아요한 레시피</h2>
                 {#if videos.length > 0}

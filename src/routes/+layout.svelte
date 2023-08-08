@@ -30,6 +30,8 @@
                 $stacks[length - 1]();
             else if ($page.route.id !== "/")
                 history.back();
+            else
+                App.exitApp();
         });
     });
 </script>

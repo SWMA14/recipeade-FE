@@ -6,6 +6,7 @@
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { getHistory, saveHistory, removeHistory, clearHistory } from "$lib/search";
     import { flyingFade } from "$lib/transition";
+    import type { VideoData } from "$lib/video";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
     import DynamicBar from "$components/DynamicBar.svelte";
@@ -41,8 +42,8 @@
     let resultShown = false;
     let selectedSort: "latest" | "popular" = "latest";
     let resultVideos: {
-        latest: Promise<Video[]>;
-        popular: Promise<Video[]>;
+        latest: Promise<VideoData[]>;
+        popular: Promise<VideoData[]>;
     } | undefined = undefined;
 
     $: selectedResultVideos = selectedSort === "latest" ? resultVideos?.latest : resultVideos?.popular;
@@ -63,11 +64,11 @@
                 latest: fetch(`${PUBLIC_API_ENDPOINT}/search/${word}?sort=current`)
                     .then(response => response.json())
                     .catch(() => [])
-                    .then(result => result as Video[]),
+                    .then(result => result as VideoData[]),
                 popular: fetch(`${PUBLIC_API_ENDPOINT}/search/${word}?sort=viewCount`)
                     .then(response => response.json())
                     .catch(() => [])
-                    .then(result => result as Video[])
+                    .then(result => result as VideoData[])
             };
         }
     }

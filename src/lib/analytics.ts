@@ -1,5 +1,5 @@
 // Init for the web
-import {FirebaseAnalytics} from '@capacitor-community/firebase-analytics';
+import {FirebaseAnalytics} from "@capacitor-community/firebase-analytics";
 
 export class AnalyticsService {
   analyticsEnabled = true;
