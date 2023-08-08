@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">recipeade</string>
-    <string name="title_activity_main">recipeade</string>
+    <string name="app_name">레시피에이드</string>
+    <string name="title_activity_main">레시피에이드</string>
     <string name="package_name">com.recipeade.svelte</string>
     <string name="custom_url_scheme">com.recipeade.svelte</string>
 </resources>
