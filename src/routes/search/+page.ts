@@ -11,7 +11,6 @@ export async function load({ fetch })
     {
         const videos = await fetch(`${PUBLIC_API_ENDPOINT}/search/${word}`)
             .then(response => response.json());
-        console.log(videos);
 
         if (videos.length > 0)
             recommendedWords.push({

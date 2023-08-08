@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { Device } from "@capacitor/device";
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
     import { getCategoryById } from "$lib/category";
@@ -35,6 +36,11 @@
     });
 
     let isRendered = false;
+    let device: "ios" | "android" | "web";
+
+    Device.getInfo()
+        .then(x => device = x.platform)
+        .catch(() => device = "web");
 
     onMount(() => {
         isRendered = true;
@@ -99,7 +105,8 @@
             </Card>
         {/each}
     </div>
-    <div class="section" in:flyingFade={{ delay: 0 }}>
+    <div class="section" class:last={data.recommended.length === 0} class:ios={data.recommended.length === 0 && device === "ios"}
+        in:flyingFade={{ delay: 0 }}>
         <Carousel leftOverflow rightOverflow heading="단계 미리 보기" canShowAll>
             {#each data.video.recipesteps as step, i (step.description)}
                 <Card leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" columnFlex scrollSnap
@@ -116,7 +123,7 @@
             </svelte:fragment>
         </Carousel>
     </div>
-    <div class="section last" in:flyingFade={{ delay: 0 }}>
+    <div class="section last" class:ios={device === "ios"} in:flyingFade={{ delay: 0 }}>
         {#if data.recommended.length > 0}
             <Carousel leftOverflow rightOverflow heading="이 레시피는 어때요?" canShowAll>
                 {#each data.recommended as video, i (video.youtubeThumbnail)}
@@ -143,6 +150,10 @@
 
         &.last {
             margin-bottom: 0;
+
+            &.ios {
+                margin-bottom: var(--space-2xs);
+            }
         }
     }
 

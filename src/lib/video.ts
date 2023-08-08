@@ -68,10 +68,7 @@ export async function getLikedVideos(): Promise<LikedVideo[]>
         key: "likedVideos"
     });
 
-    const a = JSON.parse(result.value ?? "[]") as LikedVideo[];
-    console.log(a);
-
-    return a;
+    return JSON.parse(result.value ?? "[]") as LikedVideo[];
 }
 
 export async function saveLikedVideo(id: string)

@@ -87,7 +87,7 @@
             </svelte:fragment>
         </Carousel>
     </div>
-    <div class="section last" in:flyingFade={{ delay: 0 }}>
+    <div class="section last" class:ios={device === "ios"} in:flyingFade={{ delay: 0 }}>
         <h2 class="grid-title">다른 레시피들도 있어요</h2>
         <div class="grid">
             {#each data.others as video (video.youtubeThumbnail)}
@@ -114,6 +114,10 @@
 
         &.last {
             margin-bottom: var(--space-3xl);
+
+            &.ios {
+                margin-bottom: calc(var(--space-3xl) + var(--space-2xs));
+            }
         }
     }
 
