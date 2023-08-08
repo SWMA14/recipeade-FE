@@ -53,7 +53,7 @@
     </div>
 </Card>
 
-<style>
+<style lang="postcss">
     .overflow {
         margin: 0 calc(var(--space-xs) * -1);
     }
@@ -72,14 +72,18 @@
         flex-shrink: 0;
         border-radius: var(--radius);
         overflow: hidden;
-    }
 
-    .fitter > div {
-        position: absolute;
-        top: -16.75%;
-        bottom: 0;
-        left: 0;
-        right: 0;
+        & div {
+            position: absolute;
+            top: -16.75%;
+            bottom: 0;
+            left: 0;
+            right: 0;
+
+            & img {
+                width: -webkit-fill-available;
+            }
+        }
     }
 
     .left-margin {

@@ -17,6 +17,8 @@
     };
 
     let player: YouTubePlayer | HTMLElement;
+    let playerHeight: number;
+
     $: if (player)
     {
         player = Player(player, options);
@@ -30,17 +32,17 @@
     });
 </script>
 
-<div class="player-container">
+<div class="player-container" bind:clientHeight={playerHeight}>
     <div id="player" class="player" bind:this={player} />
 </div>
-<div class="content">
+<div class="content" style="--top: {playerHeight}px;">
     <slot />
 </div>
 
 <style>
     .player-container {
         width: 100%;
-        max-width: var(--max-width);
+        /* max-width: var(--max-width); */
         margin-top: calc(var(--space-2xl) + env(safe-area-inset-top));
         position: fixed;
         top: 0;
@@ -57,7 +59,18 @@
 
     .content {
         width: 100%;
-        margin-top: calc(calc(98vw * 9 / 16) + var(--space-xs));
+        /* margin-top: calc(calc(98vw * 9 / 16) + var(--space-xs)); */
+        margin-top: calc(var(--top) + var(--space-xs));
         margin-bottom: calc(var(--space-xl) + var(--space-xs) * 2);
+    }
+
+    @media only screen and (min-width: 48rem) {
+        .player {
+            max-height: calc(70vw * 9 / 16);
+        }
+
+        .content {
+            /* margin-top: calc(calc(70vw * 9 / 16) + var(--space-xs)); */
+        }
     }
 </style>
