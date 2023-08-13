@@ -63,6 +63,7 @@
     {/if}
 </div>
 
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div on:focus={handleFocus} on:mouseover={handleMouseOver} on:mousemove={handleMouseMove} on:mouseleave={handleMouseLeave}>
     <slot name="content" />
 </div>

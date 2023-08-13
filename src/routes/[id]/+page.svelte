@@ -1,112 +1,182 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import Device from "svelte-device-info";
-    import { duration, flyingFade } from "$lib/transition";
-    import { unitizeViews } from "$lib/video";
-    import Category from "$components/Category.svelte";
-    import Review from "$components/Review.svelte";
+    import { Device } from "@capacitor/device";
+    import { getContext, onMount } from "svelte";
+    import type { Writable } from "svelte/store";
+    import { getCategoryById } from "$lib/category";
+    import { flyingFade } from "$lib/transition";
+    import { unitizeViews, getLikedVideos, saveLikedVideo, removeLikedVideo } from "$lib/video";
+    import type { DynamicBarContext } from "$lib/dynamicBar.js";
+    import Badge from "$components/Badge.svelte";
+    import Button from "$components/Button.svelte";
+    import Card from "$components/Card.svelte";
+    import Carousel from "$components/Carousel.svelte";
     import Video from "$components/Video.svelte";
+    import upperLeading from "./__upperBarComponents/leading.svelte";
+    import lowerMain from "./__lowerBarComponents/main.svelte";
+    import lowerLeading from "./__lowerBarComponents/leading.svelte";
+    import { analyticsService } from "$lib/analytics.js";
 
     export let data;
 
-    let isMobile = true;
+    getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
+        leading: upperLeading,
+        leadingProps: {
+            onClick: () => history.back()
+        },
+        isBackgroundShown: true
+    });
+    let liked = isLiked();
+    $: getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
+        leading: lowerLeading,
+        leadingProps: {
+            liked,
+            onClick: () => likeClick()
+        },
+        main: lowerMain
+    });
+
     let isRendered = false;
+    let device: "ios" | "android" | "web";
+
+    Device.getInfo()
+        .then(x => device = x.platform)
+        .catch(() => device = "web");
 
     onMount(() => {
-        isMobile = Device.isMobile;
         isRendered = true;
+        analyticsService.setScreenName("recipe");
+        analyticsService.logEvent("recipeview_page", {
+            page_title: "recipeview_page"
+        });
     });
+
+    async function isLiked()
+    {
+        return (await getLikedVideos()).some(x => x.id === data.id);
+    }
+
+    async function likeClick()
+    {
+        if (await liked)
+        {
+            await removeLikedVideo(data.id);
+            liked = Promise.resolve(false);
+        }
+        else
+        {
+            await saveLikedVideo(data.id);
+            liked = Promise.resolve(true);
+        }
+    }
 </script>
 
+
 {#if isRendered}
-    <div class="info" in:flyingFade={{ delay: duration }}>
-        <div class="categories">
-            <Category id={data.video.difficulty} />
-            <Category id={data.video.cateogry} />
+    <div class="section first" in:flyingFade={{ delay: 0 }}>
+        <div class="badges">
+            <Badge dark rightMargin>{getCategoryById(data.video.difficulty)}</Badge>
+            <Badge dark rightMargin>{data.video.category}</Badge>
+            <!-- <Badge dark>★ 5.0</Badge> -->
         </div>
-        <h2 style="font-weight: 700;">{data.video.title}</h2>
-        <p class="statistics">
-            조회수 {unitizeViews(data.video.viewCount)}회 · {data.video.publishedAt}
-        </p>
-        <div class="channel">
+        <h2>{data.video.youtubeTitle}</h2>
+        <p class="statistics typo-body-2">
+            조회수 {unitizeViews(data.video.youtubeViewCount)}회 · {data.video.channel.ChannelName}
+        </p> <!-- TODO: 업로드 날짜 -->
+        <!-- <div class="channel">
             <div class="profile">
                 <img src="https://i.namu.wiki/i/d1A_wD4kuLHmOOFqJdVlOXVt1TWA9NfNt_HA0CS0Y_N0zayUAX8olMuv7odG2FiDLDQZIRBqbPQwBSArXfEJlQ.webp" alt="채널 이미지" />
-                {data.video.channel}
+                {data.video.channel.ChannelName}
             </div>
-            <button class="white subscribe">구독</button>
-        </div>
-        <div class="divider" />
+            <div>
+                <Button size="small">구독</Button>
+            </div>
+        </div> -->
     </div>
-    <div class="reviews-container" in:flyingFade={{ delay: duration * 2 }}>
-        <h3>후기</h3>
-        <div class="reviews" class:desktop={!isMobile}>
-            {#each [...Array(5).keys()] as i}
-                <Review nickname="김*현" content="너무 맛있게 먹었어요! 감사합니다!" rightMargin
-                    image="https://i.namu.wiki/i/d1A_wD4kuLHmOOFqJdVlOXVt1TWA9NfNt_HA0CS0Y_N0zayUAX8olMuv7odG2FiDLDQZIRBqbPQwBSArXfEJlQ.webp" />
-            {/each}
+    <div class="section" in:flyingFade={{ delay: 0 }}>
+        <div class="title">
+            <h2>재료</h2>
         </div>
-    </div>
-    <div class="ingredients" in:flyingFade={{ delay: duration * 2 }}>
-        <h3>재료</h3>
         {#each data.video.ingredients as ingredient}
-            <div class="ingredient">
-                <span>{ingredient.name}</span>
-                <span>{ingredient.quantity ?? ""}{ingredient.unit ?? ""}</span>
-            </div>
-            <!-- <div class="divider" /> -->
+            <Card bottomMargin>
+                <div class="ingredient">
+                    <span>{ingredient.name}</span>
+                    <span>{ingredient.quantity ?? ""}{ingredient.unit ?? ""}</span>
+                </div>
+            </Card>
         {/each}
     </div>
-    <div class="steps" in:flyingFade={{ delay: duration * 2 }}>
-        <h3>단계 미리 보기</h3>
-        <ul>
-            {#each data.video.steps as step, i}
-                <li class:line={i < data.video.steps.length - 1}>
-                    {step.description}
-                </li>
+    <div class="section" class:last={data.recommended.length === 0} class:ios={data.recommended.length === 0 && device === "ios"}
+        in:flyingFade={{ delay: 0 }}>
+        <Carousel leftOverflow rightOverflow heading="단계 미리 보기" canShowAll>
+            {#each data.video.recipesteps as step, i (step.description)}
+                <Card leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" columnFlex scrollSnap
+                    modifier="{i + 1}단계" body={step.description}>
+                    <div style="height: calc(var(--space-3xl) * 2);"></div>
+                </Card>
             {/each}
-        </ul>
+            <svelte:fragment slot="grid">
+                {#each data.video.recipesteps as step, i (step.description)}
+                    <Card bottomMargin modifier="{i + 1}단계" body={step.description}>
+                        <div style="height: calc(var(--space-3xl) * 2);"></div>
+                    </Card>
+                {/each}
+            </svelte:fragment>
+        </Carousel>
     </div>
-    <div class="videos-container" in:flyingFade={{ delay: duration * 2 }}>
-        <h3>이 레시피는 어때요?</h3>
-        <div class="videos" class:desktop={!isMobile}>
-            {#each [...Array(5).keys()] as i}
-                <Video video={data.video} rightMargin />
-            {/each}
-        </div>
+    <div class="section last" class:ios={device === "ios"} in:flyingFade={{ delay: 0 }}>
+        {#if data.recommended.length > 0}
+            <Carousel leftOverflow rightOverflow heading="이 레시피는 어때요?" canShowAll>
+                {#each data.recommended as video, i (video.youtubeThumbnail)}
+                    <Video {video} leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" />
+                {/each}
+                <svelte:fragment slot="grid">
+                    {#each data.recommended as video (video.youtubeThumbnail)}
+                        <Video {video} verbose bottomMargin />
+                    {/each}
+                </svelte:fragment>
+            </Carousel>
+        {/if}
     </div>
 {/if}
 
-<style>
-    .divider {
-        margin: 0.5rem 0;
-        border-top: 1px solid var(--c-foreground-gray); 
-        opacity: 0.35;
+<style lang="postcss">
+    .section {
+        width: 100%;
+        margin-bottom: var(--space-m);
+
+        &.first {
+            margin-top: var(--space-2xl);
+        }
+
+        &.last {
+            margin-bottom: 0;
+
+            &.ios {
+                margin-bottom: var(--space-2xs);
+            }
+        }
     }
 
-    .info {
+    .title {
+        margin-bottom: var(--space-xs);
         display: flex;
-        flex-direction: column;
-        align-items: flex-start;
+        justify-content: space-between;
+    }
+
+    .badges {
+        margin-bottom: var(--space-2xs);
+        display: flex;
+        align-items: center;
     }
 
     .statistics {
-        font-size: 0.75rem;
-        text-align: center;
         color: var(--c-foreground-gray);
     }
 
-    .categories {
-        flex: 0 0 auto;
-        margin-top: 1rem;
-        margin-left: -0.15rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .channel {
+    /* .channel {
         width: 100%;
-        margin: 1rem 0;
+        margin-top: var(--space-xs);
+        padding-bottom: var(--space-xs);
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -118,94 +188,19 @@
     }
 
     .profile img {
-        width: 2rem;
-        height: 2rem;
-        margin-right: 0.5rem;
+        width: var(--space-m);
+        height: var(--space-m);
+        margin-right: var(--space-2xs);
         object-fit: cover;
-        border-radius: 20px;
-    }
-
-    .subscribe {
-        height: 1.5rem;
-        font-size: 0.75rem;
-    }
-
-    .reviews-container {
-        width: 100%;
-        margin-top: 2rem;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .reviews,
-    .videos {
-        width: 100%;
-        margin-top: 1rem;
-        display: flex;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        overflow-x: scroll;
-    }
-
-    .reviews::-webkit-scrollbar {
-        display: none;
-    }
-
-    .reviews.desktop {
-        padding-bottom: 1rem;
-    }
-
-    .reviews.desktop::-webkit-scrollbar {
-        display: block;
-    }
-
-    .ingredients,
-    .steps,
-    .videos-container {
-        width: 100%;
-        margin-top: 3rem;
-        display: flex;
-        flex-direction: column;
-    }
+        border-radius: var(--radius-big);
+    } */
 
     .ingredient {
-        width: 100%;
-        margin-bottom: 1rem;
-        padding: 1rem;
         display: flex;
         justify-content: space-between;
-        background-color: var(--c-background-lightdark);
-        border-radius: var(--radius);
     }
 
     .ingredient span:nth-child(2) {
         color: var(--c-primary);
-    }
-
-    .steps li {
-        margin-bottom: 3rem;
-        position: relative;
-    }
-
-    .steps li.line::after {
-        content: "";
-        position: absolute;
-        left: 0.115rem;
-        margin-top: 2rem;
-        padding: 1rem 0;
-        border: 1px solid var(--c-primary);
-        opacity: 0.2;
-    }
-
-    .videos::-webkit-scrollbar {
-        display: none;
-    }
-
-    .videos.desktop {
-        padding-bottom: 1rem;
-    }
-
-    .videos.desktop::-webkit-scrollbar {
-        display: block;
     }
 </style>

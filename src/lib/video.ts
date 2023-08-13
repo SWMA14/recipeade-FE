@@ -1,16 +1,18 @@
-export interface Video
+import { Preferences } from "@capacitor/preferences";
+
+export interface VideoData
 {
-    author: string;
-    channelUrl: string;
-    publishDate: string;
-    title: string;
-    views: number;
-    description: string;
-    transcript: string;
-    generated: boolean;
-    thumbnail: string;
+    youtubeVideoId: string;
+    youtubeTitle: string;
+    youtubeViewCount: number;
     difficulty: number;
-    kind: string;
+    category: string;
+    youtubeThumbnail: string;
+    id: number;
+    rating: number;
+    ingredients: Ingredient[];
+    recipesteps: Step[];
+    channel: Channel;
 }
 
 interface Ingredient
@@ -26,18 +28,15 @@ interface Step
     timestamp: string;
 }
 
-export interface DemoVideo
+interface Channel
 {
-    video: string;
-    thumbnail: string;
-    title: string;
-    viewCount: number;
-    channel: string;
-    publishedAt: string;
-    ingredients: Ingredient[];
-    steps: Step[];
-    difficulty: number;
-    cateogry: string;
+    channelID: string;
+    ChannelName: string;
+    id: number;
+}
+
+interface LikedVideo {
+    id: string;
 }
 
 export function unitizeViews(views: number): string
@@ -52,4 +51,55 @@ export function unitizeViews(views: number): string
         return `${(views / 1000000).toFixed(1)}백만`;
     else
         return `${(views / 10000000).toFixed(1)}천만`;
+}
+
+export function timestampToSeconds(timestamp: string): number
+{
+    const regex = /\d{1,}:\d{2}/;
+    const match = timestamp.match(regex)![0];
+    const [minute, second] = match.split(":").map((x) => parseInt(x));
+
+    return minute * 60 + second;
+}
+
+export async function getLikedVideos(): Promise<LikedVideo[]>
+{
+    const result = await Preferences.get({
+        key: "likedVideos"
+    });
+
+    return JSON.parse(result.value ?? "[]") as LikedVideo[];
+}
+
+export async function saveLikedVideo(id: string)
+{
+    const videos = await getLikedVideos();
+
+    if (!videos.some(x => x.id === id))
+        await Preferences.set({
+            key: "likedVideos",
+            value: JSON.stringify([
+                {
+                    id
+                },
+                ...videos
+            ])
+        });
+}
+
+export async function removeLikedVideo(id: string)
+{
+    const videos = await getLikedVideos();
+
+    await Preferences.set({
+        key: "likedVideos",
+        value: JSON.stringify(videos.filter(x => x.id !== id))
+    });
+}
+
+export async function clearLikedVideos()
+{
+    await Preferences.remove({
+        key: "likedVideos"
+    });
 }

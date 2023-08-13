@@ -1,7 +1,7 @@
 <script lang="ts">
     import Player from "youtube-player";
     import type { Options, YouTubePlayer } from "youtube-player/dist/types";
-    import { beforeNavigate, goto } from "$app/navigation";
+    import { beforeNavigate } from "$app/navigation";
     import { sharedPlayer } from "../../store";
 
     export let data;
@@ -17,6 +17,8 @@
     };
 
     let player: YouTubePlayer | HTMLElement;
+    let playerHeight: number;
+
     $: if (player)
     {
         player = Player(player, options);
@@ -26,82 +28,49 @@
 
     beforeNavigate(({ from }) => {
         if (from && from.url.pathname.endsWith("/cook"))
-        {
-            console.log("hi");
             (player as YouTubePlayer).seekTo(0, true);
-        }
     });
 </script>
 
-<div class="upper">
-    <div style="height: 3rem; background-color: var(--c-background);" />
-    <div class="player-container">
-        <div id="player" class="player" bind:this={player} />
-    </div>
+<div class="player-container" bind:clientHeight={playerHeight}>
+    <div id="player" class="player" bind:this={player} />
 </div>
-<div class="content">
+<div class="content" style="--top: {playerHeight}px;">
     <slot />
-</div>
-<div class="lower">
-    <div class="buttons">
-        <button class="outline like">👍</button>
-        <button class="start" on:click={() => goto(`/${data.id}/cook`)}>요리 시작하기</button>
-    </div>
-    <div class="shadow" />
 </div>
 
 <style>
-    .upper {
+    .player-container {
         width: 100%;
-        max-width: var(--max-width);
+        /* max-width: var(--max-width); */
+        margin-top: calc(var(--space-2xl) + env(safe-area-inset-top));
         position: fixed;
         top: 0;
-        z-index: 1;
-    }
-
-    .player-container {
+        z-index: 9;
+        background-color: var(--white);
         border-radius: 0 0 var(--radius) var(--radius);
         overflow: hidden;
     }
 
     .player {
         width: 100%;
-        max-height: calc(calc(100vw - 15px) * 9 / 16);
+        max-height: calc(100vw * 9 / 16);
     }
 
     .content {
         width: 100%;
-        margin-top: min(24rem, calc(calc(98vw * 9 / 16) + 1.5rem));
-        margin-bottom: 5rem;
+        /* margin-top: calc(calc(98vw * 9 / 16) + var(--space-xs)); */
+        margin-top: calc(var(--top) + var(--space-xs));
+        margin-bottom: calc(var(--space-xl) + var(--space-xs) * 2);
     }
 
-    .buttons {
-        width: calc(100% - var(--padding) * 2);
-        max-width: var(--max-width);
-        margin-top: 2rem;
-        display: flex;
-        position: fixed;
-        left: 50%;
-        bottom: 1rem;
-        transform: translateX(-50%);
-        z-index: 1;
-    }
+    @media only screen and (min-width: 48rem) {
+        .player {
+            max-height: calc(70vw * 9 / 16);
+        }
 
-    .buttons .like {
-        width: 3rem;
-        margin-right: 0.5rem;
-    }
-
-    .buttons .start {
-        width: 100%;
-    }
-
-    .shadow {
-        width: 100%;
-        height: 6rem;
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        background-image: linear-gradient(to top, var(--c-background) 15%, transparent 100%);
+        .content {
+            /* margin-top: calc(calc(70vw * 9 / 16) + var(--space-xs)); */
+        }
     }
 </style>

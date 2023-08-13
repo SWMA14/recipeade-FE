@@ -1,19 +1,56 @@
 <script lang="ts">
-    import Video from "$components/Video.svelte";
-    import { onMount } from "svelte";
-    import Device from "svelte-device-info";
+    import { Device } from "@capacitor/device";
+    import { getContext, onMount } from "svelte";
+    import type { Writable } from "svelte/store";
     import { MetaTags } from "svelte-meta-tags";
+    import { allVideos } from "../store";
+    import { PUBLIC_API_ENDPOINT } from "$env/static/public";
+    import type { DynamicBarContext } from "$lib/dynamicBar";
+    import { flyingFade } from "$lib/transition";
+    import type { VideoData } from "$lib/video";
+    import Carousel from "$components/Carousel.svelte";
+    import Video from "$components/Video.svelte";
+    import Card from "$components/Card.svelte";
+    import main from "./__lowerBarComponents/main.svelte";
 
-    export let data;
+    getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
+        isHidden: true
+    });
+    getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
+        main
+    });
 
     const title = "레시피에이드";
     const description = "";
 
-    let isMobile = true;
+    let device: "ios" | "android" | "web";
+    let isRendered = false;
 
-    onMount(() => {
-        isMobile = Device.isMobile;
-    })
+    let random: VideoData;
+    let rest: VideoData[];
+    let highViews: VideoData[];
+    let easy: VideoData[];
+    let others: VideoData[];
+
+    Device.getInfo()
+        .then(x => device = x.platform)
+        .catch(() => device = "web");
+
+    onMount(async () => {
+        if ($allVideos.length === 0)
+            $allVideos = await fetch(`${PUBLIC_API_ENDPOINT}/recipe`)
+                .then(response => response.json())
+                .then(result => result as VideoData[]);
+
+        random = $allVideos.sort(() => 0.5 - Math.random())[0];
+        rest = $allVideos.filter(x => x !== random);
+
+        highViews = rest.sort((a, b) => b.youtubeViewCount - a.youtubeViewCount).slice(0, 5);
+        easy = rest.filter(x => x.difficulty <= 2);
+        others = rest.filter(x => !highViews.includes(x) && !easy.includes(x));
+
+        isRendered = true;
+    });
 </script>
 
 <MetaTags
@@ -40,61 +77,74 @@
     ]}
 />
 
-<div class="section">
-    <h2>유튜브에서 핫해요🔥</h2>
-    <div class="videos-container" class:desktop={!isMobile}>
-        {#each data.highViews as video, i (video.thumbnail)}
-            <Video {video} rightMargin={i < data.highViews.length - 1} />
-        {/each}
+{#if isRendered}
+    <div class="intro">
+        <a href="/{random.youtubeVideoId}" style="height: 120%;">
+            <Card video={random.youtubeVideoId} noRadius largePadding darkOverlay={0.7}
+                square squareOverflowSafeArea={device === "ios"}
+                heading="이 레시피는<br>어때요?" modifier={random.channel.ChannelName} body={random.youtubeTitle} />
+        </a>
     </div>
-</div>
-<div class="section">
-    <h2>쉽게 따라해요😏</h2>
-    <div class="videos-container" class:desktop={!isMobile}>
-        {#each data.easy as video, i (video.thumbnail)}
-            <Video {video} rightMargin={i < data.easy.length - 1} />
-        {/each}
+    <div class="section" in:flyingFade={{ delay: 0 }}>
+        <Carousel leftOverflow rightOverflow heading="유튜브에서 핫해요" canShowAll>
+            {#each highViews as video, i (video.youtubeThumbnail)}
+                <Video {video} leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" />
+            {/each}
+            <svelte:fragment slot="grid">
+                {#each highViews as video, i (video.youtubeThumbnail)}
+                    <Video {video} verbose bottomMargin />
+                {/each}
+            </svelte:fragment>
+        </Carousel>
     </div>
-</div>
-<div class="section">
-    <h2>다른 레시피들도 있어요😯</h2>
-    <div class="videos-container grid" class:desktop={!isMobile}>
-        {#each data.others as video (video.thumbnail)}
-            <Video {video} bottomMargin />
-        {/each}
+    <div class="section" in:flyingFade={{ delay: 0 }}>
+        <Carousel leftOverflow rightOverflow heading="쉽게 따라해요" canShowAll>
+            {#each easy as video, i (video.youtubeThumbnail)}
+                <Video {video} leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" />
+            {/each}
+            <svelte:fragment slot="grid">
+                {#each easy as video (video.youtubeThumbnail)}
+                    <Video {video} verbose bottomMargin />
+                {/each}
+            </svelte:fragment>
+        </Carousel>
     </div>
-</div>
+    <div class="section last" class:ios={device === "ios"} in:flyingFade={{ delay: 0 }}>
+        <h2 class="grid-title">다른 레시피들도 있어요</h2>
+        <div class="grid">
+            {#each others as video (video.youtubeThumbnail)}
+                <Video {video} verbose bottomMargin />
+            {/each}
+        </div>
+    </div>
+{/if}
 
-<style>
+<style lang="postcss">
+    .intro {
+        width: -webkit-fill-available;
+        margin: 0 calc(var(--space-xs) * -1);
+        margin-bottom: var(--space-m);
+    }
+
     .section {
         width: 100%;
-        margin-bottom: 2rem;
-    }
+        margin-bottom: var(--space-m);
 
-    .videos-container {
-        display: flex;
-        margin-top: 0.5rem;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        overflow-x: scroll;
-    }
+        & .grid-title {
+            margin-bottom: var(--space-2xs);
+        }
 
-    .videos-container::-webkit-scrollbar {
-        display: none;
-    }
+        &.last {
+            margin-bottom: var(--space-3xl);
 
-    .videos-container.desktop {
-        padding-bottom: 1rem;
-    }
-
-    .videos-container.desktop::-webkit-scrollbar {
-        display: block;
+            &.ios {
+                margin-bottom: calc(var(--space-3xl) + var(--space-2xs));
+            }
+        }
     }
 
     .grid {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        justify-content: center;
     }
 </style>
