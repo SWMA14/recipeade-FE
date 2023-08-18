@@ -1,8 +1,19 @@
 <script lang="ts">
+    import { getContext } from "svelte";
+    import type { Writable } from "svelte/store";
     import { allVideos } from "../../store";
+    import type { DynamicBarContext } from "$lib/dynamicBar";
     import { flyingFade } from "$lib/transition";
     import { getLikedVideos, clearLikedVideos } from "$lib/video";
     import Video from "$components/Video.svelte";
+    import main from "../__lowerBarComponents/main.svelte";
+
+    getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
+        isHidden: true
+    });
+    getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
+        main
+    });
 
     let updateVidoes = {};
 

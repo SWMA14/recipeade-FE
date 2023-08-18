@@ -19,6 +19,10 @@
 
     export let data;
 
+    getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
+        isHidden: true
+    });
+
     let lowerBarContext = getContext<Writable<DynamicBarContext>>("lowerBar");
     $lowerBarContext = {
         main: lowerMain
