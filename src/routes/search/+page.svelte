@@ -165,17 +165,19 @@
                     <div class="words">
                         {#if histories.length > 0}
                             {#each histories as history}
-                                <Card bottomMargin>
-                                    <div class="search-history">
-                                        <span role="button" tabindex="0" on:click={() => historyClick(history.word)}
-                                            on:keydown={() => historyClick(history.word)}>
-                                            {history.word}
-                                        </span>
-                                        <div class="search-history-remove">
-                                            <Button kind="transparent" icon={faXmark} on:click={() => removeAndUpdateHistory(history.word)} />
+                                <div role="button" tabindex="0" on:click={() => historyClick(history.word)}
+                                    on:keydown={() => historyClick(history.word)}>
+                                    <Card bottomMargin>
+                                        <div class="search-history">
+                                            <span>
+                                                {history.word}
+                                            </span>
+                                            <div class="search-history-remove">
+                                                <Button kind="transparent" icon={faXmark} on:click={() => removeAndUpdateHistory(history.word)} />
+                                            </div>
                                         </div>
-                                    </div>
-                                </Card>
+                                    </Card>
+                                </div>
                             {/each}
                         {:else}
                             <img src="/images/no-result.png" alt="최근 검색어 없음" />
