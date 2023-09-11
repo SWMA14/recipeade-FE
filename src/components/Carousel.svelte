@@ -1,12 +1,11 @@
 <script lang="ts">
-    import { getContext } from "svelte";
-    import type { Writable } from "svelte/store";
     import type { DynamicBarContext } from "$lib/dynamicBar";
-    import { duration, flyingFade } from "$lib/transition";
+    import Skeleton from "$components/Skeleton.svelte";
     import Stack from "$components/Stack.svelte";
     import main from "./__carouselUpperBarComponents/main.svelte";
     import leading from "./__carouselUpperBarComponents/leading.svelte";
 
+    export let skeleton = false;
     export let leftOverflow = false;
     export let rightOverflow = false;
     export let heading: string | undefined = undefined;
@@ -42,9 +41,13 @@
         <div class="title">
             <div class="heading">
                 {#if heading}
-                    <h2>{heading}</h2>
+                    {#if skeleton}
+                        <Skeleton />
+                    {:else}
+                        <h2>{heading}</h2>
+                    {/if}
                 {/if}
-                {#if canShowAll}
+                {#if canShowAll && !skeleton}
                     <span class="show-all typo-body-2" role="button" tabindex="0" on:click={show} on:keydown={show}>
                         모두 보기
                     </span>

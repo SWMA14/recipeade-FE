@@ -4,6 +4,7 @@
     import { onMount } from "svelte";
     import type { SpaceType } from "$lib/types";
 
+    export let skeleton = false;
     export let backgroundColor = "gray-100";
     export let video: string | undefined = undefined;
     export let heading: string | undefined = undefined;
@@ -78,11 +79,14 @@
 
 <svelte:window on:scroll={checkVideoVisible} />
 
-<div class="container" bind:this={container}
+<div class="container" class:skeleton bind:this={container}
     style="--card-background-color: var(--{backgroundColor}); --left-margin: {leftMarginValue}; --right-margin: {rightMarginValue};"
     class:no-radius={noRadius} class:no-padding={noPadding} class:no-min-width={noMinWidth} class:large-padding={largePadding}
     class:column-flex={columnFlex} class:scroll-snap={scrollSnap} class:left-margin={leftMargin} class:right-margin={rightMargin}
     class:bottom-margin={bottomMargin} class:square class:overflow-safe-area={squareOverflowSafeArea} class:visible-overflow={visibleOverflow}>
+    {#if skeleton}
+        <div class="skeleton-overlay" />
+    {/if}
     {#if heading || body || modifier}
         <div class="texts" class:flex-end={!heading} class:large-padding={largePadding}
             class:dark-overlay={darkOverlay} class:overflow-safe-area={squareOverflowSafeArea}>
@@ -120,6 +124,20 @@
         background-color: var(--card-background-color);
         border-radius: var(--radius);
         overflow: hidden;
+
+        &.skeleton {
+            background-color: var(--gray-200);
+        }
+    }
+
+    .skeleton-overlay {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: var(--gray-200);
+        z-index: 1;
     }
 
     .texts {

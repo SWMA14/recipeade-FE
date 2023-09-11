@@ -6,6 +6,7 @@
     import Card from "$components/Card.svelte";
     import Carousel from "$components/Carousel.svelte";
 
+    export let skeleton = false;
     export let video: VideoData;
     export let leftMargin: SpaceType | undefined = undefined;
     export let rightMargin: SpaceType | undefined = undefined;
@@ -13,7 +14,7 @@
     export let verbose = false;
 </script>
 
-<Card visibleOverflow noPadding {leftMargin} {rightMargin} {bottomMargin} columnFlex scrollSnap>
+<Card {skeleton} visibleOverflow noPadding {leftMargin} {rightMargin} {bottomMargin} columnFlex scrollSnap>
     <a class:overflow={verbose} href="/{video.youtubeVideoId}">
         {#if verbose}
             <Carousel>
