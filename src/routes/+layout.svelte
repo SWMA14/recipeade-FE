@@ -1,10 +1,11 @@
 <script lang="ts">
     import "../app.css";
     import { Device } from "@capacitor/device";
-    import { App } from "@capacitor/app";
+    import { App, type URLOpenListenerEvent } from "@capacitor/app";
     import { onMount, setContext } from "svelte";
     import { writable } from "svelte/store";
     import { stacks } from "../store";
+    import { goto } from "$app/navigation";
     import { page } from "$app/stores";
     import { duration, flyingFade } from "$lib/transition";
     import type { DynamicBarContext } from "$lib/dynamicBar";
@@ -23,6 +24,10 @@
     setContext("lowerBar", lowerBarContext);
 
     onMount(() => {
+        App.addListener("appUrlOpen", (event: URLOpenListenerEvent) => {
+            goto("/");
+        });
+
         App.addListener("backButton", () => {
             const length = $stacks.length;
 
