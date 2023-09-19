@@ -28,6 +28,7 @@ export function growingFade(node: HTMLElement, { delay = 0, easing = quartOut, w
 
             return `
                 width: calc(${width} * ${eased});
+                min-width: calc(${width} * ${eased});
                 ${leftMargin !== "" ? `margin-left: calc(${leftMargin} * ${eased});` : ""}
                 ${rightMargin !== "" ? `margin-right: calc(${rightMargin} * ${eased});` : ""}
                 opacity: ${eased};
