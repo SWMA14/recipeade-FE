@@ -14,25 +14,37 @@
     import upperLeading from "./__upperBarComponents/leading.svelte";
     import lowerMain from "./__lowerBarComponents/main.svelte";
     import lowerLeading from "./__lowerBarComponents/leading.svelte";
+    import lowerTrailing from "./__lowerBarComponents/trailing.svelte";
     import { analyticsService } from "$lib/analytics.js";
 
     export let data;
 
-    getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
+    let isEditing = false;
+    let isLiked = getLikedVideos().then(videos => videos.some(x => x.id === data.id));
+
+    $: getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
         leading: upperLeading,
         leadingProps: {
             onClick: () => history.back()
         },
         isBackgroundShown: true
     });
-    let liked = isLiked();
     $: getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
-        leading: lowerLeading,
+        leading: isEditing ? undefined : lowerLeading,
         leadingProps: {
-            liked,
-            onClick: () => likeClick()
+            liked: isLiked,
+            onClick: () => onLikeClick()
         },
-        main: lowerMain
+        main: lowerMain,
+        mainProps: {
+            isEditing,
+            onEditExit: () => onEditClick()
+        },
+        trailing: isEditing ? undefined : lowerTrailing,
+        trailingProps: {
+            isEditing,
+            onClick: () => onEditClick()
+        },
     });
 
     let isRendered = false;
@@ -50,26 +62,25 @@
         });
     });
 
-    async function isLiked()
+    async function onEditClick()
     {
-        return (await getLikedVideos()).some(x => x.id === data.id);
+        isEditing = !isEditing;
     }
 
-    async function likeClick()
+    async function onLikeClick()
     {
-        if (await liked)
+        if (await isLiked)
         {
             await removeLikedVideo(data.id);
-            liked = Promise.resolve(false);
+            isLiked = Promise.resolve(false);
         }
         else
         {
             await saveLikedVideo(data.id);
-            liked = Promise.resolve(true);
+            isLiked = Promise.resolve(true);
         }
     }
 </script>
-
 
 {#if isRendered}
     <div class="section first" in:flyingFade={{ delay: 0 }}>
@@ -92,6 +103,12 @@
             </div>
         </div> -->
     </div>
+    {#if !isEditing}
+        <div class="section review" in:flyingFade={{ delay: 0 }}>
+            <div class="profile" />
+            123명이 저장했어요
+        </div>
+    {/if}
     <div class="section" in:flyingFade={{ delay: 0 }}>
         <div class="title">
             <h2>재료</h2>
@@ -105,38 +122,51 @@
             </Card>
         {/each}
     </div>
-    <div class="section" class:last={data.recommended.length === 0} class:ios={data.recommended.length === 0 && device === "ios"}
+    <div class="section" class:last={data.recommended.length === 0 || isEditing} class:ios={data.recommended.length === 0 && device === "ios"}
         in:flyingFade={{ delay: 0 }}>
-        <Carousel leftOverflow rightOverflow heading="단계 미리 보기" canShowAll>
-            {#each data.video.recipesteps as step, i (step.description)}
-                <Card leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" columnFlex scrollSnap
-                    modifier="{i + 1}단계" body={step.description}>
-                    <div style="height: calc(var(--space-3xl) * 2);"></div>
-                </Card>
-            {/each}
-            <svelte:fragment slot="grid">
+        {#if !isEditing}
+            <Carousel leftOverflow rightOverflow heading="단계 미리 보기" canShowAll>
                 {#each data.video.recipesteps as step, i (step.description)}
-                    <Card bottomMargin modifier="{i + 1}단계" body={step.description}>
+                    <Card leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" columnFlex scrollSnap
+                        modifier="{i + 1}단계" body={step.description}>
                         <div style="height: calc(var(--space-3xl) * 2);"></div>
                     </Card>
                 {/each}
-            </svelte:fragment>
-        </Carousel>
-    </div>
-    <div class="section last" class:ios={device === "ios"} in:flyingFade={{ delay: 0 }}>
-        {#if data.recommended.length > 0}
-            <Carousel leftOverflow rightOverflow heading="이 레시피는 어때요?" canShowAll>
-                {#each data.recommended as video, i (video.youtubeThumbnail)}
-                    <Video {video} leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" />
-                {/each}
                 <svelte:fragment slot="grid">
-                    {#each data.recommended as video (video.youtubeThumbnail)}
-                        <Video {video} verbose bottomMargin />
+                    {#each data.video.recipesteps as step, i (step.description)}
+                        <Card bottomMargin modifier="{i + 1}단계" body={step.description}>
+                            <div style="height: calc(var(--space-3xl) * 2);"></div>
+                        </Card>
                     {/each}
                 </svelte:fragment>
             </Carousel>
+        {:else}
+            <div class="steps">
+                <h2>단계</h2>
+                {#each data.video.recipesteps as step, i (step.description)}
+                    <Card bottomMargin={i < data.video.recipesteps.length - 1} modifier="{i + 1}단계" body={step.description}>
+                        <div style="height: calc(var(--space-3xl) * 2);"></div>
+                    </Card>
+                {/each}
+            </div>
         {/if}
     </div>
+    {#if !isEditing}
+        <div class="section last" class:ios={device === "ios"} in:flyingFade={{ delay: 0 }}>
+            {#if data.recommended.length > 0}
+                <Carousel leftOverflow rightOverflow heading="이 레시피는 어때요?" canShowAll>
+                    {#each data.recommended as video, i (video.youtubeThumbnail)}
+                        <Video {video} leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" />
+                    {/each}
+                    <svelte:fragment slot="grid">
+                        {#each data.recommended as video (video.youtubeThumbnail)}
+                            <Video {video} verbose bottomMargin />
+                        {/each}
+                    </svelte:fragment>
+                </Carousel>
+            {/if}
+        </div>
+    {/if}
 {/if}
 
 <style lang="postcss">
@@ -149,7 +179,7 @@
         }
 
         &.last {
-            margin-bottom: 0;
+            margin-bottom: var(--space-xs);
 
             &.ios {
                 margin-bottom: var(--space-2xs);
@@ -171,6 +201,25 @@
 
     .statistics {
         color: var(--c-foreground-gray);
+    }
+
+    .review {
+        width: -webkit-fill-available;
+        margin: 0 calc(var(--space-xs) * -1);
+        margin-bottom: var(--space-m);
+        padding: var(--space-xs);
+        display: flex;
+        align-items: center;
+        color: var(--primary-500);
+        background-color: var(--primary-100);
+    }
+
+    .profile {
+        width: var(--space-m);
+        height: var(--space-m);
+        margin-right: var(--space-2xs);
+        border-radius: var(--radius-big);
+        background-color: var(--white);
     }
 
     /* .channel {
@@ -202,5 +251,14 @@
 
     .ingredient span:nth-child(2) {
         color: var(--c-primary);
+    }
+
+    .steps {
+        display: flex;
+        flex-direction: column;
+
+        & h2 {
+            margin-bottom: var(--space-2xs);
+        }
     }
 </style>

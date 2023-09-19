@@ -8,5 +8,5 @@
 </script>
 
 {#await liked then isLiked}
-<Button kind="primary-light" icon={isLiked ? faHeartFilled : faHeart} on:click={onClick} />
+    <Button kind="primary-light" icon={isLiked ? faHeartFilled : faHeart} on:click={onClick} />
 {/await}
