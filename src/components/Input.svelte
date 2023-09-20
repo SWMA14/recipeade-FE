@@ -7,6 +7,10 @@
     export let iconClicked: () => void = () => {};
     export let valueChanged: (value: string) => void = () => {};
     export let value: string;
+    export let autoBreak = false;
+    export let fittedHeight = false;
+    export let noPadding = false;
+    export let noDelete = false;
 
     $: valueChanged(value);
 </script>
@@ -18,9 +22,16 @@
         </div>
     {/if}
     <form on:submit|preventDefault={iconClicked}>
-        <input type="text" class:padding-left={icon} {placeholder} bind:value on:click />
+        {#if autoBreak}
+            <div class="auto-break" contenteditable="true" {placeholder}>
+                {value}
+            </div>
+        {:else}
+            <input type="text" class:fitted-height={fittedHeight} class:padding-left={icon} class:no-padding={noPadding}
+                {placeholder} bind:value on:click />
+        {/if}
     </form>
-    {#if value}
+    {#if value && !noDelete}
         <div class="button right">
             <Button kind="transparent" icon={faXmark} on:click={() => value = ""} />
         </div>
@@ -51,13 +62,26 @@
         padding-right: var(--space-l);
         border-radius: var(--radius);
         background-color: var(--gray-100);
+
+        &.fitted-height {
+            height: unset;
+        }
+
+        &.padding-left {
+            padding-left: var(--space-l);
+        }
+
+        &.no-padding {
+            padding: 0;
+        }
     }
 
     input::placeholder {
         color: var(--gray-400);
     }
 
-    .padding-left {
-        padding-left: var(--space-l);
+    .auto-break:empty:before {
+        content: attr(placeholder);
+        color: var(--gray-400);
     }
 </style>
