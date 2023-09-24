@@ -26,7 +26,9 @@
     <div class="upper-bar">
         <DynamicBar {...dynamicBarContext} {leading} {main} />
     </div>
-    <slot />
+    <div class="content">
+        <slot />
+    </div>
 </div>
 
 <style>
@@ -54,5 +56,10 @@
         left: 0;
         z-index: 1002;
         background-color: var(--white);
+    }
+
+    .content {
+        margin-top: calc(var(--space-3xl) + env(safe-area-inset-top));
+        padding: 0 var(--space-xs);
     }
 </style>
