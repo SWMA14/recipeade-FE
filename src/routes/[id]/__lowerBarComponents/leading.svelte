@@ -1,12 +1,10 @@
 <script lang="ts">
-    import { faHeart as faHeartFilled } from "@fortawesome/free-solid-svg-icons";
-    import { faHeart } from "@fortawesome/free-regular-svg-icons";
+    import { faPenToSquare, faXmark } from "@fortawesome/free-solid-svg-icons";
     import Button from "$components/Button.svelte";
 
-    export let liked: Promise<boolean>;
-    export let onClick: () => void;
+    export let isEditing: boolean;
+    export let onEditStart: () => void;
+    export let onEditCancel: () => void;
 </script>
 
-{#await liked then isLiked}
-    <Button kind="primary-light" icon={isLiked ? faHeartFilled : faHeart} on:click={onClick} />
-{/await}
+<Button kind="primary-light" noHover icon={isEditing ? faXmark : faPenToSquare} on:click={isEditing ? onEditCancel : onEditStart} />

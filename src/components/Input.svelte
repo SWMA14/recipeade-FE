@@ -23,12 +23,12 @@
     {/if}
     <form on:submit|preventDefault={iconClicked}>
         {#if autoBreak}
-            <div class="auto-break" contenteditable="true" {placeholder}>
+            <div class="auto-break" contenteditable="true" {placeholder} on:focusout>
                 {value}
             </div>
         {:else}
             <input type="text" class:fitted-height={fittedHeight} class:padding-left={icon} class:no-padding={noPadding}
-                {placeholder} bind:value on:click />
+                {placeholder} bind:value on:change on:click />
         {/if}
     </form>
     {#if value && !noDelete}

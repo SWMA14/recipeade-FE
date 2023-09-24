@@ -1,21 +1,24 @@
 <script lang="ts">
     import { Device } from "@capacitor/device";
+    import { SortableList } from "@jhubbardsf/svelte-sortablejs";
+    import { faGripLinesVertical, faTrash } from "@fortawesome/free-solid-svg-icons";
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
+    import { analyticsService } from "$lib/analytics";
     import { getCategoryById } from "$lib/category";
-    import { flyingFade } from "$lib/transition";
-    import { unitizeViews, getLikedVideos, saveLikedVideo, removeLikedVideo } from "$lib/video";
     import type { DynamicBarContext } from "$lib/dynamicBar.js";
+    import { flyingFade } from "$lib/transition";
+    import { unitizeViews, getLikedVideos, saveLikedVideo, removeLikedVideo, type VideoData } from "$lib/video";
+    import { allVideos, sharedPlayer } from "../../store";
     import Badge from "$components/Badge.svelte";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
     import Carousel from "$components/Carousel.svelte";
+    import Input from "$components/Input.svelte";
     import Video from "$components/Video.svelte";
     import upperLeading from "./__upperBarComponents/leading.svelte";
-    import lowerMain from "./__lowerBarComponents/main.svelte";
     import lowerLeading from "./__lowerBarComponents/leading.svelte";
-    import lowerTrailing from "./__lowerBarComponents/trailing.svelte";
-    import { analyticsService } from "$lib/analytics.js";
+    import lowerMain from "./__lowerBarComponents/main.svelte";
 
     export let data;
 
@@ -30,25 +33,24 @@
         isBackgroundShown: true
     });
     $: getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
-        leading: isEditing ? undefined : lowerLeading,
+        leading: lowerLeading,
         leadingProps: {
-            liked: isLiked,
-            onClick: () => onLikeClick()
+            isEditing,
+            onEditStart,
+            onEditCancel
         },
         main: lowerMain,
         mainProps: {
             isEditing,
-            onEditExit: () => onEditClick()
-        },
-        trailing: isEditing ? undefined : lowerTrailing,
-        trailingProps: {
-            isEditing,
-            onClick: () => onEditClick()
+            onEditExit: () => onEditExit()
         },
     });
 
     let isRendered = false;
     let device: "ios" | "android" | "web";
+    let recipe = $allVideos.find(x => x.youtubeVideoId === data.id) ?? data.video;
+    let cache = {} as VideoData;
+    let temp = "";
 
     Device.getInfo()
         .then(x => device = x.platform)
@@ -56,15 +58,31 @@
 
     onMount(() => {
         isRendered = true;
+
         analyticsService.setScreenName("recipe");
         analyticsService.logEvent("recipeview_page", {
             page_title: "recipeview_page"
         });
     });
 
-    async function onEditClick()
+    function onEditStart()
     {
-        isEditing = !isEditing;
+        cache = structuredClone($allVideos.find(x => x.youtubeVideoId === data.id) ?? data.video);
+        isEditing = true;
+    }
+
+    function onEditCancel()
+    {
+        isEditing = false;
+    }
+
+    function onEditExit()
+    {
+        isEditing = false;
+
+        const index = $allVideos.findIndex(x => x.youtubeVideoId === data.id);
+        $allVideos[index] = structuredClone(cache);
+        recipe = cache;
     }
 
     async function onLikeClick()
@@ -79,6 +97,20 @@
             await saveLikedVideo(data.id);
             isLiked = Promise.resolve(true);
         }
+    }
+
+    function handleIngredientsSort(e: any)
+    {
+        const temp = cache.ingredients[e.oldIndex];
+        cache.ingredients[e.oldIndex] = cache.ingredients[e.newIndex];
+        cache.ingredients[e.newIndex] = temp;
+    }
+
+    function handleStepsSort(e: any)
+    {
+        const temp = cache.recipesteps[e.oldIndex];
+        cache.recipesteps[e.oldIndex] = cache.recipesteps[e.newIndex];
+        cache.recipesteps[e.newIndex] = temp;
     }
 </script>
 
@@ -113,27 +145,52 @@
         <div class="title">
             <h2>재료</h2>
         </div>
-        {#each data.video.ingredients as ingredient}
-            <Card bottomMargin>
-                <div class="ingredient">
-                    <span>{ingredient.name}</span>
-                    <span>{ingredient.quantity ?? ""}{ingredient.unit ?? ""}</span>
-                </div>
-            </Card>
-        {/each}
+        {#if isEditing}
+            <SortableList class="sortable-list" handle=".handle" onEnd={handleIngredientsSort}>
+                {#each cache.ingredients as ingredient, i (ingredient.name)}
+                    <Card bottomMargin>
+                        <div class="list-content">
+                            <div class="ingredient" class:edit={isEditing}>
+                                <Input placeholder="재료명" value={ingredient.name} on:change={e => cache.ingredients[i].name = e.target.value}
+                                    fittedHeight noPadding noDelete />
+                                <div style="color: var(--primary-500);">
+                                <Input placeholder="수량" value={ingredient.quantity ?? ""}{ingredient.unit ?? ""}
+                                    fittedHeight noPadding noDelete />
+                                </div>
+                            </div>
+                            <div class="button-wrapper">
+                                <Button kind="transparent" size="small" icon={faTrash} on:click={() => cache.ingredients.splice(i, 1)} />
+                            </div>
+                            <div class="button-wrapper handle">
+                                <Button kind="transparent" size="small" icon={faGripLinesVertical} />
+                            </div>
+                        </div>
+                    </Card>
+                {/each}
+            </SortableList>
+        {:else}
+            {#each recipe.ingredients as ingredient (ingredient.name)}
+                <Card bottomMargin>
+                    <div class="ingredient">
+                        <span>{ingredient.name}</span>
+                        <span>{ingredient.quantity ?? ""}{ingredient.unit ?? ""}</span>
+                    </div>
+                </Card>
+            {/each}
+        {/if}
     </div>
     <div class="section" class:last={data.recommended.length === 0 || isEditing} class:ios={data.recommended.length === 0 && device === "ios"}
         in:flyingFade={{ delay: 0 }}>
         {#if !isEditing}
             <Carousel leftOverflow rightOverflow heading="단계 미리 보기" canShowAll>
-                {#each data.video.recipesteps as step, i (step.description)}
+                {#each recipe.recipesteps as step, i (step.description)}
                     <Card leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" columnFlex scrollSnap
                         modifier="{i + 1}단계" body={step.description}>
                         <div style="height: calc(var(--space-3xl) * 2);"></div>
                     </Card>
                 {/each}
                 <svelte:fragment slot="grid">
-                    {#each data.video.recipesteps as step, i (step.description)}
+                    {#each recipe.recipesteps as step, i (step.description)}
                         <Card bottomMargin modifier="{i + 1}단계" body={step.description}>
                             <div style="height: calc(var(--space-3xl) * 2);"></div>
                         </Card>
@@ -143,11 +200,30 @@
         {:else}
             <div class="steps">
                 <h2>단계</h2>
-                {#each data.video.recipesteps as step, i (step.description)}
-                    <Card bottomMargin={i < data.video.recipesteps.length - 1} modifier="{i + 1}단계" body={step.description}>
-                        <div style="height: calc(var(--space-3xl) * 2);"></div>
-                    </Card>
-                {/each}
+                <SortableList class="sortable-list" handle=".handle" onEnd={handleStepsSort}>
+                    {#each cache.recipesteps as step, i (step.description)}
+                        <Card bottomMargin={i < cache.recipesteps.length - 1}>
+                            <div class="list-content">
+                                <div class="step">
+                                    <Input placeholder="단계 설명" value={step.description} on:focusout={e => cache.recipesteps[i].description = e.target.textContent}
+                                        autoBreak fittedHeight noPadding noDelete />
+                                    <div class="timestamp">
+                                        <span>{step.timestamp}</span>
+                                        <div class="button-wrapper">
+                                            <Button size="small">현재 시간으로 변경</Button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="button-wrapper">
+                                    <Button kind="transparent" size="small" icon={faTrash} on:click={() => cache.recipesteps.splice(i, 1)} />
+                                </div>
+                                <div class="button-wrapper handle">
+                                    <Button kind="transparent" size="small" icon={faGripLinesVertical} />
+                                </div>
+                            </div>
+                        </Card>
+                    {/each}
+                </SortableList>
             </div>
         {/if}
     </div>
@@ -244,9 +320,25 @@
         border-radius: var(--radius-big);
     } */
 
+    .list-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .button-wrapper {
+        width: var(--space-m);
+    }
+
     .ingredient {
+        width: -webkit-fill-available;
+        margin-right: var(--space-xs);
         display: flex;
         justify-content: space-between;
+
+        &.edit {
+            flex-direction: column;
+        }
     }
 
     .ingredient span:nth-child(2) {
@@ -259,6 +351,34 @@
 
         & h2 {
             margin-bottom: var(--space-2xs);
+        }
+    }
+
+    .step {
+        width: -webkit-fill-available;
+        margin-right: var(--space-xs);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .description:empty:before {
+        content: attr(placeholder);
+        color: var(--gray-400);
+    }
+
+    .timestamp {
+        margin-top: var(--space-2xs);
+        display: flex;
+        align-items: center;
+
+        & .button-wrapper {
+            width: calc(var(--space-3xl) * 2);
+        }
+
+        & span {
+            margin-right: var(--space-2xs);
+            color: var(--primary-500);
+            font-variant-numeric: tabular-nums;
         }
     }
 </style>
