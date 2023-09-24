@@ -104,9 +104,9 @@
 
     async function getCurrentTimestamp()
     {
-        const duration = await $sharedPlayer.getCurrentTime();
-        const minutes = `${Math.floor(duration / 60)}`.padStart(2, "0");
-        const seconds = `${Math.floor(duration % 60)}`.padStart(2, "0");
+        const time = await $sharedPlayer.getCurrentTime();
+        const minutes = `${Math.floor(time / 60)}`.padStart(2, "0");
+        const seconds = `${Math.floor(time % 60)}`.padStart(2, "0");
 
         return `${minutes}:${seconds}`;
     }
@@ -189,7 +189,10 @@
                                 <Input placeholder="재료명" value={ingredient.name} on:change={e => cache.ingredients[i].name = e.target.value}
                                     fittedHeight noPadding noDelete />
                                 <div style="color: var(--primary-500);">
-                                <Input placeholder="수량" value={ingredient.quantity ?? ""}{ingredient.unit ?? ""}
+                                <Input placeholder="수량" value={ingredient.quantity ?? ""}{ingredient.unit ?? ""} on:change={e => {
+                                    cache.ingredients[i].quantity = e.target.value;
+                                    cache.ingredients[i].unit = "";
+                                }}
                                     fittedHeight noPadding noDelete />
                                 </div>
                             </div>
@@ -217,23 +220,7 @@
     </div>
     <div class="section" class:last={data.recommended.length === 0 || isEditing} class:ios={data.recommended.length === 0 && device === "ios"}
         in:flyingFade={{ delay: 0 }}>
-        {#if !isEditing}
-            <Carousel leftOverflow rightOverflow heading="단계 미리 보기" canShowAll>
-                {#each recipe.recipesteps as step, i (step.description)}
-                    <Card leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" columnFlex scrollSnap
-                        modifier="{i + 1}단계" body={step.description}>
-                        <div style="height: calc(var(--space-3xl) * 2);"></div>
-                    </Card>
-                {/each}
-                <svelte:fragment slot="grid">
-                    {#each recipe.recipesteps as step, i (step.description)}
-                        <Card bottomMargin modifier="{i + 1}단계" body={step.description}>
-                            <div style="height: calc(var(--space-3xl) * 2);"></div>
-                        </Card>
-                    {/each}
-                </svelte:fragment>
-            </Carousel>
-        {:else}
+        {#if isEditing}
             <div class="steps">
                 <h2>단계</h2>
                 <SortableList class="sortable-list" handle=".handle" onEnd={handleStepsSort}>
@@ -262,6 +249,22 @@
                 </SortableList>
                 <Button on:click={addStep}>단계 추가하기</Button>
             </div>
+        {:else}
+            <Carousel leftOverflow rightOverflow heading="단계 미리 보기" canShowAll>
+                {#each recipe.recipesteps as step, i (step.description)}
+                    <Card leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" columnFlex scrollSnap
+                        modifier="{i + 1}단계" body={step.description}>
+                        <div style="height: calc(var(--space-3xl) * 2);"></div>
+                    </Card>
+                {/each}
+                <svelte:fragment slot="grid">
+                    {#each recipe.recipesteps as step, i (step.description)}
+                        <Card bottomMargin modifier="{i + 1}단계" body={step.description}>
+                            <div style="height: calc(var(--space-3xl) * 2);"></div>
+                        </Card>
+                    {/each}
+                </svelte:fragment>
+            </Carousel>
         {/if}
     </div>
     {#if !isEditing}
