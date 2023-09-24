@@ -5,6 +5,8 @@
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { duration, flyingFade } from "$lib/transition";
     import DynamicBar from "$components/DynamicBar.svelte";
+    import main from "./__stackUpperBarComponents/main.svelte";
+    import leading from "./__stackUpperBarComponents/leading.svelte";
 
     export let dynamicBarContext: DynamicBarContext;
     export let onBack: () => void;
@@ -12,7 +14,7 @@
     document.body.style.overflow = "hidden";
     document.body.style.height = "100%";
     $stacks = [...$stacks, onBack];
-    
+
     onDestroy(() => {
         document.body.style.overflow = "";
         document.body.style.height = "";
@@ -22,7 +24,7 @@
 
 <div class="panel" in:flyingFade={{ duration: duration * 3, y: 50 }} out:flyingFade={{ duration: duration * 3, easing: quartIn, y: 50}}>
     <div class="upper-bar">
-        <DynamicBar {...dynamicBarContext} />
+        <DynamicBar {...dynamicBarContext} {leading} {main} />
     </div>
     <slot />
 </div>
