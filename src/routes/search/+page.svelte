@@ -241,7 +241,6 @@
     }
 
     .wrapper {
-        width: var(--space-xxl);
         margin-right: var(--space-2xs);
     }
 
