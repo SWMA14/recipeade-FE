@@ -80,6 +80,9 @@
     {
         isEditing = false;
 
+        cache.ingredients = cache.ingredients.filter(x => x.name);
+        cache.recipesteps = cache.recipesteps.filter(x => x.description);
+
         const index = $allVideos.findIndex(x => x.youtubeVideoId === data.id);
         $allVideos[index] = structuredClone(cache);
         recipe = cache;
@@ -99,6 +102,15 @@
         }
     }
 
+    async function getCurrentTimestamp()
+    {
+        const duration = await $sharedPlayer.getCurrentTime();
+        const minutes = `${Math.floor(duration / 60)}`.padStart(2, "0");
+        const seconds = `${Math.floor(duration % 60)}`.padStart(2, "0");
+
+        return `${minutes}:${seconds}`;
+    }
+
     function handleIngredientsSort(e: any)
     {
         const temp = cache.ingredients[e.oldIndex];
@@ -106,11 +118,34 @@
         cache.ingredients[e.newIndex] = temp;
     }
 
+    async function addIngredient()
+    {
+        cache.ingredients = [
+            ...cache.ingredients,
+            {
+                name: "",
+                quantity: "",
+                unit: ""
+            }
+        ];
+    }
+
     function handleStepsSort(e: any)
     {
         const temp = cache.recipesteps[e.oldIndex];
         cache.recipesteps[e.oldIndex] = cache.recipesteps[e.newIndex];
         cache.recipesteps[e.newIndex] = temp;
+    }
+
+    async function addStep()
+    {
+        cache.recipesteps = [
+            ...cache.recipesteps,
+            {
+                description: "",
+                timestamp: await getCurrentTimestamp()
+            }
+        ];
     }
 </script>
 
@@ -167,6 +202,7 @@
                         </div>
                     </Card>
                 {/each}
+                <Button on:click={addIngredient}>재료 추가하기</Button>
             </SortableList>
         {:else}
             {#each recipe.ingredients as ingredient (ingredient.name)}
@@ -202,7 +238,7 @@
                 <h2>단계</h2>
                 <SortableList class="sortable-list" handle=".handle" onEnd={handleStepsSort}>
                     {#each cache.recipesteps as step, i (step.description)}
-                        <Card bottomMargin={i < cache.recipesteps.length - 1}>
+                        <Card bottomMargin>
                             <div class="list-content">
                                 <div class="step">
                                     <Input placeholder="단계 설명" value={step.description} on:focusout={e => cache.recipesteps[i].description = e.target.textContent}
@@ -210,7 +246,7 @@
                                     <div class="timestamp">
                                         <span>{step.timestamp}</span>
                                         <div class="button-wrapper">
-                                            <Button size="small">현재 시간으로 변경</Button>
+                                            <Button size="small" on:click={async () => cache.recipesteps[i].timestamp = await getCurrentTimestamp()}>현재 시간으로 변경</Button>
                                         </div>
                                     </div>
                                 </div>
@@ -224,6 +260,7 @@
                         </Card>
                     {/each}
                 </SortableList>
+                <Button on:click={addStep}>단계 추가하기</Button>
             </div>
         {/if}
     </div>
