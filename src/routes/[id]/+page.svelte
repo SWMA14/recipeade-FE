@@ -15,6 +15,7 @@
     import Card from "$components/Card.svelte";
     import Carousel from "$components/Carousel.svelte";
     import Input from "$components/Input.svelte";
+    import Stack from "$components/Stack.svelte";
     import Video from "$components/Video.svelte";
     import upperLeading from "./__upperBarComponents/leading.svelte";
     import lowerLeading from "./__lowerBarComponents/leading.svelte";
@@ -46,11 +47,20 @@
         },
     });
 
+    const dynamicBarContext: DynamicBarContext = {
+        leadingProps: {
+            onClick: hideTagStack
+        },
+        mainProps: {
+            heading: "태그 수정"
+        }
+    };
+
     let isRendered = false;
     let device: "ios" | "android" | "web";
     let recipe = $allVideos.find(x => x.youtubeVideoId === data.id) ?? data.video;
     let cache = {} as VideoData;
-    let temp = "";
+    let shown = false;
 
     Device.getInfo()
         .then(x => device = x.platform)
@@ -86,6 +96,16 @@
         const index = $allVideos.findIndex(x => x.youtubeVideoId === data.id);
         $allVideos[index] = structuredClone(cache);
         recipe = cache;
+    }
+
+    function showTagStack()
+    {
+        shown = true;
+    }
+
+    function hideTagStack()
+    {
+        shown = false;
     }
 
     async function onLikeClick()
@@ -154,7 +174,11 @@
         <div class="badges">
             <Badge dark rightMargin>{getCategoryById(data.video.difficulty)}</Badge>
             <Badge dark rightMargin>{data.video.category}</Badge>
-            <!-- <Badge dark>★ 5.0</Badge> -->
+            {#if isEditing}
+                <div class="tag">
+                    <Button kind="badge" size="small" on:click={showTagStack}>태그 수정</Button>
+                </div>
+            {/if}
         </div>
         <h2>{data.video.youtubeTitle}</h2>
         <p class="statistics typo-body-2">
@@ -197,7 +221,10 @@
                                 </div>
                             </div>
                             <div class="button-wrapper">
-                                <Button kind="transparent" size="small" icon={faTrash} on:click={() => cache.ingredients.splice(i, 1)} />
+                                <Button kind="transparent" size="small" icon={faTrash} on:click={() => {
+                                    cache.ingredients.splice(i, 1);
+                                    cache = cache;
+                                }} />
                             </div>
                             <div class="button-wrapper handle">
                                 <Button kind="transparent" size="small" icon={faGripLinesVertical} />
@@ -238,7 +265,10 @@
                                     </div>
                                 </div>
                                 <div class="button-wrapper">
-                                    <Button kind="transparent" size="small" icon={faTrash} on:click={() => cache.recipesteps.splice(i, 1)} />
+                                    <Button kind="transparent" size="small" icon={faTrash} on:click={() => {
+                                        cache.recipesteps.splice(i, 1);
+                                        cache = cache;
+                                    }} />
                                 </div>
                                 <div class="button-wrapper handle">
                                     <Button kind="transparent" size="small" icon={faGripLinesVertical} />
@@ -282,6 +312,39 @@
                 </Carousel>
             {/if}
         </div>
+    {/if}
+    {#if shown}
+        <Stack {dynamicBarContext} onBack={hideTagStack}>
+            <div class="tags-content">
+                <div class="tags-section">
+                    <h3>난이도</h3>
+                    <div class="tags">
+                        {#each ["아주 쉬움", "쉬움", "보통", "어려움", "아주 어려움"] as difficulty (difficulty)}
+                            <div class="tag">
+                                <Button kind="badge" size="small">
+                                    {difficulty}
+                                </Button>
+                            </div>
+                        {/each}
+                    </div>
+                </div>
+                <div class="tags-section">
+                    <h3>종류</h3>
+                    <div class="tags">
+                        {#each ["한식", "양식", "중식", "일식", "아시안"] as difficulty (difficulty)}
+                            <div class="tag">
+                                <Button kind="badge" size="small">
+                                    {difficulty}
+                                </Button>
+                            </div>
+                        {/each}
+                    </div>
+                </div>
+                <div class="tags-section">
+                    <h3>기타</h3>
+                </div>
+            </div>
+        </Stack>
     {/if}
 {/if}
 
@@ -420,5 +483,26 @@
             color: var(--primary-500);
             font-variant-numeric: tabular-nums;
         }
+    }
+
+    .tags-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .tags-section {
+        margin-bottom: var(--space-m);
+
+        & h3 {
+            margin-bottom: var(--space-xs);
+        }
+    }
+
+    .tags {
+        display: flex;
+    }
+
+    .tag {
+        margin-right: var(--space-2xs);
     }
 </style>

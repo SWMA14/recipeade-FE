@@ -100,8 +100,6 @@
     }
 
     .grid {
-        margin-top: calc(var(--space-3xl) + env(safe-area-inset-top));
-        padding: 0 var(--space-xs);
         display: flex;
         flex-direction: column;
     }
