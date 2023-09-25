@@ -8,71 +8,130 @@
 import UIKit
 import Social
 
-class ShareViewController: SLComposeServiceViewController {
-    var sharedURL: URL?
-    var sharedImage: UIImage?
-    var sharedText: String?
-    
-    override func isContentValid() -> Bool {
-        // Do validation of contentText and/or NSExtensionContext attachments here
-        return true
-    }
+//class ShareViewController: SLComposeServiceViewController {
+//    var sharedURL: URL?
+//    var sharedImage: UIImage?
+//    var sharedText: String?
+//
+//    override func isContentValid() -> Bool {
+//        // Do validation of contentText and/or NSExtensionContext attachments here
+//        return true
+//    }
+//
+//    override func viewDidLoad() {
+//        super.viewDidLoad()
+//
+//
+//        let extensionItem = extensionContext?.inputItems.first as? NSExtensionItem
+//        let itemProvider = extensionItem?.attachments?.first as? NSItemProvider
+//
+//        if itemProvider?.hasItemConformingToTypeIdentifier("public.url") == true {
+//            itemProvider?.loadItem(forTypeIdentifier: "public.url", options: nil) { [weak self] (url, error) in
+//                if let shareURL = url as? URL {
+//                    self?.sharedURL = shareURL
+//                }
+//            }
+//        }
+//
+//        if itemProvider?.hasItemConformingToTypeIdentifier("public.image") == true {
+//            itemProvider?.loadItem(forTypeIdentifier: "public.image", options: nil) { [weak self] (image, error) in
+//                if let shareImage = image as? UIImage {
+//                    self?.sharedImage = shareImage
+//                }
+//            }
+//        }
+//
+//    }
+//
+//    override func didSelectPost() {
+//        // This is called after the user selects Post. Do the upload of contentText and/or NSExtensionContext attachments.
+//
+//        // Inform the host that we're done, so it un-blocks its UI. Note: Alternatively you could call super's -didSelectPost, which will similarly complete the extension context.
+//        // Save data to UserDefaults with App Group identifier
+//        let userDefaults = UserDefaults(suiteName: "group.com.recipeade.svelte")
+//
+//        if let content = textView.text{
+//            userDefaults?.set(content, forKey: "sharedText")
+//        }
+//
+//        userDefaults?.set(sharedURL?.absoluteString, forKey: "sharedURL")
+//
+//        // Convert UIImage to Data for saving in UserDefaults
+//        if let image = sharedImage {
+//            if let imageData = image.jpegData(compressionQuality: 1.0) {
+//                let base64String = imageData.base64EncodedString()
+//                userDefaults?.set(base64String, forKey: "sharedImage")
+//            }
+//        }
+//
+//        // End the request by calling completeRequestReturningItems(_:), passing the items that were initially supplied.
+//        self.extensionContext!.completeRequest(returningItems: [], completionHandler:nil)
+//    }
+//
+//    override func configurationItems() -> [Any]! {
+//        // To add configuration options via table cells at the bottom of the sheet, return an array of SLComposeSheetConfigurationItem here.
+//        return []
+//    }
+//
+//}
 
+
+class ShareViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
-        let extensionItem = extensionContext?.inputItems.first as? NSExtensionItem
-        let itemProvider = extensionItem?.attachments?.first as? NSItemProvider
-        
-        if itemProvider?.hasItemConformingToTypeIdentifier("public.url") == true {
-            itemProvider?.loadItem(forTypeIdentifier: "public.url", options: nil) { [weak self] (url, error) in
-                if let shareURL = url as? URL {
-                    self?.sharedURL = shareURL
+        if let item = extensionContext?.inputItems.first as? NSExtensionItem,
+           let itemProvider = item.attachments?.first as? NSItemProvider,
+           itemProvider.hasItemConformingToTypeIdentifier("public.url") {
+            // This is a URL
+            itemProvider.loadItem(forTypeIdentifier: "public.url", options: nil) { [weak self] (urlData, error) in
+                if let urlData = urlData as? URL {
+                    // Save the URL to shared user defaults
+                    let userDefaults = UserDefaults(suiteName: "group.com.recipeade.svelte")
+                    userDefaults?.set(urlData.absoluteString, forKey: "sharedURL")
+                    
+                    DispatchQueue.main.async {
+                        self?.showSnackBar(message: "레시피 추출 중...")
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0){
+                            self?.showSnackBar(message: "레시피 생성 완료!")
+                            self?.extensionContext?.completeRequest(returningItems: [],completionHandler: nil)
+                        }
+                    }
                 }
             }
         }
-        
-        if itemProvider?.hasItemConformingToTypeIdentifier("public.image") == true {
-            itemProvider?.loadItem(forTypeIdentifier: "public.image", options: nil) { [weak self] (image, error) in
-                if let shareImage = image as? UIImage {
-                    self?.sharedImage = shareImage
-                }
-            }
-        }
-
     }
-
-    override func didSelectPost() {
-        // This is called after the user selects Post. Do the upload of contentText and/or NSExtensionContext attachments.
+    
+    func showSnackBar(message: String){
         
-        // Inform the host that we're done, so it un-blocks its UI. Note: Alternatively you could call super's -didSelectPost, which will similarly complete the extension context.
-        // Save data to UserDefaults with App Group identifier
-        let userDefaults = UserDefaults(suiteName: "group.com.recipeade.svelte")
+        let snackBarView = UIView()
+        snackBarView.backgroundColor = UIColor.orange
+        snackBarView.layer.cornerRadius = 10 // Adjust as needed
+        snackBarView.clipsToBounds = true
+        snackBarView.translatesAutoresizingMaskIntoConstraints = false
         
-        if let content = textView.text{
-            userDefaults?.set(content, forKey: "sharedText")
-        }
+        let label = UILabel()
+        label.text = message
+        label.textColor = .white
+        label.translatesAutoresizingMaskIntoConstraints = false
         
-        userDefaults?.set(sharedURL?.absoluteString, forKey: "sharedURL")
+        snackBarView.addSubview(label)
+        self.view.addSubview(snackBarView)
         
-        // Convert UIImage to Data for saving in UserDefaults
-        if let image = sharedImage {
-            if let imageData = image.jpegData(compressionQuality: 1.0) {
-                let base64String = imageData.base64EncodedString()
-                userDefaults?.set(base64String, forKey: "sharedImage")
-            }
-        }
-        
-        // End the request by calling completeRequestReturningItems(_:), passing the items that were initially supplied.
-        self.extensionContext!.completeRequest(returningItems: [], completionHandler:nil)
+        NSLayoutConstraint.activate([
+            snackBarView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            snackBarView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
+            snackBarView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            
+            // Set a fixed height for the snack bar.
+            snackBarView.heightAnchor.constraint(equalToConstant: 50),
+            
+            // Center the label within the snack bar.
+            label.centerXAnchor.constraint(equalTo: snackBarView.centerXAnchor),
+            label.centerYAnchor.constraint(equalTo: snackBarView.centerYAnchor),
+        ])
     }
-
-    override func configurationItems() -> [Any]! {
-        // To add configuration options via table cells at the bottom of the sheet, return an array of SLComposeSheetConfigurationItem here.
-        return []
-    }
-
 }
-
 //import UIKit
 //import Social
 //import MobileCoreServices
