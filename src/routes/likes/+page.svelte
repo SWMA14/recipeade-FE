@@ -2,9 +2,11 @@
     import { getContext } from "svelte";
     import type { Writable } from "svelte/store";
     import { allVideos } from "../../store";
+    import { goto } from "$app/navigation";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { flyingFade } from "$lib/transition";
     import { getLikedVideos, clearLikedVideos } from "$lib/video";
+    import Button from "$components/Button.svelte";
     import Video from "$components/Video.svelte";
     import main from "../__lowerBarComponents/main.svelte";
 
@@ -36,11 +38,12 @@
             <div class="heading">
                 <h2>좋아요한 레시피</h2>
                 {#if videos.length > 0}
-                    <span class="erase-all typo-body-2" role="button" tabindex="0" on:click={clearAndUpdateLikedVideos} on:keydown={clearAndUpdateLikedVideos}>
-                        모두 지우기
-                    </span>
+                <span class="erase-all typo-body-2" role="button" tabindex="0" on:click={clearAndUpdateLikedVideos} on:keydown={clearAndUpdateLikedVideos}>
+                    모두 지우기
+                </span>
                 {/if}
             </div>
+            <Button on:click={() => goto("/login")}>로그인</Button>
             <div class="grid">
                 {#if likedVideos.length > 0}
                     {#each videos as video (video.youtubeThumbnail)}
