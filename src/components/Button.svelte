@@ -1,14 +1,16 @@
 <script lang="ts">
     import { Device } from "@capacitor/device";
     import Fa from "svelte-fa";
-    import type { IconDefinition } from "@fortawesome/free-solid-svg-icons";
+    import type { IconDefinition as SolidIconDefinition } from "@fortawesome/free-solid-svg-icons";
+    import type { IconDefinition as BrandIconDefinition } from "@fortawesome/free-brands-svg-icons";
     import type { ButtonType, SpaceType } from "$lib/types";
 
     export let kind: ButtonType = "primary";
     export let size: "default" | "small" = "default";
-    export let icon: IconDefinition | undefined = undefined;
+    export let icon: SolidIconDefinition | BrandIconDefinition | undefined = undefined;
     export let leftMargin: SpaceType | undefined = undefined;
     export let rightMargin: SpaceType | undefined = undefined;
+    export let bottomMargin: SpaceType | undefined = undefined;
     export let noHover = false;
     export let selected = false;
     export let progress: number | undefined = undefined;
@@ -16,6 +18,7 @@
 
     let leftMarginValue = leftMargin ? `var(--space-${leftMargin})` : undefined;
     let rightMarginValue = rightMargin ? `var(--space-${rightMargin})` : undefined;
+    let bottomMarginValue = bottomMargin ? `var(--space-${bottomMargin})` : undefined;
     let device: "ios" | "android" | "web";
 
     Device.getInfo()
@@ -24,13 +27,15 @@
 </script>
 
 <button class="kind-{kind} size-{size}" {...$$restProps} class:no-hover={noHover || device !== "web"} class:typo-body-2={size === "small"}
-    class:left-margin={leftMargin} class:right-margin={rightMargin} class:selected class:progress
-    style="--progress: {progress ?? 0}%; --left-margin: {leftMarginValue}; --right-margin: {rightMarginValue};
+    class:left-margin={leftMargin} class:right-margin={rightMargin} class:bottom-margin={bottomMargin} class:selected class:progress
+    style="--progress: {progress ?? 0}%; --left-margin: {leftMarginValue}; --right-margin: {rightMarginValue}; --bottom-margin: {bottomMarginValue};
     --color: var(--kind-{kind}-color); --background-color: var(--kind-{kind}-background-color);
     --hover: var(--kind-{kind}-hover-background-color);"
     on:click on:focus on:mouseenter on:mousemove on:mouseleave>
     {#if icon}
-        <Fa {icon} />
+        <div class="icon-wrapper">
+            <Fa {icon} />
+        </div>
     {/if}
     <slot />
 </button>
@@ -102,6 +107,10 @@
                 background-image: linear-gradient(to right, var(--primary-100) var(--progress), var(--white) 0%);
             }
         }
+
+        & .icon-wrapper {
+            margin-right: var(--space-2xs);
+        }
     }
 
     .left-margin {
@@ -110,5 +119,9 @@
 
     .right-margin {
         margin-right: var(--right-margin);
+    }
+
+    .bottom-margin {
+        margin-bottom: var(--bottom-margin);
     }
 </style>
