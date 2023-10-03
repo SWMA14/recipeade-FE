@@ -9,6 +9,7 @@
     export let heading: string | undefined = undefined;
     export let body: string | undefined = undefined;
     export let canShowAll = false;
+    export let onScrollEnd: (() => void) | undefined = undefined;
 
     const dynamicBarContext: DynamicBarContext = {
         leadingProps: {
@@ -29,6 +30,12 @@
     function hide()
     {
         shown = false;
+    }
+
+    function onScroll(e: any)
+    {
+        if (e.target.scrollLeft + e.target.clientWidth >= e.target.scrollWidth && onScrollEnd)
+            onScrollEnd();
     }
 </script>
 
@@ -54,7 +61,7 @@
             {/if}
         </div>
     {/if}
-    <div class="scroll" class:left-overflow={leftOverflow} class:right-overflow={rightOverflow}>
+    <div class="scroll" class:left-overflow={leftOverflow} class:right-overflow={rightOverflow} on:scroll={onScroll}>
         <slot />
     </div>
 </div>
