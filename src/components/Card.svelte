@@ -115,7 +115,6 @@
 <style lang="postcss">
     .container {
         width: 100%;
-        height: inherit;
         min-width: var(--card-min-width);
         padding: var(--space-xs);
         display: flex;

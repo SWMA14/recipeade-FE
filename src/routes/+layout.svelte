@@ -58,6 +58,7 @@
 <style lang="postcss">
     main {
         width: 100%;
+        height: 100%;
         /* max-width: var(--max-width); */
         margin: 0 auto;
         margin-top: env(safe-area-inset-top);
