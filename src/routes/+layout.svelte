@@ -4,10 +4,12 @@
     import { App } from "@capacitor/app";
     import { onMount, setContext } from "svelte";
     import { writable } from "svelte/store";
-    import { stacks } from "../store";
+    import { allVideos, stacks } from "../store";
     import { page } from "$app/stores";
-    import { duration, flyingFade } from "$lib/transition";
+    import { PUBLIC_API_ENDPOINT } from "$env/static/public";
     import type { DynamicBarContext } from "$lib/dynamicBar";
+    import { duration, flyingFade } from "$lib/transition";
+    import type { VideoData } from "$lib/video";
     import DynamicBar from "$components/DynamicBar.svelte";
 
     let device: "ios" | "android" | "web";
@@ -22,7 +24,7 @@
     setContext("upperBar", upperBarContext);
     setContext("lowerBar", lowerBarContext);
 
-    onMount(() => {
+    onMount(async () => {
         App.addListener("backButton", () => {
             const length = $stacks.length;
 
@@ -33,6 +35,11 @@
             else
                 App.exitApp();
         });
+
+        if ($allVideos.length === 0)
+            $allVideos = await fetch(`${PUBLIC_API_ENDPOINT}/recipe`)
+                .then(response => response.json())
+                .then(result => result as VideoData[]);
     });
 </script>
 

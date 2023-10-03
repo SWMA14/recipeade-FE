@@ -1,21 +1,25 @@
 <script lang="ts">
     import Fa from "svelte-fa";
-    import { faHouse, faMagnifyingGlass, faHeart } from "@fortawesome/free-solid-svg-icons";
+    import { faHouse, faMagnifyingGlass, faHeart, faBookmark, faFire, faGear } from "@fortawesome/free-solid-svg-icons";
     import { page } from "$app/stores";
     import Card from "$components/Card.svelte";
 
     let tabs = [
         {
             href: "/",
-            icon: faHouse
+            icon: faBookmark
+        },
+        {
+            href: "/discover",
+            icon: faFire
         },
         {
             href: "/search",
             icon: faMagnifyingGlass
         },
         {
-            href: "/likes",
-            icon: faHeart
+            href: "/settings",
+            icon: faGear
         }
     ];
 </script>

@@ -1,182 +1,71 @@
 <script lang="ts">
-    import { Device } from "@capacitor/device";
-    import { getContext, onMount } from "svelte";
+    import { getContext } from "svelte";
     import type { Writable } from "svelte/store";
-    import { MetaTags } from "svelte-meta-tags";
     import { allVideos } from "../store";
-    import { PUBLIC_API_ENDPOINT } from "$env/static/public";
-    import { DUMMY_VIDEO } from "$lib/dummy";
+    import { goto } from "$app/navigation";
     import type { DynamicBarContext } from "$lib/dynamicBar";
-    import type { VideoData } from "$lib/video";
-    import Carousel from "$components/Carousel.svelte";
-    import Card from "$components/Card.svelte";
-    import Skeleton from "$components/Skeleton.svelte";
+    import { flyingFade } from "$lib/transition";
+    import { getLikedVideos, clearLikedVideos } from "$lib/video";
+    import Button from "$components/Button.svelte";
     import Video from "$components/Video.svelte";
-    import main from "./__lowerBarComponents/main.svelte";
+    import upperMain from "./__upperBarComponents/main.svelte";
+    import lowerMain from "./__lowerBarComponents/main.svelte";
 
     getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
-        isHidden: true
+        isBackgroundShown: true,
+        main: upperMain
     });
     getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
-        main
+        main: lowerMain
     });
 
-    const title = "레시피에이드";
-    const description = "";
+    let updateVidoes = {};
 
-    let device: "ios" | "android" | "web";
-    let isRendered = false;
+    function confident(target: any | undefined): any
+    {
+        return target!;
+    }
 
-    let random: VideoData;
-    let rest: VideoData[];
-    let highViews: VideoData[];
-    let easy: VideoData[];
-    let others: VideoData[];
-
-    Device.getInfo()
-        .then(x => device = x.platform)
-        .catch(() => device = "web");
-
-    onMount(async () => {
-        if ($allVideos.length === 0)
-            $allVideos = await fetch(`${PUBLIC_API_ENDPOINT}/recipe`)
-                .then(response => response.json())
-                .then(result => result as VideoData[]);
-
-        for (const video of $allVideos)
-            for (const step of video.recipesteps)
-                if (step.timestamp.split(":")[0].length === 1)
-                    step.timestamp = "0" + step.timestamp;
-
-        random = $allVideos.sort(() => 0.5 - Math.random())[0];
-        rest = $allVideos.filter(x => x !== random);
-
-        highViews = rest.sort((a, b) => b.youtubeViewCount - a.youtubeViewCount).slice(0, 5);
-        easy = rest.filter(x => x.difficulty <= 2);
-        others = rest.filter(x => !highViews.includes(x) && !easy.includes(x));
-
-        isRendered = true;
-    });
+    async function clearAndUpdateLikedVideos()
+    {
+        await clearLikedVideos();
+        updateVidoes = {};
+    }
 </script>
 
-<MetaTags
-    {title}
-    {description}
-    canonical=""
-    openGraph={{
-        type: "website",
-        site_name: "레시피에이드",
-        url: "",
-        title,
-        description,
-        images: [
-            {
-                url: "/images/thumbnail.png"
-            }
-        ]
-    }}
-    additionalMetaTags={[
-        {
-            property: "theme-color",
-            content: "#fc5e03"
-        }
-    ]}
-/>
-
-<div class="intro">
-    {#if !isRendered}
-        <Card skeleton noRadius largePadding square squareOverflowSafeArea={device === "ios"} />
-    {:else}
-        <a href="/{random.youtubeVideoId}" style="height: 120%;">
-            <Card video={random.youtubeVideoId} noRadius largePadding darkOverlay={0.7}
-                square squareOverflowSafeArea={device === "ios"}
-                heading="이 레시피는<br>어때요?" modifier={random.channel.ChannelName} body={random.youtubeTitle} />
-        </a>
-    {/if}
-</div>
-<div class="section">
-    <Carousel skeleton={!isRendered} leftOverflow rightOverflow heading="유튜브에서 핫해요" canShowAll>
-        {#if !isRendered}
-            <Video skeleton video={DUMMY_VIDEO} leftMargin="xs" rightMargin="xs" />
-            <Video skeleton video={DUMMY_VIDEO} />
-        {:else}
-            {#each highViews as video, i (video.youtubeThumbnail)}
-                <Video {video} leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" />
-            {/each}
-        {/if}
-        <svelte:fragment slot="grid">
-            {#if isRendered}
-                {#each highViews as video, i (video.youtubeThumbnail)}
-                    <Video {video} verbose bottomMargin />
-                {/each}
-            {/if}
-        </svelte:fragment>
-    </Carousel>
-</div>
-<div class="section">
-    <Carousel skeleton={!isRendered} leftOverflow rightOverflow heading="쉽게 따라해요" canShowAll>
-        {#if !isRendered}
-            <Video skeleton video={DUMMY_VIDEO} leftMargin="xs" rightMargin="xs" />
-            <Video skeleton video={DUMMY_VIDEO} />
-        {:else}
-            {#each easy as video, i (video.youtubeThumbnail)}
-                <Video {video} leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" />
-            {/each}
-        {/if}
-        <svelte:fragment slot="grid">
-            {#if isRendered}
-                {#each easy as video (video.youtubeThumbnail)}
-                    <Video {video} verbose bottomMargin />
-                {/each}
-            {/if}
-        </svelte:fragment>
-    </Carousel>
-</div>
-<div class="section last" class:ios={device === "ios"}>
-    {#if !isRendered}
-        <div class="grid-title">
-            <Skeleton />
-        </div>
-        <div class="grid">
-            <Video skeleton video={DUMMY_VIDEO} bottomMargin />
-            <Video skeleton video={DUMMY_VIDEO} />
-        </div>
-    {:else}
-        <h2 class="grid-title">다른 레시피들도 있어요</h2>
-        <div class="grid">
-            {#each others as video (video.youtubeThumbnail)}
-                <Video {video} verbose bottomMargin />
-            {/each}
-        </div>
-    {/if}
+<div class="section" in:flyingFade={{ delay: 0 }}>
+    {#key updateVidoes}
+        {#await getLikedVideos() then likedVideos}
+            {@const videos = likedVideos.map(video => confident($allVideos.find(x => x.youtubeVideoId === video.id)))}
+            <div class="grid">
+                <Button on:click={() => goto("/login")}>로그인</Button>
+                {#if likedVideos.length > 0}
+                    {#each videos as video (video.youtubeThumbnail)}
+                        <Video {video} verbose bottomMargin />
+                    {/each}
+                {:else}
+                    <img src="/images/no-result.png" alt="저장한 레시피 없음" />
+                    <span class="no-result">저장한 레시피가 없어요.</span>
+                {/if}
+            </div>
+        {/await}
+    {/key}
 </div>
 
 <style lang="postcss">
-    .intro {
-        width: -webkit-fill-available;
-        margin: 0 calc(var(--space-xs) * -1);
-        margin-bottom: var(--space-m);
-    }
-
     .section {
         width: 100%;
-        margin-bottom: var(--space-m);
-
-        & .grid-title {
-            margin-bottom: var(--space-2xs);
-        }
-
-        &.last {
-            margin-bottom: var(--space-3xl);
-
-            &.ios {
-                margin-bottom: calc(var(--space-3xl) + var(--space-2xs));
-            }
-        }
+        margin-bottom: var(--space-3xl);
     }
 
     .grid {
+        margin-top: calc(var(--space-3xl) + env(safe-area-inset-top));
         display: flex;
         flex-direction: column;
+    }
+
+    .no-result {
+        text-align: center;
+        color: var(--gray-400);
     }
 </style>
