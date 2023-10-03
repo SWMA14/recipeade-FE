@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { surveyedVideos } from "../store";
     import { getCategoryById } from "$lib/category";
     import type { SpaceType } from "$lib/types";
     import { type VideoData, unitizeViews } from "$lib/video";
@@ -12,10 +13,23 @@
     export let rightMargin: SpaceType | undefined = undefined;
     export let bottomMargin = false;
     export let verbose = false;
+    export let selectable = false;
+
+    let selected = false;
+
+    function onClick()
+    {
+        if (!selectable)
+            return;
+
+        selected = !selected;
+        $surveyedVideos = selected ? [...$surveyedVideos, video.youtubeVideoId] : $surveyedVideos.filter(x => x !== video.youtubeVideoId);
+    }
 </script>
 
-<Card {skeleton} visibleOverflow noPadding {leftMargin} {rightMargin} {bottomMargin} columnFlex scrollSnap>
-    <a class:overflow={verbose} href="/{video.youtubeVideoId}">
+<Card {skeleton} backgroundColor={selected ? "primary-100" : "gray-100"} visibleOverflow noPadding {leftMargin} {rightMargin} {bottomMargin}
+    columnFlex scrollSnap>
+    <a class:overflow={verbose} href={selectable ? "#" : `/${video.youtubeVideoId}`} on:click={onClick}>
         {#if verbose}
             <Carousel>
                 <div class="verbose fitter left-margin">
@@ -44,7 +58,7 @@
         {/if}
     </a>
     <div class="info">
-        <a class="upper typo-body-1" href="/{video.youtubeVideoId}">{video.youtubeTitle}</a>
+        <a class="upper typo-body-1" href={selectable ? "#" : `/${video.youtubeVideoId}`} on:click={onClick}>{video.youtubeTitle}</a>
         <span class="lower typo-body-2">{video.channel.ChannelName} · 조회수 {unitizeViews(video.youtubeViewCount)}회</span>
         <div class="badges">
             <Badge rightMargin>{getCategoryById(video.difficulty)}</Badge>
