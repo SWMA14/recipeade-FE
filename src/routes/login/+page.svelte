@@ -1,5 +1,6 @@
 <script lang="ts">
     import { faApple, faGoogle } from "@fortawesome/free-brands-svg-icons";
+    import { _ } from "svelte-i18n";
     import { getContext } from "svelte";
     import type { Writable } from "svelte/store";
     import { allVideos, surveyedVideos } from "../../store";
@@ -52,15 +53,11 @@
 <div class="container">
     {#if !isSignedIn}
         <div class="login">
-            <h1>
-                시원한 에이드처럼<br>
-                불편함을 싹<br>
-                내려 드릴게요
-            </h1>
-            <Button kind="gray" icon={faApple} bottomMargin="2xs" on:click={signIn}>Apple 계정으로 로그인</Button>
-            <Button kind="gray" icon={faGoogle} on:click={signIn}>Google 계정으로 로그인</Button>
-            <span class="divider typo-body-2">또는</span>
-            <Button on:click={signIn}>계정 생성</Button>
+            <h1>{@html $_("page.login.slogan")}</h1>
+            <Button kind="gray" icon={faApple} bottomMargin="2xs" on:click={signIn}>{$_("page.login.signInWithApple")}</Button>
+            <Button kind="gray" icon={faGoogle} on:click={signIn}>{$_("page.login.signInWithGoogle")}</Button>
+            <span class="divider typo-body-2">{$_("page.login.signInOr")}</span>
+            <Button on:click={signIn}>{$_("page.login.signUp")}</Button>
         </div>
     {:else if !isOnboarded}
         <div class="onboarding">

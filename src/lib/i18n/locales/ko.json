@@ -1,0 +1,11 @@
+{
+    "page": {
+        "login": {
+            "slogan": "시원한 에이드처럼<br>불편함을 싹<br>내려 드릴게요",
+            "signInWithApple": "Apple로 로그인",
+            "signInWithGoogle": "Google로 로그인",
+            "signInOr": "또는",
+            "signUp": "계정 생성"
+        }
+    }
+}

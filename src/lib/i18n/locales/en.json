@@ -1,0 +1,11 @@
+{
+    "page": {
+        "login": {
+            "slogan": "Just Like Ade,<br>Cooling Down<br>Discomforts",
+            "signInWithApple": "Continue with Apple",
+            "signInWithGoogle": "Continue with Google",
+            "signInOr": "Or",
+            "signUp": "Create Account"
+        }
+    }
+}
