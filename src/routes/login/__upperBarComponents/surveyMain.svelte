@@ -1,5 +1,9 @@
+<script>
+    import { _ } from "svelte-i18n";
+</script>
+
 <div>
-    <h2>어떤 레시피를 좋아하세요?</h2>
+    <h2>{$_("page.login.surveyTitle")}</h2>
 </div>
 
 <style>

@@ -5,7 +5,11 @@
             "signInWithApple": "Continue with Apple",
             "signInWithGoogle": "Continue with Google",
             "signInOr": "Or",
-            "signUp": "Create Account"
+            "signUp": "Create Account",
+            "onboardingOkay": "Got It",
+            "surveyTitle": "Which recipes do you like?",
+            "surveySelectMore": "Select {count} more",
+            "surveyStart": "Start"
         }
     }
 }
