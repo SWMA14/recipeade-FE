@@ -6,7 +6,8 @@
     import type { Writable } from "svelte/store";
     import { analyticsService } from "$lib/analytics";
     import { getCategoryById } from "$lib/category";
-    import type { DynamicBarContext } from "$lib/dynamicBar.js";
+    import type { DynamicBarContext } from "$lib/dynamicBar";
+    import { tags } from "$lib/tag";
     import { flyingFade } from "$lib/transition";
     import { unitizeViews, getLikedVideos, saveLikedVideo, removeLikedVideo, type VideoData } from "$lib/video";
     import { allVideos, sharedPlayer } from "../../store";
@@ -175,9 +176,7 @@
             <Badge dark rightMargin>{getCategoryById(data.video.difficulty)}</Badge>
             <Badge dark rightMargin>{data.video.category}</Badge>
             {#if isEditing}
-                <div class="tag">
-                    <Button kind="badge" size="small" on:click={showTagStack}>태그 수정</Button>
-                </div>
+                <Button kind="badge" size="small" on:click={showTagStack}>태그 수정</Button>
             {/if}
         </div>
         <h2>{data.video.youtubeTitle}</h2>
@@ -315,34 +314,14 @@
     {/if}
     {#if shown}
         <Stack {dynamicBarContext} onBack={hideTagStack}>
-            <div class="tags-content">
-                <div class="tags-section">
-                    <h3>난이도</h3>
-                    <div class="tags">
-                        {#each ["아주 쉬움", "쉬움", "보통", "어려움", "아주 어려움"] as difficulty (difficulty)}
-                            <div class="tag">
-                                <Button kind="badge" size="small">
-                                    {difficulty}
-                                </Button>
-                            </div>
-                        {/each}
+            <div class="tags">
+                {#each tags as tag (tag)}
+                    <div class="tag">
+                        <Button kind="badge" size="small">
+                            {tag}
+                        </Button>
                     </div>
-                </div>
-                <div class="tags-section">
-                    <h3>종류</h3>
-                    <div class="tags">
-                        {#each ["한식", "양식", "중식", "일식", "아시안"] as difficulty (difficulty)}
-                            <div class="tag">
-                                <Button kind="badge" size="small">
-                                    {difficulty}
-                                </Button>
-                            </div>
-                        {/each}
-                    </div>
-                </div>
-                <div class="tags-section">
-                    <h3>기타</h3>
-                </div>
+                {/each}
             </div>
         </Stack>
     {/if}
@@ -485,24 +464,15 @@
         }
     }
 
-    .tags-content {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .tags-section {
-        margin-bottom: var(--space-m);
-
-        & h3 {
-            margin-bottom: var(--space-xs);
-        }
-    }
-
     .tags {
         display: flex;
-    }
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
 
-    .tag {
-        margin-right: var(--space-2xs);
+        & .tag {
+            margin-right: var(--space-2xs);
+            margin-bottom: var(--space-2xs);
+        }
     }
 </style>
