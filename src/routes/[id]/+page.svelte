@@ -195,8 +195,9 @@
     </div>
     {#if !isEditing}
         <div class="section review" in:flyingFade={{ delay: 0 }}>
-            <div class="profile" />
-            123명이 저장했어요
+            <div class="profile over" />
+            <div class="profile below" />
+            <span>123명의 사용자가 저장했어요</span>
         </div>
     {/if}
     <div class="section" in:flyingFade={{ delay: 0 }}>
@@ -364,12 +365,16 @@
     .review {
         width: -webkit-fill-available;
         margin: 0 calc(var(--space-xs) * -1);
-        margin-bottom: var(--space-m);
+        margin-bottom: var(--space-xs);
         padding: var(--space-xs);
         display: flex;
         align-items: center;
         color: var(--primary-500);
         background-color: var(--primary-100);
+
+        & span {
+            margin-left: var(--space-2xl);
+        }
     }
 
     .profile {
@@ -378,6 +383,16 @@
         margin-right: var(--space-2xs);
         border-radius: var(--radius-big);
         background-color: var(--white);
+        position: absolute;
+
+        &.over {
+            outline: solid var(--space-3xs) var(--primary-100);
+            z-index: 2;
+        }
+
+        &.below {
+            left: var(--space-m);
+        }
     }
 
     /* .channel {

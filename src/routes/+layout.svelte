@@ -40,8 +40,7 @@
     <slot />
 </main>
 {#if !$upperBarContext.isHidden}
-    <div class="navigation title" class:background={$upperBarContext.isBackgroundShown}
-        transition:flyingFade={{ y: -20, duration: duration * 2 }}>
+    <div class="navigation title" class:background={$upperBarContext.isBackgroundShown}>
         <DynamicBar leading={$upperBarContext.leading} leadingProps={$upperBarContext.leadingProps}
             main={$upperBarContext.main} mainProps={$upperBarContext.mainProps}
             trailing={$upperBarContext.trailing} trailingProps={$upperBarContext.trailingProps} />
