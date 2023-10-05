@@ -53,11 +53,16 @@
 <div class="container">
     {#if !isSignedIn}
         <div class="login">
-            <h1>{@html $_("page.login.slogan")}</h1>
-            <Button kind="gray" icon={faApple} bottomMargin="2xs" on:click={signIn}>{$_("page.login.signInWithApple")}</Button>
-            <Button kind="gray" icon={faGoogle} on:click={signIn}>{$_("page.login.signInWithGoogle")}</Button>
-            <span class="divider typo-body-2">{$_("page.login.signInOr")}</span>
-            <Button on:click={signIn}>{$_("page.login.signUp")}</Button>
+            <div class="slogan">
+                <h1>{@html $_("page.login.slogan")}</h1>
+            </div>
+            <div class="buttons">
+                <Button kind="gray" icon={faApple} bottomMargin="2xs" on:click={signIn}>{$_("page.login.signInWithApple")}</Button>
+                <Button kind="gray" icon={faGoogle} on:click={signIn}>{$_("page.login.signInWithGoogle")}</Button>
+                <span class="divider typo-body-2">{$_("page.login.signInOr")}</span>
+                <Button on:click={signIn}>{$_("page.login.signUp")}</Button>
+                <span class="disclaimer typo-body-2">{@html $_("page.login.signInTOS")}</span>
+            </div>
         </div>
     {:else if !isOnboarded}
         <div class="onboarding">
@@ -88,21 +93,40 @@
     }
 
     .login {
+        height: 100vh;
         display: flex;
         flex-direction: column;
-        align-items: center;
+        justify-content: space-between;
+
+        & .slogan {
+            height: -webkit-fill-available;
+            display: flex;
+            align-items: center;
+        }
 
         & h1 {
-            margin-bottom: calc(var(--space-3xl) * 3);
-            align-self: flex-start;
             background-image: linear-gradient(315deg, var(--primary-900) 10%, var(--primary-500));
             background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+
+        & .buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
     
         & .divider {
             margin: var(--space-2xs) 0;
             color: var(--gray-500);
+        }
+
+        & .disclaimer {
+            margin-top: var(--space-xs);
+            margin-bottom: var(--space-m);
+            padding: 0 var(--space-m);
+            color: var(--gray-500);
+            text-align: center;
         }
     }
 

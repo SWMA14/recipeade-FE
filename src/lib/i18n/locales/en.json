@@ -6,6 +6,7 @@
             "signInWithGoogle": "Continue with Google",
             "signInOr": "Or",
             "signUp": "Create Account",
+            "signInTOS": "By using the service, it is considered that you have agreed to the Terms of Service and Privacy Policy.",
             "onboardingOkay": "Got It",
             "surveyTitle": "Which recipes do you like?",
             "surveySelectMore": "Select {count} more",
