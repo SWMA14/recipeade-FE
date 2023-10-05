@@ -8,9 +8,20 @@
             "signUp": "계정 생성하기",
             "signInTOS": "서비스를 이용함으로써 이용약관과 개인정보처리방침에 동의한 것으로 간주됩니다.",
             "onboardingOkay": "알겠어요",
-            "surveyTitle": "어떤 레시피를 좋아하세요?",
+            "surveyHeading": "어떤 레시피를 좋아하세요?",
             "surveySelectMore": "레시피 {count}개를 더 선택해 주세요",
             "surveyStart": "시작하기"
+        },
+        "settings": {
+            "heading": "설정",
+            "signOut": "로그아웃",
+            "deleteAccount": "회원 탈퇴"
+        },
+        "discover": {
+            "featured": "이 레시피는<br>어때요?",
+            "trendingOnYouTube": "유튜브에서 핫해요",
+            "easyToFollow": "쉽게 따라해요",
+            "others": "다른 레시피들도 있어요"
         }
     }
 }

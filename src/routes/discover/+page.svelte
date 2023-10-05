@@ -1,10 +1,10 @@
 <script lang="ts">
     import { Device } from "@capacitor/device";
+    import { _ } from "svelte-i18n";
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
     import { MetaTags } from "svelte-meta-tags";
     import { allVideos } from "../../store";
-    import { PUBLIC_API_ENDPOINT } from "$env/static/public";
     import { DUMMY_VIDEO } from "$lib/dummy";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import type { VideoData } from "$lib/video";
@@ -85,12 +85,12 @@
         <a href="/{random.youtubeVideoId}" style="height: 120%;">
             <Card video={random.youtubeVideoId} noRadius largePadding darkOverlay={0.7}
                 square squareOverflowSafeArea={device === "ios"}
-                heading="이 레시피는<br>어때요?" modifier={random.channel.ChannelName} body={random.youtubeTitle} />
+                heading={$_("page.discover.featured")} modifier={random.channel.ChannelName} body={random.youtubeTitle} />
         </a>
     {/if}
 </div>
 <div class="section">
-    <Carousel skeleton={!isRendered} leftOverflow rightOverflow heading="유튜브에서 핫해요" canShowAll>
+    <Carousel skeleton={!isRendered} leftOverflow rightOverflow heading={$_("page.discover.trendingOnYouTube")} canShowAll>
         {#if !isRendered}
             <Video skeleton video={DUMMY_VIDEO} leftMargin="xs" rightMargin="xs" />
             <Video skeleton video={DUMMY_VIDEO} />
@@ -109,7 +109,7 @@
     </Carousel>
 </div>
 <div class="section">
-    <Carousel skeleton={!isRendered} leftOverflow rightOverflow heading="쉽게 따라해요" canShowAll>
+    <Carousel skeleton={!isRendered} leftOverflow rightOverflow heading={$_("page.discover.easyToFollow")} canShowAll>
         {#if !isRendered}
             <Video skeleton video={DUMMY_VIDEO} leftMargin="xs" rightMargin="xs" />
             <Video skeleton video={DUMMY_VIDEO} />
@@ -137,7 +137,7 @@
             <Video skeleton video={DUMMY_VIDEO} />
         </div>
     {:else}
-        <h2 class="grid-title">다른 레시피들도 있어요</h2>
+        <h2 class="grid-title">{$_("page.discover.others")}</h2>
         <div class="grid">
             {#each others as video (video.youtubeThumbnail)}
                 <Video {video} verbose bottomMargin />

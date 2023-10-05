@@ -3,7 +3,7 @@
 </script>
 
 <div>
-    <h2>{$_("page.login.surveyTitle")}</h2>
+    <h2>{$_("page.login.surveyHeading")}</h2>
 </div>
 
 <style>

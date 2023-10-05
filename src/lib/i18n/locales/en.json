@@ -8,9 +8,20 @@
             "signUp": "Create Account",
             "signInTOS": "By using the service, it is considered that you have agreed to the Terms of Service and Privacy Policy.",
             "onboardingOkay": "Got It",
-            "surveyTitle": "Which recipes do you like?",
+            "surveyHeading": "Which recipes do you like?",
             "surveySelectMore": "Select {count} more",
             "surveyStart": "Start"
+        },
+        "settings": {
+            "heading": "Settings",
+            "signOut": "Sign Out",
+            "deleteAccount": "Delete Account"
+        },
+        "discover": {
+            "featured": "Recommend<br>To You",
+            "trendingOnYouTube": "Trending on YouTube",
+            "easyToFollow": "Easy to follow",
+            "others": "There's a lot more"
         }
     }
 }
