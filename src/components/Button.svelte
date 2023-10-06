@@ -30,10 +30,10 @@
     class:left-margin={leftMargin} class:right-margin={rightMargin} class:bottom-margin={bottomMargin} class:selected class:progress
     style="--progress: {progress ?? 0}%; --left-margin: {leftMarginValue}; --right-margin: {rightMarginValue}; --bottom-margin: {bottomMarginValue};
     --color: var(--kind-{kind}-color); --background-color: var(--kind-{kind}-background-color);
-    --hover: var(--kind-{kind}-hover-background-color);"
+    --hover: var(--kind-{kind}-hover-background-color); --selected-hover: var(--kind-{kind}-selected-hover-background-color);"
     on:click on:focus on:mouseenter on:mousemove on:mouseleave>
     {#if icon}
-        <div class="icon-wrapper">
+        <div class:icon-margin={$$slots.default}>
             <Fa {icon} />
         </div>
     {/if}
@@ -45,33 +45,43 @@
         --kind-primary-color: var(--white);
         --kind-primary-background-color: var(--primary-500);
         --kind-primary-hover-background-color: var(--primary-600);
+        --kind-primary-selected-hover-background-color: var(--primary-100);
         --kind-primary-light-color: var(--primary-500);
         --kind-primary-light-background-color: var(--primary-100);
         --kind-primary-light-hover-background-color: var(--primary-200);
+        --kind-primary-light-selected-hover-background-color: var(--primary-600);
         --kind-gray-color: var(--gray-900);
         --kind-gray-background-color: var(--gray-200);
         --kind-gray-hover-background-color: var(--gray-300);
+        --kind-gray-selected-hover-background-color: var(--gray-800);
         --kind-info-color: var(--white);
         --kind-info-background-color: var(--info-500);
         --kind-info-hover-background-color: var(--info-600);
+        --kind-info-selected-hover-background-color: var(--info-100);
         --kind-success-color: var(--white);
         --kind-success-background-color: var(--success-500);
         --kind-success-hover-background-color: var(--success-600);
+        --kind-success-selected-hover-background-color: var(--success-100);
         --kind-warning-color: var(--white);
         --kind-warning-background-color: var(--warning-500);
         --kind-warning-hover-background-color: var(--warning-600);
+        --kind-warning-selected-hover-background-color: var(--warning-100);
         --kind-danger-color: var(--white);
         --kind-danger-background-color: var(--danger-500);
         --kind-danger-hover-background-color: var(--danger-600);
+        --kind-danger-selected-hover-background-color: var(--danger-100);
         --kind-white-color: var(--gray-900);
         --kind-white-background-color: var(--white);
         --kind-white-hover-background-color: var(--gray-100);
+        --kind-white-selected-hover-background-color: var(--gray-800);
         --kind-transparent-color: var(--gray-400);
         --kind-transparent-background-color: transparent;
         --kind-transparent-hover-background-color: transparent;
+        --kind-transparent-selected-hover-background-color: var(--gray-500);
         --kind-badge-color: var(--primary-500);
         --kind-badge-background-color: var(--white);
         --kind-badge-hover-background-color: var(--gray-100);
+        --kind-badge-selected-hover-background-color: var(--primary-600);
 
         width: 100%;
         height: var(--space-xl);
@@ -86,6 +96,10 @@
         
         &:not(.no-hover):hover {
             background-color: var(--hover);
+
+            &.selected {
+                background-color: var(--selected-hover);
+            }
         }
 
         &.kind-badge {
@@ -108,7 +122,7 @@
             }
         }
 
-        & .icon-wrapper {
+        & .icon-margin {
             margin-right: var(--space-2xs);
         }
     }
