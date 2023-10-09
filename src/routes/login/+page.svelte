@@ -5,6 +5,7 @@
     import type { Writable } from "svelte/store";
     import { allVideos, surveyedVideos } from "../../store";
     import type { DynamicBarContext } from "$lib/dynamicBar";
+    import { type SignInWithAppleOptions, SignInWithApple } from "$lib/signIn";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
     import Carousel from "$components/Carousel.svelte";
@@ -39,6 +40,26 @@
         isSignedIn = true;
     }
 
+    function signInWithApple()
+    {
+        const options: SignInWithAppleOptions = {
+            clientId: "com.recipeade.svelte",
+            redirectURI: "https://recipeade.net/login/oauth_apple",
+            scopes: "name email",
+            state: "12345"
+        };
+
+        SignInWithApple.authorize(options)
+            .then(result => {
+                localStorage.setItem("appleIdentityToken", result.response.identityToken);
+                console.log(result.response);
+                isSignedIn = true;
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
     function completeOnboarding()
     {
         isOnboardingCompleted = true;
@@ -57,7 +78,7 @@
                 <h1>{@html $_("page.login.slogan")}</h1>
             </div>
             <div class="buttons">
-                <Button kind="gray" icon={faApple} bottomMargin="2xs" on:click={signIn}>{$_("page.login.signInWithApple")}</Button>
+                <Button kind="gray" icon={faApple} bottomMargin="2xs" on:click={signInWithApple}>{$_("page.login.signInWithApple")}</Button>
                 <Button kind="gray" icon={faGoogle} on:click={signIn}>{$_("page.login.signInWithGoogle")}</Button>
                 <span class="divider typo-body-2">{$_("page.login.signInOr")}</span>
                 <Button on:click={signIn}>{$_("page.login.signUp")}</Button>
