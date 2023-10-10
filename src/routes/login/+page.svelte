@@ -1,11 +1,13 @@
 <script lang="ts">
+    import { type SignInWithAppleOptions, SignInWithApple } from "@capacitor-community/apple-sign-in";
+    import { GoogleAuth } from "@codetrix-studio/capacitor-google-auth"
     import { faApple, faGoogle } from "@fortawesome/free-brands-svg-icons";
     import { _ } from "svelte-i18n";
-    import { getContext } from "svelte";
+    import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
     import { allVideos, surveyedVideos } from "../../store";
+    import { browser } from "$app/environment";
     import type { DynamicBarContext } from "$lib/dynamicBar";
-    import { type SignInWithAppleOptions, SignInWithApple } from "@capacitor-community/apple-sign-in";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
     import Carousel from "$components/Carousel.svelte";
@@ -35,6 +37,15 @@
         }
     });
 
+    onMount(() => {
+        if (browser)
+            GoogleAuth.initialize({
+                clientId: "627309130382-9109aakabgpnjm91n43inhnhbtja28fp.apps.googleusercontent.com",
+                scopes: ["profile", "email"],
+                grantOfflineAccess: true
+            });
+    });
+
     function signIn()
     {
         isSignedIn = true;
@@ -60,6 +71,15 @@
             });
     }
 
+    function signInWithGoogle()
+    {
+        GoogleAuth.signIn()
+            .then(result => {
+                console.log(result);
+                isSignedIn = true;
+            });
+    }
+
     function completeOnboarding()
     {
         isOnboardingCompleted = true;
@@ -79,7 +99,7 @@
             </div>
             <div class="buttons">
                 <Button kind="gray" icon={faApple} bottomMargin="2xs" on:click={signInWithApple}>{$_("page.login.signInWithApple")}</Button>
-                <Button kind="gray" icon={faGoogle} on:click={signIn}>{$_("page.login.signInWithGoogle")}</Button>
+                <Button kind="gray" icon={faGoogle} on:click={signInWithGoogle}>{$_("page.login.signInWithGoogle")}</Button>
                 <span class="divider typo-body-2">{$_("page.login.signInOr")}</span>
                 <Button on:click={signIn}>{$_("page.login.signUp")}</Button>
                 <span class="disclaimer typo-body-2">{@html $_("page.login.signInTOS")}</span>

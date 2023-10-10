@@ -4,4 +4,5 @@
     <string name="title_activity_main">레시피에이드</string>
     <string name="package_name">com.recipeade.svelte</string>
     <string name="custom_url_scheme">com.recipeade.svelte</string>
+    <string name="server_client_id">627309130382-9109aakabgpnjm91n43inhnhbtja28fp.apps.googleusercontent.com</string>
 </resources>
