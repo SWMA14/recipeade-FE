@@ -1,14 +1,8 @@
-import { registerPlugin } from "@capacitor/core";
-
-const _pluginName: string = "SignInWithApple";
-
-export interface SignInWithApplePlugin
-{
+export interface SignInWithApplePlugin {
     authorize(options?: SignInWithAppleOptions): Promise<SignInWithAppleResponse>;
 }
 
-export interface SignInWithAppleOptions
-{
+export interface SignInWithAppleOptions {
     clientId: string;
     redirectURI: string;
     scopes?: string;
@@ -16,8 +10,7 @@ export interface SignInWithAppleOptions
     nonce?: string;
 }
 
-export interface SignInWithAppleResponse
-{
+export interface SignInWithAppleResponse {
     response: {
         user: string | null;
         email: string | null;
@@ -27,5 +20,3 @@ export interface SignInWithAppleResponse
         authorizationCode: string;
     };
 }
-
-export const SignInWithApple = registerPlugin<SignInWithApplePlugin>(_pluginName);
