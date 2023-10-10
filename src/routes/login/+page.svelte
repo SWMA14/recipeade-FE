@@ -5,8 +5,7 @@
     import type { Writable } from "svelte/store";
     import { allVideos, surveyedVideos } from "../../store";
     import type { DynamicBarContext } from "$lib/dynamicBar";
-    import { SignInWithApple } from "$lib/signIn/apple";
-    import type { SignInWithAppleOptions } from "$lib/signIn/apple/definitions";
+    import { type SignInWithAppleOptions, SignInWithApple } from "@capacitor-community/apple-sign-in";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
     import Carousel from "$components/Carousel.svelte";
