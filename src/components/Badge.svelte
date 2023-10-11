@@ -9,6 +9,7 @@
 
 <style>
     div {
+        height: var(--space-s);
         padding: var(--space-3xs) var(--space-xs);
         display: flex;
         align-items: center;

@@ -84,6 +84,8 @@
         }
 
         &.kind-badge {
+            width: var(--space-xxl);
+            height: var(--space-s);
             border: 1px solid var(--kind-badge-color);
             border-radius: var(--radius-big);
         }

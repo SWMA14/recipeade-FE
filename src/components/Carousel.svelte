@@ -2,8 +2,6 @@
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import Skeleton from "$components/Skeleton.svelte";
     import Stack from "$components/Stack.svelte";
-    import main from "./__carouselUpperBarComponents/main.svelte";
-    import leading from "./__carouselUpperBarComponents/leading.svelte";
 
     export let skeleton = false;
     export let leftOverflow = false;
@@ -13,13 +11,11 @@
     export let canShowAll = false;
 
     const dynamicBarContext: DynamicBarContext = {
-        main,
-        mainProps: {
-            heading
-        },
-        leading,
         leadingProps: {
             onClick: hide
+        },
+        mainProps: {
+            heading
         }
     };
 
@@ -104,8 +100,6 @@
     }
 
     .grid {
-        margin-top: calc(var(--space-3xl) + env(safe-area-inset-top));
-        padding: 0 var(--space-xs);
         display: flex;
         flex-direction: column;
     }

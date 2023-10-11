@@ -43,6 +43,11 @@
                 .then(response => response.json())
                 .then(result => result as VideoData[]);
 
+        for (const video of $allVideos)
+            for (const step of video.recipesteps)
+                if (step.timestamp.split(":")[0].length === 1)
+                    step.timestamp = "0" + step.timestamp;
+
         random = $allVideos.sort(() => 0.5 - Math.random())[0];
         rest = $allVideos.filter(x => x !== random);
 

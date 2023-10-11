@@ -1,21 +1,21 @@
 <script lang="ts">
     import { duration, growingFade } from "$lib/transition";
-    import { sineIn, sineOut } from "svelte/easing";
+    import { cubicIn, cubicOut } from "svelte/easing";
 
     export let leading: any = undefined;
-    export let leadingWidth = "var(--space-2xl)";
+    export let leadingWidth = "var(--space-xl)";
     export let leadingProps: object = {};
     export let main: any = undefined;
     export let mainProps: object = {};
     export let trailing: any = undefined;
-    export let trailingWidth = "var(--space-2xl)";
+    export let trailingWidth = "var(--space-xl)";
     export let trailingProps: object = {};
 </script>
 
 <div class="container">
     {#if leading}
-        <div class="leading" in:growingFade={{ width: leadingWidth, easing: sineOut, rightMargin: "var(--space-xs)", duration: duration * 2 }}
-            out:growingFade={{ width: leadingWidth, rightMargin: "var(--space-xs)", easing: sineIn, duration: duration * 2 }}>
+        <div class="leading" in:growingFade={{ width: leadingWidth, easing: cubicOut, rightMargin: "var(--space-xs)", duration: duration * 2 }}
+            out:growingFade={{ width: leadingWidth, rightMargin: "var(--space-xs)", easing: cubicIn, duration: duration * 2 }}>
             <svelte:component this={leading} {...leadingProps} />
         </div>
     {/if}
@@ -23,8 +23,8 @@
         <svelte:component this={main} {...mainProps} />
     </div>
     {#if trailing}
-        <div class="trailing" in:growingFade={{ width: trailingWidth, easing: sineOut, leftMargin: "var(--space-xs)", duration: duration * 2 }}
-            out:growingFade={{ width: trailingWidth, leftMargin: "var(--space-xs)", easing: sineIn, duration: duration * 2 }}>
+        <div class="trailing" in:growingFade={{ width: trailingWidth, easing: cubicOut, leftMargin: "var(--space-xs)", duration: duration * 2 }}
+            out:growingFade={{ width: trailingWidth, leftMargin: "var(--space-xs)", easing: cubicIn, duration: duration * 2 }}>
             <svelte:component this={trailing} {...trailingProps} />
         </div>
     {/if}
@@ -43,7 +43,7 @@
     }
 
     .leading {
-        width: var(--space-2xl);
+        min-width: var(--space-xl);
         margin-right: var(--space-xs);
         display: inline-block;
         overflow: hidden;
@@ -55,7 +55,7 @@
     }
 
     .trailing {
-        width: var(--space-2xl);
+        min-width: var(--space-xl);
         margin-left: var(--space-xs);
         display: inline-block;
         overflow: hidden;
