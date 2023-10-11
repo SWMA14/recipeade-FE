@@ -68,7 +68,7 @@
         height: 100%;
         /* max-width: var(--max-width); */
         margin: 0 auto;
-        margin-top: env(safe-area-inset-top);
+        /* margin-top: env(safe-area-inset-top); */
         padding: 0 var(--space-xs);
         display: flex;
         flex-direction: column;

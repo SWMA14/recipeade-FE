@@ -27,8 +27,8 @@
                 {value}
             </div>
         {:else}
-            <input type="text" class:fitted-height={fittedHeight} class:padding-left={icon} class:no-padding={noPadding}
-                {placeholder} bind:value on:change on:click />
+            <input class:fitted-height={fittedHeight} class:padding-left={icon} class:no-padding={noPadding}
+                {placeholder} bind:value on:change on:click {...$$restProps} />
         {/if}
     </form>
     {#if value && !noDelete}

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { Device } from "@capacitor/device";
     import { type SignInWithAppleOptions, SignInWithApple } from "@capacitor-community/apple-sign-in";
     import { GoogleAuth } from "@codetrix-studio/capacitor-google-auth"
     import { faApple, faGoogle } from "@fortawesome/free-brands-svg-icons";
@@ -11,16 +12,26 @@
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
     import Carousel from "$components/Carousel.svelte";
+    import Input from "$components/Input.svelte";
     import Video from "$components/Video.svelte";
     import onboardingMain from "./__lowerBarComponents/onboardingMain.svelte";
     import surveyMain from "./__lowerBarComponents/surveyMain.svelte";
     import surveyUpperMain from "./__upperBarComponents/surveyMain.svelte";
 
+    let device: "ios" | "android" | "web";
     let isSignedIn = false;
+    let isSigningWithEmail = false;
     let isOnboarded = false;
     let isOnboardingCompleted = false;
     let isSurveyed = false;
 
+    let email = "";
+    let emailValidating: Promise<boolean>;
+    let password = "";
+
+    Device.getInfo()
+        .then(x => device = x.platform)
+        .catch(() => device = "web");
     $: getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
         isHidden: !isOnboarded || isSurveyed,
         isBackgroundShown: true,
@@ -46,12 +57,7 @@
             });
     });
 
-    function signIn()
-    {
-        isSignedIn = true;
-    }
-
-    function signInWithApple()
+    async function signInWithApple()
     {
         const options: SignInWithAppleOptions = {
             clientId: "com.recipeade.svelte",
@@ -80,6 +86,11 @@
             });
     }
 
+    function signInWithEmail()
+    {
+        isSigningWithEmail = true;
+    }
+
     function completeOnboarding()
     {
         isOnboardingCompleted = true;
@@ -92,18 +103,25 @@
 </script>
 
 <div class="container">
-    {#if !isSignedIn}
-        <div class="login">
+    {#if !isSignedIn && !isSigningWithEmail}
+        <div class="tall login">
             <div class="slogan">
                 <h1>{@html $_("page.login.slogan")}</h1>
             </div>
             <div class="buttons">
-                <Button kind="gray" icon={faApple} bottomMargin="2xs" on:click={signInWithApple}>{$_("page.login.signInWithApple")}</Button>
+                {#if device !== "android"}
+                    <Button kind="gray" icon={faApple} bottomMargin="2xs" on:click={signInWithApple}>{$_("page.login.signInWithApple")}</Button>
+                {/if}
                 <Button kind="gray" icon={faGoogle} on:click={signInWithGoogle}>{$_("page.login.signInWithGoogle")}</Button>
                 <span class="divider typo-body-2">{$_("page.login.signInOr")}</span>
-                <Button on:click={signIn}>{$_("page.login.signUp")}</Button>
+                <Button on:click={signInWithEmail}>{$_("page.login.signUp")}</Button>
                 <span class="disclaimer typo-body-2">{@html $_("page.login.signInTOS")}</span>
             </div>
+        </div>
+    {:else if !isSignedIn && isSigningWithEmail}
+        <div class="tall">
+            <h1>{@html $_("page.login.enterEmail")}</h1>
+            <Input value={email} placeholder={$_("page.login.enterEmailPlaceholder")} />
         </div>
     {:else if !isOnboarded}
         <div class="onboarding">
@@ -133,12 +151,18 @@
         margin: auto 0;
     }
 
-    .login {
+    .tall {
         height: 100vh;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
 
+        & h1 {
+            margin-top: calc(var(--space-3xl) + env(safe-area-inset-top));
+            margin-bottom: var(--space-m);
+        }
+    }
+
+    .login {
         & .slogan {
             height: -webkit-fill-available;
             display: flex;
