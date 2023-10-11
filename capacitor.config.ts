@@ -5,7 +5,17 @@ const config: CapacitorConfig = {
   appName: '레시피에이드',
   webDir: '.svelte-kit/cloudflare',
   server: {
-    androidScheme: 'https'
+    androidScheme: 'https',
+    // url: "http://172.16.100.158:5173/",
+    // cleartext: true
+  },
+  plugins: {
+    GoogleAuth: {
+      scopes: ["profile", "email"],
+      clientId: "627309130382-9109aakabgpnjm91n43inhnhbtja28fp.apps.googleusercontent.com",
+      iosClientId: "627309130382-4gt12fc0r1aljmikrn2i10bd9324st8q.apps.googleusercontent.com",
+      forceCodeForRefreshToken: true
+    }
   }
 };
 
