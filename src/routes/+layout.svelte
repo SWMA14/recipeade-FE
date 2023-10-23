@@ -8,6 +8,7 @@
     import { page } from "$app/stores";
     import { PUBLIC_API_ENDPOINT } from "$env/static/public";
     import type { DynamicBarContext } from "$lib/dynamicBar";
+    import { DUMMY_VIDEO } from "$lib/dummy";
     import { duration, flyingFade } from "$lib/transition";
     import type { VideoData } from "$lib/video";
     import DynamicBar from "$components/DynamicBar.svelte";
@@ -37,9 +38,10 @@
         });
 
         if ($allVideos.length === 0)
-            $allVideos = await fetch(`${PUBLIC_API_ENDPOINT}/recipe`)
-                .then(response => response.json())
-                .then(result => result as VideoData[]);
+            $allVideos.push(DUMMY_VIDEO);
+            // $allVideos = await fetch(`${PUBLIC_API_ENDPOINT}/recipe`)
+            //     .then(response => response.json())
+            //     .then(result => result as VideoData[]);
     });
 </script>
 
