@@ -13,6 +13,53 @@
     import Skeleton from "$components/Skeleton.svelte";
     import Video from "$components/Video.svelte";
     import main from "./__lowerBarComponents/main.svelte";
+    import {ShareExtensionDataPlugin} from "./shareExtension";
+    import Button from "$components/Button.svelte";
+    import { goto } from "$app/navigation";
+    import { SignInWithApple,type SignInWithAppleOptions,type SignInWithAppleResponse } from "./signinapple";
+    
+
+    let text = "gdgd";
+
+   function loadAppleIDScript() {
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src =
+        'https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js';
+ 
+    
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
+  const signInWithAppleNative = () => {
+    let options: SignInWithAppleOptions = {
+    clientId: "com.recipeade.svelte",
+    redirectURI: "https://recipeade.net/login/oauth_apple",
+    scopes: "name email",
+    state: "12345",
+    }
+
+    SignInWithApple.authorize(options).then((result: SignInWithAppleResponse) => {
+        console.log(result);
+    }).catch((error: Error) => {
+        console.log(error);
+    });
+  }
+  
+  const read = ()=> {
+    ShareExtensionDataPlugin.read().then((result: any) => {
+        console.log(result);
+        text = result;
+    }).catch((error: Error) => {
+        console.log(error);
+        text = error.message;
+    });
+  }
+
+
 
     getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
         isHidden: true
@@ -42,6 +89,7 @@
             $allVideos = await fetch(`${PUBLIC_API_ENDPOINT}/recipe`)
                 .then(response => response.json())
                 .then(result => result as VideoData[]);
+        
 
         random = $allVideos.sort(() => 0.5 - Math.random())[0];
         rest = $allVideos.filter(x => x !== random);
@@ -78,7 +126,18 @@
     ]}
 />
 
-<div class="intro">
+
+<div>
+    <button on:click={signInWithAppleNative}>Apple ID 스크립트 열기</button>
+    <a href={`${PUBLIC_API_ENDPOINT}/login/apple/token`}>
+        제발 클릭 좀요
+    </a>
+    <Button on:click={read}>
+        gdgd
+    </Button>
+    <p>{text}</p>
+</div>
+<!-- <div class="intro">
     {#if !isRendered}
         <Card skeleton noRadius largePadding square squareOverflowSafeArea={device === "ios"} />
     {:else}
@@ -144,7 +203,7 @@
             {/each}
         </div>
     {/if}
-</div>
+</div> -->
 
 <style lang="postcss">
     .intro {

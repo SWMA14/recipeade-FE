@@ -75,6 +75,21 @@ import Social
 //
 //}
 
+enum APIError: Error {
+    case invalidURL
+    case noData
+}
+
+func create_recipe(url : String) async throws -> Data{
+    guard let actual_url = URL(string:"https://recipeade.net/customize/create_default?sourceLink=\(url)") else {
+        throw APIError.invalidURL
+    }
+    
+    let (data,_) = try await URLSession.shared.data(from: actual_url)
+    
+    return data
+}
+
 
 class ShareViewController: UIViewController {
     override func viewDidLoad() {
@@ -89,130 +104,142 @@ class ShareViewController: UIViewController {
                     let userDefaults = UserDefaults(suiteName: "group.com.recipeade.svelte")
                     userDefaults?.set(urlData.absoluteString, forKey: "sharedURL")
                     
+                    
                     DispatchQueue.main.async {
+                        Task{
+                            do{
+                                let data = try await create_recipe(url: urlData.absoluteString)
+                            } catch {
+                
+                            }
+                        }
                         self?.showSnackBar(message: "레시피 추출 중...")
-                        
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0){
+                       
+                    
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5){
                             self?.showSnackBar(message: "레시피 생성 완료!")
                             self?.extensionContext?.completeRequest(returningItems: [],completionHandler: nil)
                         }
+                        
                     }
                 }
             }
         }
     }
-    
-    func showSnackBar(message: String){
         
-        let snackBarView = UIView()
-        snackBarView.backgroundColor = UIColor.orange
-        snackBarView.layer.cornerRadius = 10 // Adjust as needed
-        snackBarView.clipsToBounds = true
-        snackBarView.translatesAutoresizingMaskIntoConstraints = false
-        
-        let label = UILabel()
-        label.text = message
-        label.textColor = .white
-        label.translatesAutoresizingMaskIntoConstraints = false
-        
-        snackBarView.addSubview(label)
-        self.view.addSubview(snackBarView)
-        
-        NSLayoutConstraint.activate([
-            snackBarView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            snackBarView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
-            snackBarView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+        func showSnackBar(message: String){
             
-            // Set a fixed height for the snack bar.
-            snackBarView.heightAnchor.constraint(equalToConstant: 50),
+            let snackBarView = UIView()
+            snackBarView.backgroundColor = UIColor.orange
+            snackBarView.layer.cornerRadius = 10 // Adjust as needed
+            snackBarView.clipsToBounds = true
+            snackBarView.translatesAutoresizingMaskIntoConstraints = false
             
-            // Center the label within the snack bar.
-            label.centerXAnchor.constraint(equalTo: snackBarView.centerXAnchor),
-            label.centerYAnchor.constraint(equalTo: snackBarView.centerYAnchor),
-        ])
+            let label = UILabel()
+            label.text = message
+            label.textColor = .white
+            label.translatesAutoresizingMaskIntoConstraints = false
+            
+            snackBarView.addSubview(label)
+            self.view.addSubview(snackBarView)
+            
+            NSLayoutConstraint.activate([
+                snackBarView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+                snackBarView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
+                snackBarView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+                
+                // Set a fixed height for the snack bar.
+                snackBarView.heightAnchor.constraint(equalToConstant: 50),
+                
+                // Center the label within the snack bar.
+                label.centerXAnchor.constraint(equalTo: snackBarView.centerXAnchor),
+                label.centerYAnchor.constraint(equalTo: snackBarView.centerYAnchor),
+            ])
+        }
+        
     }
-}
-//import UIKit
-//import Social
-//import MobileCoreServices
-//
-//class ShareViewController: UIViewController {
-//    @IBOutlet weak var imageView: UIImageView!
-//    @IBOutlet weak var textView: UITextView!
-//
-//        override func viewDidLoad() {
-//            let extensionItems = extensionContext?.inputItems as! [NSExtensionItem]
-//
-//            for extensionItem in extensionItems {
-//                if let itemProviders = extensionItem.attachments as? [NSItemProvider] {
-//                    for itemProvider in itemProviders {
-//                        // 해당 객체가 있는지 식별
-//                        if itemProvider.hasItemConformingToTypeIdentifier(kUTTypeImage as String) {
-//                            itemProvider.loadItem(forTypeIdentifier: kUTTypeImage as String, options: nil, completionHandler: { result, error in
-//                                var image: UIImage?
-//                                if result is UIImage {
-//                                    image = result as? UIImage
-//                                }
-//
-//                                if result is URL {
-//                                    let data = try? Data(contentsOf: result as! URL)
-//                                    image = UIImage(data: data!)!
-//                                }
-//
-//                                if result is Data {
-//                                    image = UIImage(data: result as! Data)!
-//                                }
-//
-//                                DispatchQueue.main.async {
-//                                    if let image = image {
-//                                        self.imageView.image = image
-//                                    }
-//                                }
-//                            })
-//                        }
-//
-//                        if itemProvider.hasItemConformingToTypeIdentifier(kUTTypeURL as String) {
-//                            itemProvider.loadItem(forTypeIdentifier: kUTTypeURL as String, options: nil, completionHandler: { result, error in
-//                                let data = NSData.init(contentsOf:result as! URL)
-//                                DispatchQueue.main.async {
-//                                    if let urlStr = result {
-//                                        self.textView.text = "\(urlStr)"
-//                                    }
-//                                }
-//                            })
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//
-//
-//    @IBAction func btnSend(_ sender: UIButton) {
-//        // 처리후 종료
-//        if let userDefaults = UserDefaults(suiteName: "group.com.recipeade.com") {
-//            if let image = imageView.image {
-//                userDefaults.set(image.pngData(), forKey: "image")
-//            }
-//
-//            if let text = textView.text {
-//                userDefaults.set(text, forKey: "text")
-//            }
-//        }
-//
-//        self.hideExtensionWithCompletionHandler(completion: { _ in
-//            self.extensionContext?.completeRequest(returningItems: nil, completionHandler: nil)
-//        })
-//    }
-//
-//    @IBAction func btnDismiss(_ sender: UIButton) {
-//        self.hideExtensionWithCompletionHandler(completion: { _ in
-//            self.extensionContext?.completeRequest(returningItems: nil, completionHandler: nil)
-//        })
-//    }
-//
-//    func hideExtensionWithCompletionHandler(completion: @escaping (Bool) -> Void) {
-//        UIView.animate(withDuration: 0.3, animations: {
-//            self.navigationController?.view.transform = CGAffineTransform(translationX: 0, y:self.navigationController!.view.frame.size.height)
-//        }, completion: completion)
-//    }
-//}
+    
+    //import UIKit
+    //import Social
+    //import MobileCoreServices
+    //
+    //class ShareViewController: UIViewController {
+    //    @IBOutlet weak var imageView: UIImageView!
+    //    @IBOutlet weak var textView: UITextView!
+    //
+    //        override func viewDidLoad() {
+    //            let extensionItems = extensionContext?.inputItems as! [NSExtensionItem]
+    //
+    //            for extensionItem in extensionItems {
+    //                if let itemProviders = extensionItem.attachments as? [NSItemProvider] {
+    //                    for itemProvider in itemProviders {
+    //                        // 해당 객체가 있는지 식별
+    //                        if itemProvider.hasItemConformingToTypeIdentifier(kUTTypeImage as String) {
+    //                            itemProvider.loadItem(forTypeIdentifier: kUTTypeImage as String, options: nil, completionHandler: { result, error in
+    //                                var image: UIImage?
+    //                                if result is UIImage {
+    //                                    image = result as? UIImage
+    //                                }
+    //
+    //                                if result is URL {
+    //                                    let data = try? Data(contentsOf: result as! URL)
+    //                                    image = UIImage(data: data!)!
+    //                                }
+    //
+    //                                if result is Data {
+    //                                    image = UIImage(data: result as! Data)!
+    //                                }
+    //
+    //                                DispatchQueue.main.async {
+    //                                    if let image = image {
+    //                                        self.imageView.image = image
+    //                                    }
+    //                                }
+    //                            })
+    //                        }
+    //
+    //                        if itemProvider.hasItemConformingToTypeIdentifier(kUTTypeURL as String) {
+    //                            itemProvider.loadItem(forTypeIdentifier: kUTTypeURL as String, options: nil, completionHandler: { result, error in
+    //                                let data = NSData.init(contentsOf:result as! URL)
+    //                                DispatchQueue.main.async {
+    //                                    if let urlStr = result {
+    //                                        self.textView.text = "\(urlStr)"
+    //                                    }
+    //                                }
+    //                            })
+    //                        }
+    //                    }
+    //                }
+    //            }
+    //        }
+    //
+    //
+    //    @IBAction func btnSend(_ sender: UIButton) {
+    //        // 처리후 종료
+    //        if let userDefaults = UserDefaults(suiteName: "group.com.recipeade.com") {
+    //            if let image = imageView.image {
+    //                userDefaults.set(image.pngData(), forKey: "image")
+    //            }
+    //
+    //            if let text = textView.text {
+    //                userDefaults.set(text, forKey: "text")
+    //            }
+    //        }
+    //
+    //        self.hideExtensionWithCompletionHandler(completion: { _ in
+    //            self.extensionContext?.completeRequest(returningItems: nil, completionHandler: nil)
+    //        })
+    //    }
+    //
+    //    @IBAction func btnDismiss(_ sender: UIButton) {
+    //        self.hideExtensionWithCompletionHandler(completion: { _ in
+    //            self.extensionContext?.completeRequest(returningItems: nil, completionHandler: nil)
+    //        })
+    //    }
+    //
+    //    func hideExtensionWithCompletionHandler(completion: @escaping (Bool) -> Void) {
+    //        UIView.animate(withDuration: 0.3, animations: {
+    //            self.navigationController?.view.transform = CGAffineTransform(translationX: 0, y:self.navigationController!.view.frame.size.height)
+    //        }, completion: completion)
+    //    }
+    //}
