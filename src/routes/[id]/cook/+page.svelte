@@ -19,6 +19,11 @@
 
     export let data;
 
+    getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
+        ...x,
+        trailing: undefined,
+        trailingProps: undefined
+    });
     getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
         ...x,
         isHidden: true

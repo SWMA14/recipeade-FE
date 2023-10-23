@@ -1,5 +1,7 @@
 import { PUBLIC_API_ENDPOINT, PUBLIC_RECOMMENDED_SEARCH_PLACEHOLDER } from "$env/static/public";
 
+export const prerender = false;
+
 export async function load({ fetch })
 {
     let recommendedWords = [] as {

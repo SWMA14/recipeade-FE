@@ -60,7 +60,7 @@
     .content {
         width: 100%;
         margin-top: calc(var(--top) + var(--space-xs));
-        margin-bottom: calc(var(--space-xl) + var(--space-xs));
+        padding-bottom: calc(var(--space-xl) + var(--space-xs));
     }
 
     @media only screen and (min-width: 48rem) {

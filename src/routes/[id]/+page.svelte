@@ -1,9 +1,11 @@
 <script lang="ts">
     import { Device } from "@capacitor/device";
+    import { Share } from "@capacitor/share";
     import { SortableList } from "@jhubbardsf/svelte-sortablejs";
     import { faGripLinesVertical, faTrash } from "@fortawesome/free-solid-svg-icons";
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
+    import { PUBLIC_LANDING_ENDPOINT } from "$env/static/public";
     import { analyticsService } from "$lib/analytics";
     import { getCategoryById } from "$lib/category";
     import type { DynamicBarContext } from "$lib/dynamicBar";
@@ -19,6 +21,7 @@
     import Stack from "$components/Stack.svelte";
     import Video from "$components/Video.svelte";
     import upperLeading from "./__upperBarComponents/leading.svelte";
+    import upperTrailing from "./__upperBarComponents/trailing.svelte";
     import lowerLeading from "./__lowerBarComponents/leading.svelte";
     import lowerMain from "./__lowerBarComponents/main.svelte";
 
@@ -30,7 +33,11 @@
     $: getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
         leading: upperLeading,
         leadingProps: {
-            onClick: () => history.back()
+            onClick: history.back
+        },
+        trailing: upperTrailing,
+        trailingProps: {
+            onClick: share
         },
         isBackgroundShown: true
     });
@@ -44,7 +51,7 @@
         main: lowerMain,
         mainProps: {
             isEditing,
-            onEditExit: () => onEditExit()
+            onEditExit
         },
     });
 
@@ -167,6 +174,18 @@
                 timestamp: await getCurrentTimestamp()
             }
         ];
+    }
+
+    async function share()
+    {
+        if (!await Share.canShare())
+            return;
+
+        await Share.share({
+            title: data.video.youtubeTitle,
+            text: "레시피에이드에서 YouTube 레시피 영상에서 중요한 부분만을 손쉽게 확인하고 따라하세요.",
+            url: `${PUBLIC_LANDING_ENDPOINT}/${data.id}`
+        });
     }
 </script>
 
