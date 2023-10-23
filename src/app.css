@@ -115,16 +115,19 @@ body {
     padding: 0;
 }
 
+h1,
 .typo-heading-1 {
     font-size: 2rem;
     font-weight: 900;
 }
 
+h2,
 .typo-heading-2 {
     font-size: 1.25rem;
     font-weight: 700;
 }
 
+h3,
 .typo-heading-3 {
     font-size: 1.15rem;
     font-weight: 700;
@@ -136,28 +139,8 @@ body {
 }
 
 .typo-body-2 {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 400;
-}
-
-h1 {
-    font-weight: 900;
-    font-size: 2rem;
-    line-height: 1.25;
-}
-
-h2 {
-    font-weight: 700;
-    font-size: 1.25rem;
-}
-
-h3 {
-    font-weight: 700;
-    font-size: 1.15rem;
-}
-
-strong {
-    color: var(--c-primary);
 }
 
 ul {

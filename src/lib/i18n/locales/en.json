@@ -26,6 +26,15 @@
             "trendingOnYouTube": "Trending on YouTube",
             "easyToFollow": "Easy to follow",
             "others": "There's a lot more"
+        },
+        "recipe": {
+            "autoNextStep": "Auto Next",
+            "repeatStep": "Repeat",
+            "commentsTip": "Tips from Comments",
+            "commentsTipExplainTitle": "What's This?",
+            "commentsTipExplainDescription": "AI provides you helpful cooking tips, by analyzing the comments on this video.",
+            "ingredients": "Ingredients",
+            "ingredientsUsedStep": "Step {step}"
         }
     }
 }

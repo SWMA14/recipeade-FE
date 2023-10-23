@@ -1,12 +1,8 @@
 <script lang="ts">
-    import Player from "youtube-player";
-    import type { Options, YouTubePlayer } from "youtube-player/dist/types";
-    import { onMount } from "svelte";
-    import type { SpaceType } from "$lib/types";
+    import type { SpaceType } from "../lib/types";
 
     export let skeleton = false;
     export let backgroundColor = "gray-100";
-    export let video: string | undefined = undefined;
     export let heading: string | undefined = undefined;
     export let body: string | undefined = undefined;
     export let modifier: string | undefined = undefined;
@@ -19,71 +15,25 @@
     export let columnFlex = false;
     export let leftMargin: SpaceType | undefined = undefined;
     export let rightMargin: SpaceType | undefined = undefined;
-    export let bottomMargin = false;
+    export let topMargin: SpaceType | undefined = undefined;
+    export let bottomMargin: SpaceType | undefined = undefined;
     export let scrollSnap = false;
     export let square = false;
     export let squareOverflowSafeArea = false;
 
-    let container: HTMLElement;
-    let player: YouTubePlayer | HTMLElement;
     let leftMarginValue = leftMargin ? `var(--space-${leftMargin})` : undefined;
     let rightMarginValue = rightMargin ? `var(--space-${rightMargin})` : undefined;
-
-    onMount(() => {
-        if (video)
-        {
-            let options: Options = {
-            playerVars: {
-                    autoplay: 1,
-                    modestbranding: 1,
-                    controls: 0,
-                    disablekb: 1,
-                    fs: 0,
-                }
-            };
-            let duration: number = 0;
-
-            player = Player(player, options);
-            player.loadVideoById(video, 0, "small");
-            player.mute();
-            player.seekTo(0, true); // 다시 버퍼해서 변경된 동영상 화질 적용
-
-            setInterval(async () => {
-                player = player as YouTubePlayer;
-
-                if (!duration)
-                    duration = await player.getDuration();
-
-                if (player && await player.getCurrentTime() >= duration - 10)
-                    player.seekTo(0, true);
-            }, 500);
-        }
-    });
-
-    function checkVideoVisible()
-    {
-        if (video && player)
-        {
-            const rect = container.getBoundingClientRect();
-            const viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
-            const yThreshold = 30;
-
-            player = player as YouTubePlayer;
-            if (rect.bottom >= yThreshold && rect.top - viewHeight < yThreshold)
-                player.playVideo();
-            else
-                player.pauseVideo();
-        }
-    }
+    let topMarginValue = topMargin ? `var(--space-${topMargin})` : undefined;
+    let bottomMarginValue = bottomMargin ? `var(--space-${bottomMargin})` : undefined;
 </script>
 
-<svelte:window on:scroll={checkVideoVisible} />
-
-<div class="container" class:skeleton bind:this={container}
-    style="--card-background-color: var(--{backgroundColor}); --left-margin: {leftMarginValue}; --right-margin: {rightMarginValue};"
+<div class="container" class:skeleton
+    style="--card-background-color: var(--{backgroundColor}); --left-margin: {leftMarginValue}; --right-margin: {rightMarginValue};
+    --top-margin: {topMarginValue}; --bottom-margin: {bottomMarginValue};"
     class:no-radius={noRadius} class:no-padding={noPadding} class:no-min-width={noMinWidth} class:large-padding={largePadding}
     class:column-flex={columnFlex} class:scroll-snap={scrollSnap} class:left-margin={leftMargin} class:right-margin={rightMargin}
-    class:bottom-margin={bottomMargin} class:square class:overflow-safe-area={squareOverflowSafeArea} class:visible-overflow={visibleOverflow}>
+    class:top-margin={topMargin} class:bottom-margin={bottomMargin} class:square class:overflow-safe-area={squareOverflowSafeArea}
+    class:visible-overflow={visibleOverflow}>
     {#if skeleton}
         <div class="skeleton-overlay" />
     {/if}
@@ -107,9 +57,6 @@
         <div class="overlay" style="--opacity: {darkOverlay};" />
     {/if}
     <slot />
-    {#if video}
-        <div class="player" bind:this={player} />
-    {/if}
 </div>
 
 <style lang="postcss">
@@ -204,17 +151,6 @@
         z-index: 1;
     }
 
-    .player {
-        width: 250%;
-        height: 250%;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 0;
-        background-color: var(--gray-900);
-    }
-
     .visible-overflow {
         overflow: visible;
     }
@@ -247,8 +183,12 @@
         margin-right: var(--right-margin);
     }
 
+    .top-margin {
+        margin-top: var(--top-margin);
+    }
+
     .bottom-margin {
-        margin-bottom: var(--space-xs);
+        margin-bottom: var(--bottom-margin);
     }
 
     .scroll-snap {

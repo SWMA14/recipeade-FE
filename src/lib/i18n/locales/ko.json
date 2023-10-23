@@ -26,6 +26,15 @@
             "trendingOnYouTube": "유튜브에서 핫해요",
             "easyToFollow": "쉽게 따라해요",
             "others": "다른 레시피들도 있어요"
+        },
+        "recipe": {
+            "autoNextStep": "자동 다음 단계",
+            "repeatStep": "단계 반복",
+            "commentsTip": "댓글 팁",
+            "commentsTipExplainTitle": "이게 뭐죠?",
+            "commentsTipExplainDescription": "AI로 영상의 댓글을 분석해 요리에 도움되는 팁들을 정리해 드려요.",
+            "ingredients": "재료",
+            "ingredientsUsedStep": "{step}단계"
         }
     }
 }

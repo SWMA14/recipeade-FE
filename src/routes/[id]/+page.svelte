@@ -226,7 +226,7 @@
         {#if isEditing}
             <SortableList class="sortable-list" handle=".handle" onEnd={handleIngredientsSort}>
                 {#each cache.ingredients as ingredient, i (ingredient.name)}
-                    <Card bottomMargin>
+                    <Card bottomMargin="xs">
                         <div class="list-content">
                             <div class="ingredient" class:edit={isEditing}>
                                 <Input placeholder="재료명" value={ingredient.name} on:change={e => cache.ingredients[i].name = e.target.value}
@@ -255,7 +255,7 @@
             </SortableList>
         {:else}
             {#each recipe.ingredients as ingredient (ingredient.name)}
-                <Card bottomMargin>
+                <Card bottomMargin="xs">
                     <div class="ingredient">
                         <span>{ingredient.name}</span>
                         <span>{ingredient.quantity ?? ""}{ingredient.unit ?? ""}</span>
@@ -271,7 +271,7 @@
                 <h2>단계</h2>
                 <SortableList class="sortable-list" handle=".handle" onEnd={handleStepsSort}>
                     {#each cache.recipesteps as step, i (step.description)}
-                        <Card bottomMargin>
+                        <Card bottomMargin="xs">
                             <div class="list-content">
                                 <div class="step">
                                     <Input placeholder="단계 설명" value={step.description} on:focusout={e => cache.recipesteps[i].description = e.target.textContent}
@@ -308,7 +308,7 @@
                 {/each}
                 <svelte:fragment slot="grid">
                     {#each recipe.recipesteps as step, i (step.description)}
-                        <Card bottomMargin modifier="{i + 1}단계" body={step.description}>
+                        <Card bottomMargin="xs" modifier="{i + 1}단계" body={step.description}>
                             <div style="height: calc(var(--space-3xl) * 2);"></div>
                         </Card>
                     {/each}
