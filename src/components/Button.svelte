@@ -14,6 +14,8 @@
     export let noHover = false;
     export let selected = false;
     export let progress: number | undefined = undefined;
+    export let style: string | undefined = undefined;
+
     // export let skeleton = false;
 
     let leftMarginValue = leftMargin ? `var(--space-${leftMargin})` : undefined;
@@ -29,8 +31,8 @@
 <button class="kind-{kind} size-{size}" {...$$restProps} class:no-hover={noHover || device !== "web"} class:typo-body-2={size === "small"}
     class:left-margin={leftMargin} class:right-margin={rightMargin} class:bottom-margin={bottomMargin} class:selected class:progress
     style="--progress: {progress ?? 0}%; --left-margin: {leftMarginValue}; --right-margin: {rightMarginValue}; --bottom-margin: {bottomMarginValue};
-    --color: var(--kind-{kind}-color); --background-color: var(--kind-{kind}-background-color);
-    --hover: var(--kind-{kind}-hover-background-color); --selected-hover: var(--kind-{kind}-selected-hover-background-color);"
+    --color: var(--kind-{kind}-color); --background-color: var(--kind-{kind}-background-color); --hover: var(--kind-{kind}-hover-background-color);
+    --selected-hover: var(--kind-{kind}-selected-hover-background-color); {style ?? ""}"
     on:click on:focus on:mouseenter on:mousemove on:mouseleave>
     {#if icon}
         <div class:icon-margin={$$slots.default}>
@@ -74,6 +76,10 @@
         --kind-white-background-color: var(--white);
         --kind-white-hover-background-color: var(--gray-100);
         --kind-white-selected-hover-background-color: var(--gray-800);
+        --kind-black-color: var(--white);
+        --kind-black-background-color: var(--gray-900);
+        --kind-black-hover-background-color: var(--gray-800);
+        --kind-black-selected-hover-background-color: var(--gray-100);
         --kind-transparent-color: var(--gray-400);
         --kind-transparent-background-color: transparent;
         --kind-transparent-hover-background-color: transparent;
