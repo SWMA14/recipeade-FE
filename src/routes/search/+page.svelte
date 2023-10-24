@@ -35,13 +35,12 @@
 
     let value: string | undefined = undefined;
     $: mainProps = {
-        onValueChanged: updateWord,
+        onValueChanged: updateValue,
         onIconClicked: searchClick,
         onClick: startActualSearch,
         value
     };
 
-    let word: string;
     let updateSearchHistory = {}; // clearHistory() 호출 시 화면 업데이트를 위해
     let resultShown = false;
     let selectedSort: "latest" | "popular" = "latest";
@@ -52,24 +51,24 @@
 
     $: selectedResultVideos = selectedSort === "latest" ? resultVideos?.latest : resultVideos?.popular;
 
-    function updateWord(value: string)
+    function updateValue(inputValue: string)
     {
-        word = value;
+        value = inputValue;
     }
 
     function searchClick()
     {
-        if (word !== "" && word !== undefined)
+        if (value !== "" && value !== undefined)
         {
             resultShown = true;
-            saveHistory(word);
+            saveHistory(value);
 
             resultVideos = {
-                latest: fetch(`${PUBLIC_API_ENDPOINT}/search/${word}?sort=current`)
+                latest: fetch(`${PUBLIC_API_ENDPOINT}/search/${value}?sort=current`)
                     .then(response => response.json())
                     .catch(() => [])
                     .then(result => result as VideoData[]),
-                popular: fetch(`${PUBLIC_API_ENDPOINT}/search/${word}?sort=viewCount`)
+                popular: fetch(`${PUBLIC_API_ENDPOINT}/search/${value}?sort=viewCount`)
                     .then(response => response.json())
                     .catch(() => [])
                     .then(result => result as VideoData[])
@@ -79,7 +78,6 @@
 
     function historyClick(historyWord: string)
     {
-        word = historyWord;
         value = historyWord;
         searchClick();
     }
@@ -92,9 +90,6 @@
 
     function startActualSearch()
     {
-        // main의 value props를 "" 또는 undefined로 설정해서 입력 초기화
-        // 두 개를 번갈아가면서 주지 않으면 최초 1회만 초기화됨
-        value = undefined;
         $lowerBarContext.isHidden = true;
         leadingValue = leading;
     }
@@ -108,7 +103,7 @@
         resultVideos = undefined;
 
         analyticsService.logEvent("search_cancel", {
-            search_word: word
+            search_word: value
         });
     }
 
@@ -167,7 +162,7 @@
                             {#each histories as history}
                                 <div role="button" tabindex="0" on:click={() => historyClick(history.word)}
                                     on:keydown={() => historyClick(history.word)}>
-                                    <Card bottomMargin>
+                                    <Card bottomMargin="xs">
                                         <div class="search-history">
                                             <span>
                                                 {history.word}
@@ -210,7 +205,7 @@
                     {#await selectedResultVideos then videos}
                         {#if videos !== undefined && videos.length > 0}
                             {#each videos as video (video.youtubeThumbnail)}
-                                <Video {video} verbose bottomMargin />
+                                <Video {video} verbose bottomMargin="xs" />
                             {/each}
                         {:else}
                             <img src="/images/no-result.png" alt="결과 없음" />

@@ -6,7 +6,7 @@
     export let icon: IconDefinition | undefined = undefined;
     export let iconClicked: () => void = () => {};
     export let valueChanged: (value: string) => void = () => {};
-    export let value: string;
+    export let value: string = "";
     export let autoBreak = false;
     export let fittedHeight = false;
     export let noPadding = false;
