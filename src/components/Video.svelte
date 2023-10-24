@@ -11,7 +11,7 @@
     export let video: VideoData;
     export let leftMargin: SpaceType | undefined = undefined;
     export let rightMargin: SpaceType | undefined = undefined;
-    export let bottomMargin = false;
+    export let bottomMargin: SpaceType | undefined = undefined;
     export let verbose = false;
     export let selectable = false;
 

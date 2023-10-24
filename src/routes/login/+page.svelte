@@ -139,7 +139,7 @@
     {:else if !isSurveyed}
         <div class="survey">
             {#each $allVideos as video (video.youtubeThumbnail)}
-                <Video {video} selectable verbose bottomMargin />
+                <Video {video} selectable verbose bottomMargin="xs" />
             {/each}
         </div>
     {/if}

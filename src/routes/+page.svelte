@@ -41,7 +41,7 @@
                 <Button on:click={() => goto("/login")}>로그인</Button>
                 {#if likedVideos.length > 0}
                     {#each videos as video (video.youtubeThumbnail)}
-                        <Video {video} verbose bottomMargin />
+                        <Video {video} verbose bottomMargin="xs" />
                     {/each}
                 {:else}
                     <img src="/images/no-result.png" alt="저장한 레시피 없음" />

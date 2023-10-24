@@ -325,7 +325,7 @@
                     {/each}
                     <svelte:fragment slot="grid">
                         {#each data.recommended as video (video.youtubeThumbnail)}
-                            <Video {video} verbose bottomMargin />
+                            <Video {video} verbose bottomMargin="xs" />
                         {/each}
                     </svelte:fragment>
                 </Carousel>

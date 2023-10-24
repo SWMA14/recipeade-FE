@@ -102,7 +102,7 @@
         <svelte:fragment slot="grid">
             {#if isRendered}
                 {#each highViews as video, i (video.youtubeThumbnail)}
-                    <Video {video} verbose bottomMargin />
+                    <Video {video} verbose bottomMargin="xs" />
                 {/each}
             {/if}
         </svelte:fragment>
@@ -121,7 +121,7 @@
         <svelte:fragment slot="grid">
             {#if isRendered}
                 {#each easy as video (video.youtubeThumbnail)}
-                    <Video {video} verbose bottomMargin />
+                    <Video {video} verbose bottomMargin="xs" />
                 {/each}
             {/if}
         </svelte:fragment>
@@ -133,14 +133,14 @@
             <Skeleton />
         </div>
         <div class="grid">
-            <Video skeleton video={DUMMY_VIDEO} bottomMargin />
+            <Video skeleton video={DUMMY_VIDEO} bottomMargin="xs" />
             <Video skeleton video={DUMMY_VIDEO} />
         </div>
     {:else}
         <h2 class="grid-title">{$_("page.discover.others")}</h2>
         <div class="grid">
             {#each others as video (video.youtubeThumbnail)}
-                <Video {video} verbose bottomMargin />
+                <Video {video} verbose bottomMargin="xs" />
             {/each}
         </div>
     {/if}
