@@ -3,10 +3,11 @@
     import { type SignInWithAppleOptions, SignInWithApple } from "@capacitor-community/apple-sign-in";
     import { GoogleAuth } from "@codetrix-studio/capacitor-google-auth"
     import { faApple, faGoogle } from "@fortawesome/free-brands-svg-icons";
-    import { _ } from "svelte-i18n";
+    import { _, format } from "svelte-i18n";
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
     import { allVideos, surveyedVideos } from "../../store";
+    import { goto } from "$app/navigation";
     import { browser } from "$app/environment";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import Button from "$components/Button.svelte";
@@ -23,7 +24,11 @@
     let isSigningWithEmail = false;
     let isOnboarded = false;
     let isOnboardingCompleted = false;
-    let isSurveyed = false;
+    let isSurveyed = true; // temporary
+
+    let videos = Array<HTMLVideoElement>(4);
+    let isPlayed = Array<boolean>(4).fill(false);
+    isPlayed[0] = true;
 
     let email = "";
     let emailValidating: Promise<boolean>;
@@ -33,19 +38,24 @@
         .then(x => device = x.platform)
         .catch(() => device = "web");
     $: getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
-        isHidden: !isOnboarded || isSurveyed,
-        isBackgroundShown: true,
-        main: surveyUpperMain
+        isHidden: true
+        // isHidden: !isOnboarded || isSurveyed,
+        // isBackgroundShown: true,
+        // main: surveyUpperMain  -- temporary
     });
     $: getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
         isHidden: !isSignedIn || !isOnboardingCompleted,
-        main: !isOnboarded ? onboardingMain : surveyMain,
-        mainProps: !isOnboarded ? {
-            onClick: startSurvey
-        } : {
-            selected: $surveyedVideos.length,
-            threshold: 5
+        main: onboardingMain,
+        mainProps: {
+            onClick: () => goto("/")
         }
+        // main: !isOnboarded ? onboardingMain : surveyMain,
+        // mainProps: !isOnboarded ? {
+        //     onClick: startSurvey
+        // } : {
+        //     selected: $surveyedVideos.length,
+        //     threshold: 5
+        // }  -- temporary
     });
 
     onMount(() => {
@@ -79,11 +89,12 @@
 
     function signInWithGoogle()
     {
-        GoogleAuth.signIn()
-            .then(result => {
-                console.log(result);
-                isSignedIn = true;
-            });
+        isSignedIn = true;
+        // GoogleAuth.signIn()
+        //     .then(result => {
+        //         console.log(result);
+        //         isSignedIn = true;
+        //     });
     }
 
     function signInWithEmail()
@@ -100,6 +111,21 @@
     {
         isOnboarded = true;
     }
+
+    function checkVideosVisible(e: any)
+    {
+        for (const [i, video] of videos.entries())
+        {
+            if (!video)
+                continue;
+
+            if (!isPlayed[i] && (e.target.scrollLeft >= e.target.clientWidth * 0.8 * i || e.target.scrollLeft + e.target.clientWidth >= e.target.scrollWidth))
+            {
+                video.play();
+                isPlayed[i] = true;
+            }
+        }
+    }
 </script>
 
 <div class="container">
@@ -110,11 +136,11 @@
             </div>
             <div class="buttons">
                 {#if device !== "android"}
-                    <Button kind="gray" icon={faApple} bottomMargin="2xs" on:click={signInWithApple}>{$_("page.login.signInWithApple")}</Button>
+                    <Button kind="primary" icon={faApple} bottomMargin="2xs" on:click={signInWithApple}>{$_("page.login.signInWithApple")}</Button>
                 {/if}
-                <Button kind="gray" icon={faGoogle} on:click={signInWithGoogle}>{$_("page.login.signInWithGoogle")}</Button>
-                <span class="divider typo-body-2">{$_("page.login.signInOr")}</span>
-                <Button on:click={signInWithEmail}>{$_("page.login.signUp")}</Button>
+                <Button kind="primary" icon={faGoogle} on:click={signInWithGoogle}>{$_("page.login.signInWithGoogle")}</Button>
+                <!-- <span class="divider typo-body-2">{$_("page.login.signInOr")}</span>
+                <Button on:click={signInWithEmail}>{$_("page.login.signUp")}</Button> -->
                 <span class="disclaimer typo-body-2">{@html $_("page.login.signInTOS")}</span>
             </div>
         </div>
@@ -125,12 +151,15 @@
         </div>
     {:else if !isOnboarded}
         <div class="onboarding">
-            <Carousel leftOverflow rightOverflow onScrollEnd={completeOnboarding}>
-                {#each ["유튜브에서 공유해 레시피를 만들어요", "요리 모드로 편리하게 요리해요", "음성으로 제어해 손을 쓰지 않아도 괜찮아요"] as text, i (text)}
-                    <Card backgroundColor="primary-200" leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs"
-                        columnFlex scrollSnap>
-                        <div style="height: 50vh;">
-                            {text}
+            <Carousel leftOverflow rightOverflow onScroll={checkVideosVisible} onScrollEnd={completeOnboarding}>
+                {#each Array(3) as _, i}
+                    <Card leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" columnFlex scrollSnap>
+                        <div class="feature-video">
+                            <video src="/videos/landing-{i + 1}.mp4" bind:this={videos[i]} muted autoplay={i === 0} />
+                        </div>
+                        <div class="description">
+                            <h2>{$format(`page.login.onboardingHeader${i + 1}`)}</h2>
+                            <span>{$format(`page.login.onboardingDescription${i + 1}`)}</span>
                         </div>
                     </Card>
                 {/each}
@@ -197,5 +226,50 @@
 
     .survey {
         margin-top: calc(var(--space-3xl) + env(safe-area-inset-top));
+    }
+
+    .section {
+        padding: var(--space-3xl) var(--space-m);
+        display: flex;
+
+        @media (max-width: 64rem) {
+            flex-direction: column;
+        }
+    }
+
+    .feature-video {
+        aspect-ratio: 1 / 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-big);
+        overflow: hidden;
+        box-shadow: 0 0 5rem rgba(120, 14, 0, 0.1);
+
+        & video {
+            min-width: 150%;
+            min-height: 150%;
+        }
+    }
+
+    .description {
+        margin: var(--space-s) 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+
+        &.left {
+            padding-right: var(--space-m);
+        }
+
+        & .white {
+            color: var(--white);
+        }
+
+        & span {
+            margin-top: var(--space-2xs);
+        }
     }
 </style>

@@ -59,7 +59,7 @@
     "sortablejs": "^1.15.0",
     "svelte-device-info": "^1.0.0",
     "svelte-fa": "^3.0.4",
-    "svelte-i18n": "^3.7.4",
+    "svelte-i18n": "^4.0.0",
     "uuid": "^9.0.0",
     "youtube-player": "^5.6.0"
   },
