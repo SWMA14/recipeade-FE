@@ -1,5 +1,6 @@
 <script lang="ts">
     import { faXmark, type IconDefinition } from "@fortawesome/free-solid-svg-icons";
+    import type { SpaceType } from "$lib/types";
     import Button from "$components/Button.svelte";
 
     export let placeholder = "";
@@ -11,11 +12,14 @@
     export let fittedHeight = false;
     export let noPadding = false;
     export let noDelete = false;
+    export let bottomMargin: SpaceType | undefined = undefined;
 
     $: valueChanged(value);
+
+    let bottomMarginValue = bottomMargin ? `var(--space-${bottomMargin})` : undefined;
 </script>
 
-<div class="container">
+<div class="container" class:bottom-margin={bottomMargin} style="--bottom-margin: {bottomMarginValue};">
     {#if icon}
         <div class="button">
             <Button kind="transparent" {icon} on:click={iconClicked} />
@@ -83,5 +87,9 @@
     .auto-break:empty:before {
         content: attr(placeholder);
         color: var(--gray-400);
+    }
+
+    .bottom-margin {
+        margin-bottom: var(--bottom-margin);
     }
 </style>

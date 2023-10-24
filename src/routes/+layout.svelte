@@ -1,5 +1,6 @@
 <script lang="ts">
     import "../app.css";
+    import { faPlus, faXmark } from "@fortawesome/free-solid-svg-icons";
     import { Device } from "@capacitor/device";
     import { App } from "@capacitor/app";
     import { onMount, setContext } from "svelte";
@@ -11,13 +12,19 @@
     import { DUMMY_VIDEO } from "$lib/dummy";
     import { duration, flyingFade } from "$lib/transition";
     import type { VideoData } from "$lib/video";
+    import Button from "$components/Button.svelte";
+    import Card from "$components/Card.svelte";
     import DynamicBar from "$components/DynamicBar.svelte";
+    import Input from "$components/Input.svelte";
+    import Modal from "$components/Modal.svelte";
 
     let device: "ios" | "android" | "web";
     let upperBarContext = writable({
         isHidden: true
     } as DynamicBarContext);
     let lowerBarContext = writable({} as DynamicBarContext);
+    let recipeAddModalShown = false;
+    let recipeAddModalValue: string;
 
     Device.getInfo()
         .then(x => device = x.platform)
@@ -57,12 +64,28 @@
 {/if}
 {#if !$lowerBarContext.isHidden}
     <div class="navigation bottom" class:ios={device === "ios"} transition:flyingFade={{ duration: duration * 2 }}>
+        {#if $page.route.id === "/"}
+            <Button kind="primary-light" style="width: fit-content; align-self: flex-end;" icon={faPlus} bottomMargin="2xs"
+                on:click={() => recipeAddModalShown = true}>
+                추가하기
+            </Button>
+        {/if}
         <DynamicBar leading={$lowerBarContext.leading} leadingProps={$lowerBarContext.leadingProps}
             main={$lowerBarContext.main} mainProps={$lowerBarContext.mainProps}
             trailing={$lowerBarContext.trailing} trailingProps={$lowerBarContext.trailingProps} />
     </div>
     <div class="overlay" class:ios={device === "ios"} />
 {/if}
+<Modal bind:shown={recipeAddModalShown}>
+    <Card backgroundColor="white">
+        <div class="heading">
+            <h3>링크로 레시피 추가하기</h3>
+            <Button kind="transparent" icon={faXmark} style="width: var(--space-xl);" on:click={() => recipeAddModalShown = false} />
+        </div>
+        <Input bottomMargin="xs" placeholder="YouTube 영상 링크" valueChanged={value => recipeAddModalValue = value} />
+        <Button>추가하기</Button>
+    </Card>
+</Modal>
 
 <style lang="postcss">
     main {
@@ -103,6 +126,8 @@
             width: calc(100% - var(--space-xs) * 2);
             bottom: var(--space-xs);
             left: var(--space-xs);
+            display: flex;
+            flex-direction: column;
 
             &.ios {
                 bottom: var(--space-s);
@@ -122,5 +147,12 @@
         &.ios {
             height: calc(var(--space-xl) * 2 + var(--space-s));
         }
+    }
+
+    .heading {
+        margin-bottom: var(--space-xs);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 </style>
