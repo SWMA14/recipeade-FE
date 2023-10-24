@@ -14,10 +14,6 @@
             icon: faFire
         },
         {
-            href: "/search",
-            icon: faMagnifyingGlass
-        },
-        {
             href: "/settings",
             icon: faGear
         }

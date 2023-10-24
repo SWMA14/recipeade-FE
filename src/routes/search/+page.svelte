@@ -1,6 +1,6 @@
 <script lang="ts">
     import { faXmark } from "@fortawesome/free-solid-svg-icons";
-    import { getContext, type ComponentType } from "svelte";
+    import { getContext } from "svelte";
     import type { Writable } from "svelte/store";
     import { PUBLIC_API_ENDPOINT } from "$env/static/public";
     import type { DynamicBarContext } from "$lib/dynamicBar";
@@ -11,33 +11,27 @@
     import Card from "$components/Card.svelte";
     import DynamicBar from "$components/DynamicBar.svelte";
     import Video from "$components/Video.svelte";
-    import lowerMain from "../__lowerBarComponents/main.svelte";
-    import upperMain from "./__upperBarComponents/main.svelte";
+    import main from "./__upperBarComponents/main.svelte";
     import leading from "./__upperBarComponents/leading.svelte";
     import { analyticsService } from "$lib/analytics";
     import { onMount } from "svelte";
 
-    export let data;
-
     getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
+        ...x,
+        isHidden: true
+    });
+    getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
+        ...x,
         isHidden: true
     });
 
-    let lowerBarContext = getContext<Writable<DynamicBarContext>>("lowerBar");
-    $lowerBarContext = {
-        main: lowerMain
-    };
-
-    let leadingValue: ComponentType | undefined = undefined;
-    let leadingProps = {
+    let value: string | undefined = undefined;
+    const leadingProps = {
         onClick: endActualSearch
     };
-
-    let value: string | undefined = undefined;
     $: mainProps = {
         onValueChanged: updateValue,
         onIconClicked: searchClick,
-        onClick: startActualSearch,
         value
     };
 
@@ -50,6 +44,8 @@
     } | undefined = undefined;
 
     $: selectedResultVideos = selectedSort === "latest" ? resultVideos?.latest : resultVideos?.popular;
+    $: if (value === "")
+        resultShown = false;
 
     function updateValue(inputValue: string)
     {
@@ -82,24 +78,10 @@
         searchClick();
     }
 
-    function recommendedWordClick(word: string)
-    {
-        startActualSearch();
-        historyClick(word);
-    }
-
-    function startActualSearch()
-    {
-        $lowerBarContext.isHidden = true;
-        leadingValue = leading;
-    }
-
     function endActualSearch()
     {
         resultShown = false;
         value = "";
-        $lowerBarContext.isHidden = false;
-        leadingValue = undefined;
         resultVideos = undefined;
 
         analyticsService.logEvent("search_cancel", {
@@ -128,23 +110,10 @@
 </script>
 
 <div class="search-bar">
-    <DynamicBar leading={leadingValue} {leadingProps} main={upperMain} {mainProps} />
+    <DynamicBar {leading} {leadingProps} {main} {mainProps} />
 </div>
 <div class="container">
-    {#if !leadingValue}
-        <div class="intro" in:flyingFade|global={{ delay: 0 }}>
-            <div class="section first last">
-                <h2>추천 검색어</h2>
-                <div class="grid">
-                    {#each data.recommendedWords as { word, video } (word)}
-                        <div role="button" tabindex="0" on:click={() => recommendedWordClick(word)} on:keydown={() => recommendedWordClick(word)}>
-                            <Card noPadding square darkOverlay={0.7} body={word} {video} />
-                        </div>
-                    {/each}
-                </div>
-            </div>
-        </div>
-    {:else if !resultShown}
+    {#if !resultShown}
         <div class="actual-search" in:flyingFade={{ delay: 0 }}>
             {#key updateSearchHistory}
                 {#await getHistory() then histories}
@@ -160,8 +129,7 @@
                     <div class="words">
                         {#if histories.length > 0}
                             {#each histories as history}
-                                <div role="button" tabindex="0" on:click={() => historyClick(history.word)}
-                                    on:keydown={() => historyClick(history.word)}>
+                                <div role="button" tabindex="0" on:click={() => historyClick(history.word)} on:keydown={() => historyClick(history.word)}>
                                     <Card bottomMargin="xs">
                                         <div class="search-history">
                                             <span>
@@ -259,24 +227,6 @@
     .container {
         width: 100%;
         padding-top: calc(var(--space-3xl) + var(--space-m));
-    }
-
-    .intro {
-        margin-bottom: calc(var(--space-3xl) + var(--space-xs));
-    }
-
-    .section {
-        margin-bottom: var(--space-m);
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-    }
-
-    .grid {
-        margin-top: var(--space-xs);
-        display: grid;
-        grid-template-columns: auto auto;
-        gap: var(--space-xs);
     }
 
     .heading {

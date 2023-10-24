@@ -5,11 +5,13 @@
     import type { Writable } from "svelte/store";
     import { MetaTags } from "svelte-meta-tags";
     import { allVideos } from "../../store";
+    import { goto } from "$app/navigation";
     import { DUMMY_VIDEO } from "$lib/dummy";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import type { VideoData } from "$lib/video";
     import Carousel from "$components/Carousel.svelte";
     import Card from "$components/Card.svelte";
+    import Input from "$components/Input.svelte";
     import Skeleton from "$components/Skeleton.svelte";
     import Video from "$components/Video.svelte";
     import main from "../__lowerBarComponents/main.svelte";
@@ -90,6 +92,9 @@
     {/if}
 </div>
 <div class="section">
+    <Input placeholder="어떤 요리를 해 볼까요?" on:click={() => goto("/search")} />
+</div>
+<div class="section">
     <Carousel skeleton={!isRendered} leftOverflow rightOverflow heading={$_("page.discover.trendingOnYouTube")} canShowAll>
         {#if !isRendered}
             <Video skeleton video={DUMMY_VIDEO} leftMargin="xs" rightMargin="xs" />
@@ -150,7 +155,7 @@
     .intro {
         width: -webkit-fill-available;
         margin: 0 calc(var(--space-xs) * -1);
-        margin-bottom: var(--space-m);
+        margin-bottom: var(--space-xs);
     }
 
     .section {
