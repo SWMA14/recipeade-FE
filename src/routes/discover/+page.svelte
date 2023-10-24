@@ -92,7 +92,9 @@
     {/if}
 </div>
 <div class="section">
-    <Input placeholder="어떤 요리를 해 볼까요?" on:click={() => goto("/search")} />
+    <Card backgroundColor="gray-100">
+        <a class="fake-input" href="/search">어떤 요리를 해 볼까요?</a>
+    </Card>
 </div>
 <div class="section">
     <Carousel skeleton={!isRendered} leftOverflow rightOverflow heading={$_("page.discover.trendingOnYouTube")} canShowAll>
@@ -173,6 +175,11 @@
                 margin-bottom: calc(var(--space-3xl) + var(--space-2xs));
             }
         }
+    }
+
+    .fake-input {
+        color: var(--gray-400);
+        line-height: 1;
     }
 
     .grid {

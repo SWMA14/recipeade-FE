@@ -33,7 +33,7 @@
     $: getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
         leading: upperLeading,
         leadingProps: {
-            onClick: history.back
+            onClick: () => history.back()
         },
         trailing: upperTrailing,
         trailingProps: {
