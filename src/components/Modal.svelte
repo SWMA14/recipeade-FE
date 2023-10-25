@@ -1,12 +1,21 @@
 <script lang="ts">
+    import { onDestroy } from "svelte";
     import { fade, fly } from "svelte/transition";
     import { cubicIn, cubicOut } from "svelte/easing";
+    import { stacks } from "../store";
 
     export let shown: boolean;
+
+    $: if (shown)
+        $stacks = [...$stacks, hide];
+    $: console.log($stacks);
+
+    onDestroy(hide);
 
     function hide()
     {
         shown = false;
+        $stacks = $stacks.slice(0, -1);
     }
 </script>
 
