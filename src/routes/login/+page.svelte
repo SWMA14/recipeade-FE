@@ -7,10 +7,10 @@
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
     import { allVideos, surveyedVideos } from "../../store";
-    import { goto } from "$app/navigation";
+    import { beforeNavigate, goto } from "$app/navigation";
     import { browser } from "$app/environment";
     import { PUBLIC_API_ENDPOINT } from "$env/static/public";
-    import { saveAuthTokens } from "$lib/auth";
+    import { getAccessToken, saveAuthTokens } from "$lib/auth";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
@@ -67,6 +67,23 @@
                 scopes: ["profile", "email"],
                 grantOfflineAccess: true
             });
+    });
+
+    beforeNavigate(async ({ cancel, to }) => {
+        if (to && to.url.searchParams.has("succeeded"))
+        {
+            to.url.searchParams.delete("succeeded");
+            return;
+        }
+
+        cancel();
+        if (to && await getAccessToken() !== null)
+        {
+            to.url.searchParams.append("succeeded", "");
+            goto(to.url);
+        }
+        else
+            console.log("cancelled")
     });
 
     async function signInWithApple()
