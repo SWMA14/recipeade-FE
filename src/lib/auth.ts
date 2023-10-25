@@ -78,3 +78,18 @@ export async function authedFetch(input: RequestInfo | URL, init?: RequestInit):
 
     return response;
 }
+
+export async function saveOnboardingCompleted()
+{
+    await Preferences.set({
+        key: "onboarded",
+        value: "true"
+    });
+}
+
+export async function getIsOnboarded(): Promise<boolean>
+{
+    return await Preferences.get({
+        key: "onboarded"
+    }).then(result => result.value === "true");
+}

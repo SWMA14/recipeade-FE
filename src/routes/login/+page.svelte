@@ -10,7 +10,7 @@
     import { beforeNavigate, goto } from "$app/navigation";
     import { browser } from "$app/environment";
     import { PUBLIC_API_ENDPOINT } from "$env/static/public";
-    import { getAccessToken, saveAuthTokens } from "$lib/auth";
+    import { getAccessToken, getIsOnboarded, saveAuthTokens, saveOnboardingCompleted } from "$lib/auth";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
@@ -25,7 +25,7 @@
     let isSignedIn = false;
     let isSigningWithEmail = false;
     let isOnboarded = false;
-    let isOnboardingCompleted = false;
+    let endOnboardingButtonShown = false;
     let isSurveyed = true; // temporary
 
     let videos = Array<HTMLVideoElement>(4);
@@ -46,7 +46,7 @@
         // main: surveyUpperMain  -- temporary
     });
     $: getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
-        isHidden: !isSignedIn || !isOnboardingCompleted,
+        isHidden: !isSignedIn || !endOnboardingButtonShown,
         main: onboardingMain,
         mainProps: {
             onClick: () => goto("/")
@@ -60,13 +60,15 @@
         // }  -- temporary
     });
 
-    onMount(() => {
+    onMount(async () => {
         if (browser)
             GoogleAuth.initialize({
                 clientId: "627309130382-9109aakabgpnjm91n43inhnhbtja28fp.apps.googleusercontent.com",
                 scopes: ["profile", "email"],
                 grantOfflineAccess: true
             });
+
+        // isOnboarded = await getIsOnboarded();
     });
 
     beforeNavigate(async ({ cancel, to }) => {
@@ -109,7 +111,11 @@
                 }).then(response => response.json());
 
                 await saveAuthTokens(result["access_token"], result["refresh_token"]);
-                isSignedIn = true;
+
+                if (await getIsOnboarded())
+                    goto("/");
+                else
+                    isSignedIn = true;
             });
     }
 
@@ -129,7 +135,11 @@
                 }).then(response => response.json());
 
                 await saveAuthTokens(result["access_token"], result["refresh_token"]);
-                isSignedIn = true;
+
+                if (await getIsOnboarded())
+                    goto("/");
+                else
+                    isSignedIn = true;
             });
     }
 
@@ -140,7 +150,8 @@
 
     function completeOnboarding()
     {
-        isOnboardingCompleted = true;
+        endOnboardingButtonShown = true;
+        saveOnboardingCompleted();
     }
 
     function startSurvey()
