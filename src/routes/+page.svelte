@@ -47,7 +47,7 @@
 
 <div class="section" in:flyingFade={{ delay: 0 }}>
     <div class="title">
-        <h1>{@html getTimedGreeting()}</h1>
+        <h2>{@html getTimedGreeting()}</h2>
         <div class="buttons">
             <Button kind="transparent" size="small">{$_("page.home.editRecipes")}</Button>
         </div>
@@ -98,10 +98,6 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-
-        & h1 {
-            line-height: 1.2;
-        }
     }
 
     .heading {
