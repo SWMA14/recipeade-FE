@@ -48,7 +48,6 @@
         top: 0;
         z-index: 9;
         background-color: var(--white);
-        border-radius: 0 0 var(--radius) var(--radius);
         overflow: hidden;
     }
 
@@ -59,7 +58,7 @@
 
     .content {
         width: 100%;
-        margin-top: calc(var(--top) + var(--space-xs));
+        margin-top: calc(var(--top) + var(--space-xs) + env(safe-area-inset-top));
         padding-bottom: calc(var(--space-xl) + var(--space-xs));
     }
 

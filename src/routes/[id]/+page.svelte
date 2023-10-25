@@ -360,7 +360,7 @@
             margin-bottom: var(--space-xs);
 
             &.ios {
-                margin-bottom: var(--space-2xs);
+                margin-bottom: var(--space-s);
             }
         }
     }

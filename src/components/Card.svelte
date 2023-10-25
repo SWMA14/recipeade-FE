@@ -271,7 +271,6 @@
         }
 
         &.overflow-safe-area {
-            margin-top: calc(env(safe-area-inset-top) * -1);
             padding-bottom: calc(100% - var(--space-xs) + env(safe-area-inset-top));
         }
     }
