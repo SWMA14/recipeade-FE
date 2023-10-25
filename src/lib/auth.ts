@@ -54,7 +54,7 @@ export async function authedFetch(input: RequestInfo | URL, init?: RequestInit):
 
     let response = await fetch(input, tempInit);
 
-    if (!response.ok)
+    if (response.status === 402)
     {
         const refresh = await fetch("https://recipeade.net/login/refresh", {
             method: "POST",
@@ -62,7 +62,7 @@ export async function authedFetch(input: RequestInfo | URL, init?: RequestInit):
                 "token_type": "refresh_token",
                 "token": await getRefreshToken()
             })
-        }).then(res => res.json());
+        }).then(result => result.json());
 
         saveAuthTokens(refresh["access_token"], refresh["refresh_token"]);
 
