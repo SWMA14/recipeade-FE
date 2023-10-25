@@ -11,7 +11,7 @@
 </script>
 
 {#if shown}
-    <div class="modal" in:fly={{ y: 50, easing: cubicOut, duration: 500 }} out:fade={{ duration: 250 }}>
+    <div class="modal" in:fly={{ y: 30, easing: cubicOut, duration: 500 }} out:fade={{ duration: 250 }}>
         <slot />
     </div>
     <div class="overlay" on:keydown={hide} on:click={hide} transition:fade={{ duration: 250 }} />
