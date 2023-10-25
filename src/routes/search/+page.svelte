@@ -143,8 +143,10 @@
                                 </div>
                             {/each}
                         {:else}
-                            <img src="/images/no-result.png" alt="최근 검색어 없음" />
-                            <span class="no-result">최근 검색어가 없어요.</span>
+                            <div class="no-result">
+                                <img src="/images/no-result.png" alt="최근 검색어 없음" />
+                                <span>최근 검색어가 없어요.</span>
+                            </div>
                         {/if}
                     </div>
                 {/await}
@@ -176,12 +178,16 @@
                                 <Video {video} verbose bottomMargin="xs" />
                             {/each}
                         {:else}
-                            <img src="/images/no-result.png" alt="결과 없음" />
-                            <span class="no-result">결과가 없어요.</span>
+                            <div class="no-result">
+                                <img src="/images/no-result.png" alt="결과 없음" />
+                                <span>결과가 없어요.</span>
+                            </div>
                         {/if}
                     {:catch}
-                        <img src="/images/no-result.png" alt="결과 없음" />
-                        <span class="no-result">결과가 없어요.</span>
+                        <div class="no-result">
+                            <img src="/images/no-result.png" alt="결과 없음" />
+                            <span>결과가 없어요.</span>
+                        </div>
                     {/await}
                 </div>
             {/key}
@@ -257,7 +263,18 @@
     }
 
     .no-result {
-        text-align: center;
-        color: var(--gray-400);
+        margin-top: var(--space-3xl);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        & img {
+            width: 80%;
+        }
+
+        & span {
+            color: var(--gray-400);
+            text-align: center;
+        }
     }
 </style>

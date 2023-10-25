@@ -76,8 +76,10 @@
                         <Video {video} verbose bottomMargin="xs" />
                     {/each}
                 {:else}
-                    <img src="/images/no-result.png" alt="저장한 레시피 없음" />
-                    <span class="no-result">{$_("page.home.noAddedRecipes")}</span>
+                    <div class="no-result">
+                        <img src="/images/no-result.png" alt="저장한 레시피 없음" />
+                        <span>{$_("page.home.noAddedRecipes")}</span>
+                    </div>
                 {/if}
             </div>
         {/await}
@@ -120,8 +122,18 @@
     }
 
     .no-result {
-        margin-top: calc(var(--space-xl) * -1);
-        color: var(--gray-400);
-        text-align: center;
+        margin-top: var(--space-3xl);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        & img {
+            width: 80%;
+        }
+
+        & span {
+            color: var(--gray-400);
+            text-align: center;
+        }
     }
 </style>
