@@ -4,13 +4,18 @@
     import { App } from "@capacitor/app";
     import { onMount, setContext } from "svelte";
     import { writable } from "svelte/store";
-    import { stacks } from "../store";
+    import { allVideos, stacks } from "../store";
+    import { goto } from "$app/navigation";
     import { page } from "$app/stores";
-    import { duration, flyingFade } from "$lib/transition";
+    import { PUBLIC_API_ENDPOINT } from "$env/static/public";
+    import { getAccessToken } from "$lib/auth";
     import type { DynamicBarContext } from "$lib/dynamicBar";
+    import { DUMMY_VIDEO } from "$lib/dummy";
+    import { duration, flyingFade } from "$lib/transition";
+    import type { VideoData } from "$lib/video";
     import DynamicBar from "$components/DynamicBar.svelte";
 
-    let device: "ios" | "android" | "web";
+    let device: "ios" | "android" | "web" = "web";
     let upperBarContext = writable({
         isHidden: true
     } as DynamicBarContext);
@@ -19,10 +24,12 @@
     Device.getInfo()
         .then(x => device = x.platform)
         .catch(() => device = "web");
+
+    $: setContext("device", device);
     setContext("upperBar", upperBarContext);
     setContext("lowerBar", lowerBarContext);
 
-    onMount(() => {
+    onMount(async () => {
         App.addListener("backButton", () => {
             const length = $stacks.length;
 
@@ -33,7 +40,21 @@
             else
                 App.exitApp();
         });
+
+        if ($allVideos.length === 0)
+            $allVideos.push(DUMMY_VIDEO);
+            // $allVideos = await fetch(`${PUBLIC_API_ENDPOINT}/recipe`)
+            //     .then(response => response.json())
+            //     .then(result => result as VideoData[]);
+
+        checkSignedIn();
     });
+
+    async function checkSignedIn()
+    {
+        if (await getAccessToken() === null)
+            goto("/login");
+    }
 </script>
 
 <main>
@@ -58,9 +79,10 @@
 <style lang="postcss">
     main {
         width: 100%;
+        height: 100%;
         /* max-width: var(--max-width); */
         margin: 0 auto;
-        margin-top: env(safe-area-inset-top);
+        /* margin-top: env(safe-area-inset-top); */
         padding: 0 var(--space-xs);
         display: flex;
         flex-direction: column;
@@ -93,6 +115,8 @@
             width: calc(100% - var(--space-xs) * 2);
             bottom: var(--space-xs);
             left: var(--space-xs);
+            display: flex;
+            flex-direction: column;
 
             &.ios {
                 bottom: var(--space-s);

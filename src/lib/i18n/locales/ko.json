@@ -1,0 +1,58 @@
+{
+    "page": {
+        "login": {
+            "slogan": "시원한 에이드처럼<br>불편함을 싹<br>내려 드릴게요",
+            "signInWithApple": "Apple로 계속하기",
+            "signInWithGoogle": "Google로 계속하기",
+            "signInOr": "또는",
+            "signUp": "이메일로 계속하기",
+            "signInTOS": "서비스를 이용함으로써 이용약관과 개인정보처리방침에 동의한 것으로 간주됩니다.",
+            "enterEmail": "이메일을<br>입력하세요",
+            "enterEmailPlaceholder": "이메일",
+            "enterPassword": "비밀번호를<br>입력하세요",
+            "enterPasswordPlaceholder": "비밀번호",
+            "onboardingHeader1": "영상을 레시피로 변환해요",
+            "onboardingDescription1": "원하는 YouTube 레시피 영상을 레시피에이드로 공유하면 보기 편하고 따라하기 좋게 만들어 드려요.",
+            "onboardingHeader2": "각자에 맞게 수정해요",
+            "onboardingDescription2": "만들어진 레시피의 재료 및 단계를 자신에게 맞게 수정하거나 메모를 추가할 수 있어요.",
+            "onboardingHeader3": "순서대로 요리해요",
+            "onboardingDescription3": "영상이 단계별로 나누어져 있어 원하는 단계를 선택하고 이해될 때까지 여러 번 볼 수 있어요.",
+            "onboardingOkay": "알겠어요",
+            "surveyHeading": "어떤 레시피를 좋아하세요?",
+            "surveySelectMore": "레시피 {count}개를 더 선택해 주세요",
+            "surveyStart": "시작하기"
+        },
+        "home": {
+            "morningGreeting": "산뜻한<br>아침이에요",
+            "afternoonGreeting": "즐거운<br>점심이에요",
+            "eveningGreeting": "저녁에는<br>무엇을 먹을까요?",
+            "editRecipes": "편집",
+            "addRecipe": "레시피 추가하기",
+            "addRecipeModalTitle": "링크로 레시피 추가하기",
+            "addRecipeModalDescription": "레시피로 만들고 싶은 YouTube 영상의 공유 버튼을 누르면 링크를 복사할 수 있어요. 복사한 링크를 아래에 붙여 넣으면 레시피가 추가돼요.",
+            "addRecipeModalInputPlaceholder": "YouTube 영상 링크",
+            "addRecipeModalSubmit": "추가하기",
+            "noAddedRecipes": "저장한 레시피가 없어요."
+        },
+        "settings": {
+            "heading": "설정",
+            "signOut": "로그아웃",
+            "deleteAccount": "회원 탈퇴"
+        },
+        "discover": {
+            "featured": "이 레시피는<br>어때요?",
+            "trendingOnYouTube": "유튜브에서 핫해요",
+            "easyToFollow": "쉽게 따라해요",
+            "others": "다른 레시피들도 있어요"
+        },
+        "recipe": {
+            "autoNextStep": "자동 다음 단계",
+            "repeatStep": "단계 반복",
+            "commentsTip": "댓글 팁",
+            "commentsTipExplainTitle": "이게 뭐죠?",
+            "commentsTipExplainDescription": "AI로 영상의 댓글을 분석해 요리에 도움되는 팁들을 정리해 드려요.",
+            "ingredients": "재료",
+            "ingredientsUsedStep": "{step}단계"
+        }
+    }
+}

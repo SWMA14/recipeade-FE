@@ -1,9 +1,10 @@
 <script lang="ts">
-    import { Device } from "@capacitor/device";
+    import { Share } from "@capacitor/share";
     import { SortableList } from "@jhubbardsf/svelte-sortablejs";
     import { faGripLinesVertical, faTrash } from "@fortawesome/free-solid-svg-icons";
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
+    import { PUBLIC_LANDING_ENDPOINT } from "$env/static/public";
     import { analyticsService } from "$lib/analytics";
     import { getCategoryById } from "$lib/category";
     import type { DynamicBarContext } from "$lib/dynamicBar";
@@ -19,6 +20,7 @@
     import Stack from "$components/Stack.svelte";
     import Video from "$components/Video.svelte";
     import upperLeading from "./__upperBarComponents/leading.svelte";
+    import upperTrailing from "./__upperBarComponents/trailing.svelte";
     import lowerLeading from "./__lowerBarComponents/leading.svelte";
     import lowerMain from "./__lowerBarComponents/main.svelte";
 
@@ -32,6 +34,10 @@
         leadingProps: {
             onClick: () => history.back()
         },
+        trailing: upperTrailing,
+        trailingProps: {
+            onClick: share
+        },
         isBackgroundShown: true
     });
     $: getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
@@ -44,7 +50,7 @@
         main: lowerMain,
         mainProps: {
             isEditing,
-            onEditExit: () => onEditExit()
+            onEditExit
         },
     });
 
@@ -58,14 +64,10 @@
     };
 
     let isRendered = false;
-    let device: "ios" | "android" | "web";
+    let device: "ios" | "android" | "web" = getContext("device");
     let recipe = $allVideos.find(x => x.youtubeVideoId === data.id) ?? data.video;
     let cache = {} as VideoData;
     let shown = false;
-
-    Device.getInfo()
-        .then(x => device = x.platform)
-        .catch(() => device = "web");
 
     onMount(() => {
         isRendered = true;
@@ -168,6 +170,18 @@
             }
         ];
     }
+
+    async function share()
+    {
+        if (!await Share.canShare())
+            return;
+
+        await Share.share({
+            title: data.video.youtubeTitle,
+            text: "레시피에이드에서 YouTube 레시피 영상에서 중요한 부분만을 손쉽게 확인하고 따라하세요.",
+            url: `${PUBLIC_LANDING_ENDPOINT}/${data.id}`
+        });
+    }
 </script>
 
 {#if isRendered}
@@ -207,7 +221,7 @@
         {#if isEditing}
             <SortableList class="sortable-list" handle=".handle" onEnd={handleIngredientsSort}>
                 {#each cache.ingredients as ingredient, i (ingredient.name)}
-                    <Card bottomMargin>
+                    <Card bottomMargin="xs">
                         <div class="list-content">
                             <div class="ingredient" class:edit={isEditing}>
                                 <Input placeholder="재료명" value={ingredient.name} on:change={e => cache.ingredients[i].name = e.target.value}
@@ -236,7 +250,7 @@
             </SortableList>
         {:else}
             {#each recipe.ingredients as ingredient (ingredient.name)}
-                <Card bottomMargin>
+                <Card bottomMargin="xs">
                     <div class="ingredient">
                         <span>{ingredient.name}</span>
                         <span>{ingredient.quantity ?? ""}{ingredient.unit ?? ""}</span>
@@ -252,7 +266,7 @@
                 <h2>단계</h2>
                 <SortableList class="sortable-list" handle=".handle" onEnd={handleStepsSort}>
                     {#each cache.recipesteps as step, i (step.description)}
-                        <Card bottomMargin>
+                        <Card bottomMargin="xs">
                             <div class="list-content">
                                 <div class="step">
                                     <Input placeholder="단계 설명" value={step.description} on:focusout={e => cache.recipesteps[i].description = e.target.textContent}
@@ -289,7 +303,7 @@
                 {/each}
                 <svelte:fragment slot="grid">
                     {#each recipe.recipesteps as step, i (step.description)}
-                        <Card bottomMargin modifier="{i + 1}단계" body={step.description}>
+                        <Card bottomMargin="xs" modifier="{i + 1}단계" body={step.description}>
                             <div style="height: calc(var(--space-3xl) * 2);"></div>
                         </Card>
                     {/each}
@@ -306,7 +320,7 @@
                     {/each}
                     <svelte:fragment slot="grid">
                         {#each data.recommended as video (video.youtubeThumbnail)}
-                            <Video {video} verbose bottomMargin />
+                            <Video {video} verbose bottomMargin="xs" />
                         {/each}
                     </svelte:fragment>
                 </Carousel>
@@ -341,7 +355,7 @@
             margin-bottom: var(--space-xs);
 
             &.ios {
-                margin-bottom: var(--space-2xs);
+                margin-bottom: var(--space-s);
             }
         }
     }

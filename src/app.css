@@ -5,17 +5,6 @@
 @twilwind utilities; */
 
 :root {
-    --c-primary: #fc5e03;
-    --c-primary-hover: #ff7221;
-    --c-primary-light: #ffe2d1;
-    --c-secondary: #ffffff;
-    --c-secondary-hover: #fafafa;
-    --c-foreground: #000000;
-    --c-foreground-gray: #adadad;
-    --c-background: #ffffff;
-    --c-background-hover: #fafafa;
-    --c-background-lightdark: #f5f5f5;
-    --c-background-dark: #2e2e2e;
     --max-width: 40rem;
     --card-min-width: 80%;
     --card-min-width-decimal: 0.8;
@@ -102,6 +91,12 @@
     font-family: "Pretendard Variable", sans-serif;
     font-weight: 400;
     word-break: keep-all;
+    line-height: 1.6;
+}
+
+html,
+body {
+    height: 100%;
 }
 
 * {
@@ -110,19 +105,25 @@
     padding: 0;
 }
 
+h1,
 .typo-heading-1 {
     font-size: 2rem;
     font-weight: 900;
+    line-height: 1.4;
 }
 
+h2,
 .typo-heading-2 {
     font-size: 1.25rem;
     font-weight: 700;
+    line-height: 1.4;
 }
 
+h3,
 .typo-heading-3 {
     font-size: 1.15rem;
     font-weight: 700;
+    line-height: 1.4;
 }
 
 .typo-body-1 {
@@ -131,28 +132,8 @@
 }
 
 .typo-body-2 {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 400;
-}
-
-h1 {
-    font-weight: 900;
-    font-size: 2rem;
-    line-height: 1.25;
-}
-
-h2 {
-    font-weight: 700;
-    font-size: 1.25rem;
-}
-
-h3 {
-    font-weight: 700;
-    font-size: 1.15rem;
-}
-
-strong {
-    color: var(--c-primary);
 }
 
 ul {

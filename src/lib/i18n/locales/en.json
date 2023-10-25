@@ -1,0 +1,58 @@
+{
+    "page": {
+        "login": {
+            "slogan": "Just Like Ade,<br>Cooling Down<br>Discomforts",
+            "signInWithApple": "Continue with Apple",
+            "signInWithGoogle": "Continue with Google",
+            "signInOr": "Or",
+            "signUp": "Continue with Email",
+            "signInTOS": "By using the service, it is considered that you have agreed to the Terms of Service and Privacy Policy.",
+            "enterEmail": "Enter Your<br>Email",
+            "enterEmailPlaceholder": "Email",
+            "enterPassword": "Enter Your<br>Password",
+            "enterPasswordPlaceholder": "Password",
+            "onboardingHeader1": "Turn Videos Into Recipes",
+            "onboardingDescription1": "Share your favorite YouTube recipe videos with Recipeade, and we'll make them easy to watch and follow along with.",
+            "onboardingHeader2": "Customize It To Your Taste",
+            "onboardingDescription2": "Modify the ingredients and steps to your liking and add your own notes.",
+            "onboardingHeader3": "Cook Step By Step",
+            "onboardingDescription3": "The videos are broken down into easy-to-follow steps, and you can rewatch them until you've got it down.",
+            "onboardingOkay": "Got It",
+            "surveyHeading": "Which recipes do you like?",
+            "surveySelectMore": "Select {count} more",
+            "surveyStart": "Start"
+        },
+        "home": {
+            "morningGreeting": "Good<br>Morning",
+            "afternoonGreeting": "Have a<br>Happy Lunch",
+            "eveningGreeting": "What's<br>For Dinner?",
+            "editRecipes": "Edit",
+            "addRecipe": "Add Recipe",
+            "addRecipeModalTitle": "Add Recipe With a Link",
+            "addRecipeModalDescription": "Click the share button on the YouTube video you want to turn into a recipe and copy the link. Paste the copied link below to add the recipe.",
+            "addRecipeModalInputPlaceholder": "YouTube Video Link",
+            "addRecipeModalSubmit": "Add",
+            "noAddedRecipes": "There's no added recipes yet."
+        },
+        "settings": {
+            "heading": "Settings",
+            "signOut": "Sign Out",
+            "deleteAccount": "Delete Account"
+        },
+        "discover": {
+            "featured": "Recommend<br>To You",
+            "trendingOnYouTube": "Trending on YouTube",
+            "easyToFollow": "Easy to follow",
+            "others": "There's a lot more"
+        },
+        "recipe": {
+            "autoNextStep": "Auto Next",
+            "repeatStep": "Repeat",
+            "commentsTip": "Tips from Comments",
+            "commentsTipExplainTitle": "What's This?",
+            "commentsTipExplainDescription": "AI provides you helpful cooking tips, by analyzing the comments on this video.",
+            "ingredients": "Ingredients",
+            "ingredientsUsedStep": "Step {step}"
+        }
+    }
+}

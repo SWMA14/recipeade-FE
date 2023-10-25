@@ -19,7 +19,8 @@
     export let columnFlex = false;
     export let leftMargin: SpaceType | undefined = undefined;
     export let rightMargin: SpaceType | undefined = undefined;
-    export let bottomMargin = false;
+    export let topMargin: SpaceType | undefined = undefined;
+    export let bottomMargin: SpaceType | undefined = undefined;
     export let scrollSnap = false;
     export let square = false;
     export let squareOverflowSafeArea = false;
@@ -28,6 +29,8 @@
     let player: YouTubePlayer | HTMLElement;
     let leftMarginValue = leftMargin ? `var(--space-${leftMargin})` : undefined;
     let rightMarginValue = rightMargin ? `var(--space-${rightMargin})` : undefined;
+    let topMarginValue = topMargin ? `var(--space-${topMargin})` : undefined;
+    let bottomMarginValue = bottomMargin ? `var(--space-${bottomMargin})` : undefined;
 
     onMount(() => {
         if (video)
@@ -77,13 +80,13 @@
     }
 </script>
 
-<svelte:window on:scroll={checkVideoVisible} />
-
-<div class="container" class:skeleton bind:this={container}
-    style="--card-background-color: var(--{backgroundColor}); --left-margin: {leftMarginValue}; --right-margin: {rightMarginValue};"
+<div class="container" class:skeleton
+    style="--card-background-color: var(--{backgroundColor}); --left-margin: {leftMarginValue}; --right-margin: {rightMarginValue};
+    --top-margin: {topMarginValue}; --bottom-margin: {bottomMarginValue};"
     class:no-radius={noRadius} class:no-padding={noPadding} class:no-min-width={noMinWidth} class:large-padding={largePadding}
     class:column-flex={columnFlex} class:scroll-snap={scrollSnap} class:left-margin={leftMargin} class:right-margin={rightMargin}
-    class:bottom-margin={bottomMargin} class:square class:overflow-safe-area={squareOverflowSafeArea} class:visible-overflow={visibleOverflow}>
+    class:top-margin={topMargin} class:bottom-margin={bottomMargin} class:square class:overflow-safe-area={squareOverflowSafeArea}
+    class:visible-overflow={visibleOverflow}>
     {#if skeleton}
         <div class="skeleton-overlay" />
     {/if}
@@ -115,7 +118,6 @@
 <style lang="postcss">
     .container {
         width: 100%;
-        height: inherit;
         min-width: var(--card-min-width);
         padding: var(--space-xs);
         display: flex;
@@ -248,8 +250,12 @@
         margin-right: var(--right-margin);
     }
 
+    .top-margin {
+        margin-top: var(--top-margin);
+    }
+
     .bottom-margin {
-        margin-bottom: var(--space-xs);
+        margin-bottom: var(--bottom-margin);
     }
 
     .scroll-snap {
@@ -265,7 +271,6 @@
         }
 
         &.overflow-safe-area {
-            margin-top: calc(env(safe-area-inset-top) * -1);
             padding-bottom: calc(100% - var(--space-xs) + env(safe-area-inset-top));
         }
     }

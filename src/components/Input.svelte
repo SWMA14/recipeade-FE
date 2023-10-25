@@ -1,21 +1,25 @@
 <script lang="ts">
     import { faXmark, type IconDefinition } from "@fortawesome/free-solid-svg-icons";
+    import type { SpaceType } from "$lib/types";
     import Button from "$components/Button.svelte";
 
     export let placeholder = "";
     export let icon: IconDefinition | undefined = undefined;
     export let iconClicked: () => void = () => {};
     export let valueChanged: (value: string) => void = () => {};
-    export let value: string;
+    export let value: string = "";
     export let autoBreak = false;
     export let fittedHeight = false;
     export let noPadding = false;
     export let noDelete = false;
+    export let bottomMargin: SpaceType | undefined = undefined;
 
     $: valueChanged(value);
+
+    let bottomMarginValue = bottomMargin ? `var(--space-${bottomMargin})` : undefined;
 </script>
 
-<div class="container">
+<div class="container" class:bottom-margin={bottomMargin} style="--bottom-margin: {bottomMarginValue};">
     {#if icon}
         <div class="button">
             <Button kind="transparent" {icon} on:click={iconClicked} />
@@ -27,8 +31,8 @@
                 {value}
             </div>
         {:else}
-            <input type="text" class:fitted-height={fittedHeight} class:padding-left={icon} class:no-padding={noPadding}
-                {placeholder} bind:value on:change on:click />
+            <input class:fitted-height={fittedHeight} class:padding-left={icon} class:no-padding={noPadding}
+                {placeholder} bind:value on:change on:click {...$$restProps} />
         {/if}
     </form>
     {#if value && !noDelete}
@@ -40,6 +44,7 @@
 
 <style lang="postcss">
     .container {
+        width: 100%;
         position: relative;
     }
 
@@ -83,5 +88,9 @@
     .auto-break:empty:before {
         content: attr(placeholder);
         color: var(--gray-400);
+    }
+
+    .bottom-margin {
+        margin-bottom: var(--bottom-margin);
     }
 </style>
