@@ -5,8 +5,10 @@
     import { onMount, setContext } from "svelte";
     import { writable } from "svelte/store";
     import { allVideos, stacks } from "../store";
+    import { beforeNavigate, goto } from "$app/navigation";
     import { page } from "$app/stores";
     import { PUBLIC_API_ENDPOINT } from "$env/static/public";
+    import { getAccessToken } from "$lib/auth";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { DUMMY_VIDEO } from "$lib/dummy";
     import { duration, flyingFade } from "$lib/transition";
@@ -42,7 +44,23 @@
             // $allVideos = await fetch(`${PUBLIC_API_ENDPOINT}/recipe`)
             //     .then(response => response.json())
             //     .then(result => result as VideoData[]);
+
+        checkSignedIn();
     });
+
+    beforeNavigate(async ({ cancel }) => {
+        checkSignedIn(cancel);
+    })
+
+    async function checkSignedIn(cancel?: () => void)
+    {
+        console.log(await getAccessToken());
+        if (await getAccessToken() === null)
+        {
+            cancel?.();
+            goto("/login");
+        }
+    }
 </script>
 
 <main>

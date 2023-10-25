@@ -9,6 +9,8 @@
     import { allVideos, surveyedVideos } from "../../store";
     import { goto } from "$app/navigation";
     import { browser } from "$app/environment";
+    import { PUBLIC_API_ENDPOINT } from "$env/static/public";
+    import { saveAuthTokens } from "$lib/auth";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
@@ -77,24 +79,42 @@
         };
 
         SignInWithApple.authorize(options)
-            .then(result => {
-                localStorage.setItem("appleIdentityToken", result.response.identityToken);
-                console.log(result.response);
+            .then(async signedInfo => {
+                const result = await fetch(`${PUBLIC_API_ENDPOINT}/login/oauth/apple`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        "token_type": "id_token",
+                        "token": signedInfo.response.identityToken
+                    })
+                }).then(response => response.json());
+
+                console.log(result);
+                await saveAuthTokens(result["access_token"], result["refresh_token"]);
                 isSignedIn = true;
-            })
-            .catch(error => {
-                console.log(error);
             });
     }
 
     function signInWithGoogle()
     {
-        isSignedIn = true;
-        // GoogleAuth.signIn()
-        //     .then(result => {
-        //         console.log(result);
-        //         isSignedIn = true;
-        //     });
+        GoogleAuth.signIn()
+            .then(async signedInfo => {
+                const result = await fetch(`${PUBLIC_API_ENDPOINT}/login/oauth/google`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        "token_type": "id_token",
+                        "token": signedInfo.authentication.idToken
+                    })
+                }).then(response => response.json());
+
+                await saveAuthTokens(result["access_token"], result["refresh_token"]);
+                isSignedIn = true;
+            });
     }
 
     function signInWithEmail()
@@ -136,9 +156,9 @@
             </div>
             <div class="buttons">
                 {#if device !== "android"}
-                    <Button kind="primary" icon={faApple} bottomMargin="2xs" on:click={signInWithApple}>{$_("page.login.signInWithApple")}</Button>
+                    <Button kind="black" icon={faApple} bottomMargin="2xs" on:click={signInWithApple}>{$_("page.login.signInWithApple")}</Button>
                 {/if}
-                <Button kind="primary" icon={faGoogle} on:click={signInWithGoogle}>{$_("page.login.signInWithGoogle")}</Button>
+                <Button kind="info" icon={faGoogle} on:click={signInWithGoogle}>{$_("page.login.signInWithGoogle")}</Button>
                 <!-- <span class="divider typo-body-2">{$_("page.login.signInOr")}</span>
                 <Button on:click={signInWithEmail}>{$_("page.login.signUp")}</Button> -->
                 <span class="disclaimer typo-body-2">{@html $_("page.login.signInTOS")}</span>
@@ -155,7 +175,7 @@
                 {#each Array(3) as _, i}
                     <Card leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" columnFlex scrollSnap>
                         <div class="feature-video">
-                            <video src="/videos/landing-{i + 1}.mp4" bind:this={videos[i]} muted autoplay={i === 0} />
+                            <video src="/videos/landing-{i + 1}.mp4" bind:this={videos[i]} muted autoplay={i === 0} playsinline />
                         </div>
                         <div class="description">
                             <h2>{$format(`page.login.onboardingHeader${i + 1}`)}</h2>
