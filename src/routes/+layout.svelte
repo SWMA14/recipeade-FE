@@ -15,7 +15,7 @@
     import type { VideoData } from "$lib/video";
     import DynamicBar from "$components/DynamicBar.svelte";
 
-    let device: "ios" | "android" | "web";
+    let device: "ios" | "android" | "web" = "web";
     let upperBarContext = writable({
         isHidden: true
     } as DynamicBarContext);
@@ -24,6 +24,8 @@
     Device.getInfo()
         .then(x => device = x.platform)
         .catch(() => device = "web");
+
+    $: setContext("device", device);
     setContext("upperBar", upperBarContext);
     setContext("lowerBar", lowerBarContext);
 

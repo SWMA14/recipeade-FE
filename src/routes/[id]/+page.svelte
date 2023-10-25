@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { Device } from "@capacitor/device";
     import { Share } from "@capacitor/share";
     import { SortableList } from "@jhubbardsf/svelte-sortablejs";
     import { faGripLinesVertical, faTrash } from "@fortawesome/free-solid-svg-icons";
@@ -65,14 +64,10 @@
     };
 
     let isRendered = false;
-    let device: "ios" | "android" | "web";
+    let device: "ios" | "android" | "web" = getContext("device");
     let recipe = $allVideos.find(x => x.youtubeVideoId === data.id) ?? data.video;
     let cache = {} as VideoData;
     let shown = false;
-
-    Device.getInfo()
-        .then(x => device = x.platform)
-        .catch(() => device = "web");
 
     onMount(() => {
         isRendered = true;

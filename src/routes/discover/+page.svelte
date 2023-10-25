@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { Device } from "@capacitor/device";
     import { _ } from "svelte-i18n";
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
@@ -26,7 +25,7 @@
     const title = "레시피에이드";
     const description = "";
 
-    let device: "ios" | "android" | "web";
+    let device: "ios" | "android" | "web" = getContext("device");
     let isRendered = false;
 
     let random: VideoData;
@@ -34,10 +33,6 @@
     let highViews: VideoData[];
     let easy: VideoData[];
     let others: VideoData[];
-
-    Device.getInfo()
-        .then(x => device = x.platform)
-        .catch(() => device = "web");
 
     onMount(async () => {
         // if ($allVideos.length === 0)

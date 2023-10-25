@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { Device } from "@capacitor/device";
     import { type SignInWithAppleOptions, SignInWithApple } from "@capacitor-community/apple-sign-in";
     import { GoogleAuth } from "@codetrix-studio/capacitor-google-auth"
     import { faApple, faGoogle } from "@fortawesome/free-brands-svg-icons";
@@ -21,7 +20,7 @@
     import surveyMain from "./__lowerBarComponents/surveyMain.svelte";
     import surveyUpperMain from "./__upperBarComponents/surveyMain.svelte";
 
-    let device: "ios" | "android" | "web";
+    let device: "ios" | "android" | "web" = getContext("device");
     let isSignedIn = false;
     let isSigningWithEmail = false;
     let isOnboarded = false;
@@ -36,9 +35,6 @@
     let emailValidating: Promise<boolean>;
     let password = "";
 
-    Device.getInfo()
-        .then(x => device = x.platform)
-        .catch(() => device = "web");
     $: getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
         isHidden: true
         // isHidden: !isOnboarded || isSurveyed,

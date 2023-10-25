@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { Device } from "@capacitor/device";
     import Fa from "svelte-fa";
     import type { IconDefinition as SolidIconDefinition } from "@fortawesome/free-solid-svg-icons";
     import type { IconDefinition as BrandIconDefinition } from "@fortawesome/free-brands-svg-icons";
+    import { getContext } from "svelte";
     import type { ButtonType, SpaceType } from "$lib/types";
 
     export let kind: ButtonType = "primary";
@@ -22,11 +22,7 @@
     let leftMarginValue = leftMargin ? `var(--space-${leftMargin})` : undefined;
     let rightMarginValue = rightMargin ? `var(--space-${rightMargin})` : undefined;
     let bottomMarginValue = bottomMargin ? `var(--space-${bottomMargin})` : undefined;
-    let device: "ios" | "android" | "web";
-
-    Device.getInfo()
-        .then(x => device = x.platform)
-        .catch(() => device = "web");
+    let device: "ios" | "android" | "web" = getContext("device");
 </script>
 
 <button class="kind-{kind} size-{size}" {...$$restProps} class:no-hover={noHover || device !== "web"} class:typo-body-2={size === "small"}
