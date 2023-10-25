@@ -40,6 +40,8 @@
 
     .container div {
         height: 100%;
+        display: flex;
+        align-items: center;
     }
 
     .leading {
@@ -59,5 +61,6 @@
         margin-left: var(--space-xs);
         display: inline-block;
         overflow: hidden;
+        justify-content: flex-end;
     }
 </style>

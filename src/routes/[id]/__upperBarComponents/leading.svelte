@@ -5,4 +5,4 @@
     export let onClick: () => void;
 </script>
 
-<Button kind="white" noHover icon={faArrowLeft} on:click={onClick} />
+<Button kind="white" noHover fitted icon={faArrowLeft} on:click={onClick} />

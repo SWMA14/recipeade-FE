@@ -13,6 +13,7 @@
     export let bottomMargin: SpaceType | undefined = undefined;
     export let noHover = false;
     export let selected = false;
+    export let fitted = false;
     export let progress: number | undefined = undefined;
     export let style: string | undefined = undefined;
 
@@ -29,7 +30,7 @@
 </script>
 
 <button class="kind-{kind} size-{size}" {...$$restProps} class:no-hover={noHover || device !== "web"} class:typo-body-2={size === "small"}
-    class:left-margin={leftMargin} class:right-margin={rightMargin} class:bottom-margin={bottomMargin} class:selected class:progress
+    class:left-margin={leftMargin} class:right-margin={rightMargin} class:bottom-margin={bottomMargin} class:selected class:progress class:fitted
     style="--progress: {progress ?? 0}%; --left-margin: {leftMarginValue}; --right-margin: {rightMarginValue}; --bottom-margin: {bottomMarginValue};
     --color: var(--kind-{kind}-color); --background-color: var(--kind-{kind}-background-color); --hover: var(--kind-{kind}-hover-background-color);
     --selected-hover: var(--kind-{kind}-selected-hover-background-color); {style ?? ""}"
@@ -126,6 +127,12 @@
             &.progress {
                 background-image: linear-gradient(to right, var(--primary-100) var(--progress), var(--white) 0%);
             }
+        }
+
+        &.fitted {
+            width: fit-content;
+            height: fit-content;
+            padding: 0;
         }
 
         & .icon-margin {

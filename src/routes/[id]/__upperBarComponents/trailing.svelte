@@ -5,4 +5,4 @@
     export let onClick: () => void;
 </script>
 
-<Button kind="white" noHover icon={faShareNodes} on:click={onClick} />
+<Button kind="white" noHover fitted icon={faShareNodes} on:click={onClick} />

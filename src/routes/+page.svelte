@@ -57,7 +57,7 @@
         <Card backgroundColor="white" bottomMargin="2xs">
             <div class="heading">
                 <h3>{$_("page.home.addRecipeModalTitle")}</h3>
-                <Button kind="transparent" icon={faXmark} style="width: var(--space-xl);" on:click={() => recipeAddModalShown = false} />
+                <Button kind="transparent" icon={faXmark} fitted on:click={() => recipeAddModalShown = false} />
             </div>
             <img src="/images/guide-link-copy.png" alt="링크 복사 방법" />
             <span class="guide">{$_("page.home.addRecipeModalDescription")}</span>
