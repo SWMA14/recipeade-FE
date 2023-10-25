@@ -24,7 +24,7 @@
 
 <div class="panel" in:flyingFade={{ duration: duration * 3, y: 50 }} out:flyingFade={{ duration: duration * 3, easing: quartIn, y: 50}}>
     <div class="upper-bar">
-        <DynamicBar {...dynamicBarContext} {leading} {main} />
+        <DynamicBar {...dynamicBarContext} {leading} leadingWidth="fit=content" {main} />
     </div>
     <div class="content">
         <slot />

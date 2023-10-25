@@ -110,7 +110,7 @@
 </script>
 
 <div class="search-bar">
-    <DynamicBar {leading} {leadingProps} {main} {mainProps} />
+    <DynamicBar {leading} leadingWidth="fit-content" {leadingProps} {main} {mainProps} />
 </div>
 <div class="container">
     {#if !resultShown}

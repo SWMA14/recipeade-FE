@@ -44,6 +44,7 @@
 
 <style lang="postcss">
     .container {
+        width: 100%;
         position: relative;
     }
 

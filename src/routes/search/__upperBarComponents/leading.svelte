@@ -3,4 +3,4 @@
     import Button from "$components/Button.svelte";
 </script>
 
-<Button kind="white" icon={faArrowLeft} on:click={() => history.back()} />
+<Button kind="white" icon={faArrowLeft} fitted on:click={() => history.back()} />
