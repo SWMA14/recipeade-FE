@@ -22,6 +22,18 @@
             "surveySelectMore": "레시피 {count}개를 더 선택해 주세요",
             "surveyStart": "시작하기"
         },
+        "home": {
+            "morningGreeting": "산뜻한<br>아침이에요",
+            "afternoonGreeting": "즐거운<br>점심이에요",
+            "eveningGreeting": "저녁에는<br>무엇을 먹을까요?",
+            "editRecipes": "편집",
+            "addRecipe": "레시피 추가하기",
+            "addRecipeModalTitle": "링크로 레시피 추가하기",
+            "addRecipeModalDescription": "레시피로 만들고 싶은 YouTube 영상의 공유 버튼을 누르면 링크를 복사할 수 있어요. 복사한 링크를 아래에 붙여 넣으면 레시피가 추가돼요.",
+            "addRecipeModalInputPlaceholder": "YouTube 영상 링크",
+            "addRecipeModalSubmit": "추가하기",
+            "noAddedRecipes": "저장한 레시피가 없어요."
+        },
         "settings": {
             "heading": "설정",
             "signOut": "로그아웃",

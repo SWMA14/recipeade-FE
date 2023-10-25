@@ -22,6 +22,18 @@
             "surveySelectMore": "Select {count} more",
             "surveyStart": "Start"
         },
+        "home": {
+            "morningGreeting": "Good<br>Morning",
+            "afternoonGreeting": "Have a<br>Happy Lunch",
+            "eveningGreeting": "What's<br>For Dinner?",
+            "editRecipes": "Edit",
+            "addRecipe": "Add Recipe",
+            "addRecipeModalTitle": "Add Recipe With a Link",
+            "addRecipeModalDescription": "Click the share button on the YouTube video you want to turn into a recipe and copy the link. Paste the copied link below to add the recipe.",
+            "addRecipeModalInputPlaceholder": "YouTube Video Link",
+            "addRecipeModalSubmit": "Add",
+            "noAddedRecipes": "There's no added recipes yet."
+        },
         "settings": {
             "heading": "Settings",
             "signOut": "Sign Out",

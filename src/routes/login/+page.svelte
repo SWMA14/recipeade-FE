@@ -91,7 +91,6 @@
                     })
                 }).then(response => response.json());
 
-                console.log(result);
                 await saveAuthTokens(result["access_token"], result["refresh_token"]);
                 isSignedIn = true;
             });

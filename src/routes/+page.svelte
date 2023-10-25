@@ -1,5 +1,6 @@
 <script lang="ts">
     import { faPlus, faXmark } from "@fortawesome/free-solid-svg-icons";
+    import { _ } from "svelte-i18n";
     import { getContext } from "svelte";
     import type { Writable } from "svelte/store";
     import { allVideos } from "../store";
@@ -31,33 +32,39 @@
         return target!;
     }
 
-    async function clearAndUpdateLikedVideos()
+    function getTimedGreeting()
     {
-        await clearLikedVideos();
-        updateVidoes = {};
+        const hour = new Date().getHours();
+
+        if (hour >= 6 && hour < 12)
+            return $_("page.home.morningGreeting");
+        else if (hour >= 12 && hour < 18)
+            return $_("page.home.afternoonGreeting");
+        else
+            return $_("page.home.eveningGreeting");
     }
 </script>
 
 <div class="section" in:flyingFade={{ delay: 0 }}>
     <div class="title">
-        <h1>산뜻한<br>아침이에요</h1>
+        <h1>{@html getTimedGreeting()}</h1>
         <div class="buttons">
-            <Button kind="transparent" size="small">편집</Button>
+            <Button kind="transparent" size="small">{$_("page.home.editRecipes")}</Button>
         </div>
     </div>
-    <Button kind="gray" icon={faPlus} on:click={() => recipeAddModalShown = true}>레시피 추가하기</Button>
+    <Button kind="gray" icon={faPlus} on:click={() => recipeAddModalShown = true}>{$_("page.home.addRecipe")}</Button>
     <Modal bind:shown={recipeAddModalShown}>
         <Card backgroundColor="white" bottomMargin="2xs">
             <div class="heading">
-                <h3>링크로 레시피 추가하기</h3>
+                <h3>{$_("page.home.addRecipeModalTitle")}</h3>
                 <Button kind="transparent" icon={faXmark} style="width: var(--space-xl);" on:click={() => recipeAddModalShown = false} />
             </div>
             <img src="/images/guide-link-copy.png" alt="링크 복사 방법" />
-            <span class="guide">유튜브에서 공유 버튼을 누르면 링크를 복사할 수 있어요.</span>
+            <span class="guide">{$_("page.home.addRecipeModalDescription")}</span>
         </Card>
         <Card backgroundColor="white">
-            <Input bottomMargin="xs" placeholder="YouTube 영상 링크" valueChanged={value => recipeAddModalValue = value} />
-            <Button>추가하기</Button>
+            <Input bottomMargin="xs" placeholder={$_("page.home.addRecipeModalInputPlaceholder")} valueChanged={value => recipeAddModalValue = value} />
+            <Button>{$_("page.home.addRecipeModalSubmit")}</Button>
         </Card>
     </Modal>
     {#key updateVidoes}
@@ -70,7 +77,7 @@
                     {/each}
                 {:else}
                     <img src="/images/no-result.png" alt="저장한 레시피 없음" />
-                    <span class="no-result">저장한 레시피가 없어요.</span>
+                    <span class="no-result">{$_("page.home.noAddedRecipes")}</span>
                 {/if}
             </div>
         {/await}

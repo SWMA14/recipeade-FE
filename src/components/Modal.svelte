@@ -8,7 +8,6 @@
 
     $: if (shown)
         $stacks = [...$stacks, hide];
-    $: console.log($stacks);
 
     onDestroy(hide);
 
