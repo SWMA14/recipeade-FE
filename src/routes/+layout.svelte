@@ -5,7 +5,7 @@
     import { onMount, setContext } from "svelte";
     import { writable } from "svelte/store";
     import { allVideos, stacks } from "../store";
-    import { beforeNavigate, goto } from "$app/navigation";
+    import { goto } from "$app/navigation";
     import { page } from "$app/stores";
     import { PUBLIC_API_ENDPOINT } from "$env/static/public";
     import { getAccessToken } from "$lib/auth";
@@ -48,18 +48,10 @@
         checkSignedIn();
     });
 
-    beforeNavigate(async ({ cancel }) => {
-        checkSignedIn(cancel);
-    })
-
-    async function checkSignedIn(cancel?: () => void)
+    async function checkSignedIn()
     {
-        console.log(await getAccessToken());
         if (await getAccessToken() === null)
-        {
-            cancel?.();
             goto("/login");
-        }
     }
 </script>
 
