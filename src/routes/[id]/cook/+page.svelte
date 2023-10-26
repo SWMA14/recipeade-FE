@@ -17,6 +17,7 @@
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
     import Carousel from "$components/Carousel.svelte";
+    import Ingredient from "$components/Ingredient.svelte";
     import { analyticsService } from "$lib/analytics";
 
     export let data;
@@ -138,6 +139,17 @@
         return splitted.some(x => source.includes(x));
     }
 
+    function getUsedSteps(ingredient: string): number[] | undefined
+    {
+        const result = [] as number[];
+
+        for (let i = 0; i < steps.length; i++)
+            if (includes(steps[i].description, ingredient))
+                result.push(i);
+
+        return result.length > 0 ? result : undefined;
+    }
+
     function getUsedStepsString(ingredient: string): string | undefined
     {
         const result = [] as string[];
@@ -194,6 +206,14 @@
                     .replace(/^\*/g, "<strong>")
                     .replace(/\s\*/g, " <strong>")
                     .replace(/\*/g, "</strong>")}
+                <div class="used-ingredients">
+                    {#each ingredients as ingredient, i (ingredient.name)}
+                        {#if includes(steps[selectedStep].description, ingredient.name)}
+                            <Ingredient white name={ingredient.name} amount={ingredient.quantity ?? ""}{ingredient.unit ?? ""}
+                                usedSteps={getUsedSteps(ingredient.name)} />
+                        {/if}
+                    {/each}
+                </div>
                 <div class="buttons">
                     <Button kind="white" icon={faArrowRight} rightMargin="xs" selected={isAutoNext} on:click={enableAutoNext}>{$_("page.recipe.autoNextStep")}</Button>
                     <Button kind="white" icon={faRepeat} selected={isRepeating} on:click={enableRepeat}>{$_("page.recipe.repeatStep")}</Button>
@@ -253,6 +273,21 @@
 <style lang="postcss">
     .content {
         padding: var(--space-xs);
+
+        & .used-ingredients {
+            margin-top: var(--space-m);
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xs);
+        }
+
+        & .buttons {
+            margin-top: var(--space-xs);
+            display: flex;
+            align-items: center;
+            justify-content: left;
+        }
     }
 
     .expandable {
@@ -308,12 +343,5 @@
 
     .section {
         margin-top: var(--space-2xl);
-    }
-
-    .buttons {
-        margin-top: var(--space-m);
-        display: flex;
-        align-items: center;
-        justify-content: left;
     }
 </style>

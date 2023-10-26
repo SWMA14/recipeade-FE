@@ -11,6 +11,7 @@
     export let usedSteps: number[] | undefined = undefined;
     export let summary: string | undefined = undefined;
     export let bottomMargin: SpaceType | undefined = undefined;
+    export let white = false;
 
     let summaryExpanded = false;
     let bottomMarginValue = bottomMargin ? `var(--space-${bottomMargin})` : undefined;
@@ -20,12 +21,12 @@
         const result = usedSteps!
             .map(i => $_("page.recipe.ingredientsUsedStep", { values: { step: (i + 1).toString() } }));
 
-        return result.join(" · ");
+        return result.join(" &bull; ");
     }
 </script>
 
 <div bind:this={ref} class="wrapper" class:bottom-margin={bottomMargin} style="--bottom-margin: {bottomMarginValue};">
-    <Card>
+    <Card backgroundColor={white ? "white" : "gray-50"}>
         <span>{name}</span>
         {#if !usedSteps && summary}
             <div class="summary-wrapper">
@@ -36,9 +37,9 @@
             <span class="amount">{amount}</span>
         {/if}
         {#if usedSteps}
-            <div class="divider" />
+            <div class="divider" class:white />
             <div class="summary-wrapper">
-                <span class="typo-body-2 steps">{getUsedStepsString()}</span>
+                <span class="typo-body-2 steps">{@html getUsedStepsString()}</span>
                 {#if summary}
                     <Button kind="transparent" icon={summaryExpanded ? faAngleUp : faAngleDown} fitted leftMargin="2xs"
                         on:click={() => summaryExpanded = !summaryExpanded} />
@@ -82,6 +83,10 @@
         & .divider {
             margin: var(--space-xs) calc(var(--space-xs) * -1);
             border-top: 2.25px solid var(--white);
+
+            &.white {
+                border-top: 2.25px solid var(--gray-50);
+            }
         }
 
         & .steps {
