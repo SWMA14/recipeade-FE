@@ -207,13 +207,6 @@
             </div>
         </div> -->
     </div>
-    {#if !isEditing}
-        <div class="section review" in:flyingFade={{ delay: 0 }}>
-            <div class="profile over" />
-            <div class="profile below" />
-            <span>123명의 사용자가 저장했어요</span>
-        </div>
-    {/if}
     <div class="section" in:flyingFade={{ delay: 0 }}>
         <div class="title">
             <h2>재료</h2>

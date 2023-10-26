@@ -9,7 +9,7 @@
     --card-min-width: 80%;
     --card-min-width-decimal: 0.8;
     --padding: 1rem;
-    --radius: 10px;
+    --radius: 15px;
     --radius-big: 20px;
     --overlay-opacity: 0.4;
 
@@ -59,7 +59,7 @@
     --danger-800: #8a1630;
     --danger-900: #720d2c;
     --white: #ffffff;
-    --gray-50: #fbfbfb;
+    --gray-50: #f9f9f9;
     --gray-100: #f2f2f2;
     --gray-200: #e6e6e6;
     --gray-300: #d6d6d6;

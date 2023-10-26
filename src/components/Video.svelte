@@ -27,7 +27,7 @@
     }
 </script>
 
-<Card {skeleton} backgroundColor={selected ? "primary-100" : "gray-100"} visibleOverflow noPadding {leftMargin} {rightMargin} {bottomMargin}
+<Card {skeleton} backgroundColor={selected ? "primary-100" : "gray-50"} visibleOverflow noPadding {leftMargin} {rightMargin} {bottomMargin}
     columnFlex scrollSnap>
     <a class:overflow={verbose} href={selectable ? "#" : `/${video.youtubeVideoId}`} on:click={onClick}>
         {#if verbose}

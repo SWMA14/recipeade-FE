@@ -5,7 +5,7 @@
     import type { SpaceType } from "$lib/types";
 
     export let skeleton = false;
-    export let backgroundColor = "gray-100";
+    export let backgroundColor = "gray-50";
     export let video: string | undefined = undefined;
     export let heading: string | undefined = undefined;
     export let body: string | undefined = undefined;

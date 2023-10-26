@@ -50,8 +50,8 @@
         --kind-primary-light-hover-background-color: var(--primary-200);
         --kind-primary-light-selected-hover-background-color: var(--primary-600);
         --kind-gray-color: var(--gray-900);
-        --kind-gray-background-color: var(--gray-200);
-        --kind-gray-hover-background-color: var(--gray-300);
+        --kind-gray-background-color: var(--gray-50);
+        --kind-gray-hover-background-color: var(--gray-200);
         --kind-gray-selected-hover-background-color: var(--gray-800);
         --kind-info-color: var(--white);
         --kind-info-background-color: var(--info-500);
@@ -71,19 +71,19 @@
         --kind-danger-selected-hover-background-color: var(--danger-100);
         --kind-white-color: var(--gray-900);
         --kind-white-background-color: var(--white);
-        --kind-white-hover-background-color: var(--gray-100);
+        --kind-white-hover-background-color: var(--gray-50);
         --kind-white-selected-hover-background-color: var(--gray-800);
         --kind-black-color: var(--white);
         --kind-black-background-color: var(--gray-900);
         --kind-black-hover-background-color: var(--gray-800);
-        --kind-black-selected-hover-background-color: var(--gray-100);
+        --kind-black-selected-hover-background-color: var(--gray-50);
         --kind-transparent-color: var(--gray-400);
         --kind-transparent-background-color: transparent;
         --kind-transparent-hover-background-color: transparent;
         --kind-transparent-selected-hover-background-color: var(--gray-500);
         --kind-badge-color: var(--primary-500);
         --kind-badge-background-color: var(--white);
-        --kind-badge-hover-background-color: var(--gray-100);
+        --kind-badge-hover-background-color: var(--gray-50);
         --kind-badge-selected-hover-background-color: var(--primary-600);
 
         width: 100%;

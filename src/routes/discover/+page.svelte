@@ -87,7 +87,7 @@
     {/if}
 </div>
 <div class="section">
-    <Card backgroundColor="gray-100">
+    <Card>
         <a class="fake-input" href="/search">어떤 요리를 해 볼까요?</a>
     </Card>
 </div>
