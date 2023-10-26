@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Share } from "@capacitor/share";
     import { SortableList } from "@jhubbardsf/svelte-sortablejs";
-    import { faGripLinesVertical, faTrash } from "@fortawesome/free-solid-svg-icons";
+    import { faClock, faGripLinesVertical, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
     import { PUBLIC_LANDING_ENDPOINT } from "$env/static/public";
@@ -12,12 +12,15 @@
     import { flyingFade } from "$lib/transition";
     import { unitizeViews, getLikedVideos, saveLikedVideo, removeLikedVideo, type VideoData } from "$lib/video";
     import { allVideos, sharedPlayer } from "../../store";
+    import AsymmetricGrid from "$components/AsymmetricGrid.svelte";
     import Badge from "$components/Badge.svelte";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
     import Carousel from "$components/Carousel.svelte";
+    import Ingredient from "$components/Ingredient.svelte";
     import Input from "$components/Input.svelte";
     import Stack from "$components/Stack.svelte";
+    import Step from "$components/Step.svelte";
     import Video from "$components/Video.svelte";
     import upperLeading from "./__upperBarComponents/leading.svelte";
     import upperTrailing from "./__upperBarComponents/trailing.svelte";
@@ -239,24 +242,23 @@
                         </div>
                     </Card>
                 {/each}
-                <Button on:click={addIngredient}>재료 추가하기</Button>
+                <Button kind="gray" icon={faPlus} on:click={addIngredient}>재료 추가하기</Button>
             </SortableList>
         {:else}
-            {#each recipe.ingredients as ingredient (ingredient.name)}
-                <Card bottomMargin="xs">
-                    <div class="ingredient">
-                        <span>{ingredient.name}</span>
-                        <span>{ingredient.quantity ?? ""}{ingredient.unit ?? ""}</span>
-                    </div>
-                </Card>
-            {/each}
+            <AsymmetricGrid>
+                {#each recipe.ingredients as ingredient (ingredient.name)}
+                    <Ingredient name={ingredient.name} amount={ingredient.quantity ?? ""}{ingredient.unit ?? ""} />
+                {/each}
+            </AsymmetricGrid>
         {/if}
     </div>
     <div class="section" class:last={data.recommended.length === 0 || isEditing} class:ios={data.recommended.length === 0 && device === "ios"}
         in:flyingFade={{ delay: 0 }}>
+        <div class="title">
+            <h2>단계</h2>
+        </div>
         {#if isEditing}
             <div class="steps">
-                <h2>단계</h2>
                 <SortableList class="sortable-list" handle=".handle" onEnd={handleStepsSort}>
                     {#each cache.recipesteps as step, i (step.description)}
                         <Card bottomMargin="xs">
@@ -267,7 +269,10 @@
                                     <div class="timestamp">
                                         <span>{step.timestamp}</span>
                                         <div class="button-wrapper">
-                                            <Button size="small" on:click={async () => cache.recipesteps[i].timestamp = await getCurrentTimestamp()}>현재 시간으로 변경</Button>
+                                            <Button size="small" style="width: fit-content;" icon={faClock}
+                                                on:click={async () => cache.recipesteps[i].timestamp = await getCurrentTimestamp()}>
+                                                현재 시간으로
+                                            </Button>
                                         </div>
                                     </div>
                                 </div>
@@ -284,24 +289,12 @@
                         </Card>
                     {/each}
                 </SortableList>
-                <Button on:click={addStep}>단계 추가하기</Button>
+                <Button kind="gray" icon={faPlus} on:click={addStep}>단계 추가하기</Button>
             </div>
         {:else}
-            <Carousel leftOverflow rightOverflow heading="단계 미리 보기" canShowAll>
-                {#each recipe.recipesteps as step, i (step.description)}
-                    <Card leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" columnFlex scrollSnap
-                        modifier="{i + 1}단계" body={step.description}>
-                        <div style="height: calc(var(--space-3xl) * 2);"></div>
-                    </Card>
-                {/each}
-                <svelte:fragment slot="grid">
-                    {#each recipe.recipesteps as step, i (step.description)}
-                        <Card bottomMargin="xs" modifier="{i + 1}단계" body={step.description}>
-                            <div style="height: calc(var(--space-3xl) * 2);"></div>
-                        </Card>
-                    {/each}
-                </svelte:fragment>
-            </Carousel>
+            {#each recipe.recipesteps as step, i (step.description)}
+                <Step index={i + 1} description={step.description} bottomMargin="xs" />
+            {/each}
         {/if}
     </div>
     {#if !isEditing}
@@ -366,7 +359,7 @@
     }
 
     .statistics {
-        color: var(--c-foreground-gray);
+        color: var(--gray-700);
     }
 
     .review {

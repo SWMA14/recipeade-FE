@@ -32,8 +32,8 @@
                 <span class="amount">{amount}</span>
                 <Button kind="transparent" icon={faAngleDown} fitted />
             </div>
-        {:else}
-            <span class="amount">{!amount || amount === "" ? "적당량" : amount}</span>
+        {:else if amount}
+            <span class="amount">{amount}</span>
         {/if}
         {#if usedSteps}
             <div class="divider" />

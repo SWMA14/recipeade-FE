@@ -7,4 +7,4 @@
     export let onEditCancel: () => void;
 </script>
 
-<Button kind="primary-light" noHover icon={isEditing ? faXmark : faPenToSquare} on:click={isEditing ? onEditCancel : onEditStart} />
+<Button kind="black" noHover icon={isEditing ? faXmark : faPenToSquare} on:click={isEditing ? onEditCancel : onEditStart} />
