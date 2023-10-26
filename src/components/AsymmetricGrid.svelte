@@ -1,11 +1,11 @@
 <script lang="ts">
     let firsts: HTMLElement[] = [];
     let seconds: HTMLElement[] = [];
-    let offset: number;
+    let offset: number = 0;
 
     function splitChildren(node: HTMLElement)
     {
-        offset = (node.firstChild as HTMLElement).clientHeight / 2;
+        offset = (node.children[0] as HTMLElement).clientHeight / 2;
 
         for (let i = 0; i < node.children.length; i++)
         {
