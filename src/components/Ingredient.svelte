@@ -7,11 +7,13 @@
 
     export let ref: HTMLElement | undefined = undefined;
     export let name: string;
-    export let amount: string = "적당량";
+    export let amount: string | undefined = undefined;
     export let usedSteps: number[] | undefined = undefined;
     export let summary: string | undefined = undefined;
+    export let bottomMargin: SpaceType | undefined = undefined;
 
     let summaryExpanded = false;
+    let bottomMarginValue = bottomMargin ? `var(--space-${bottomMargin})` : undefined;
 
     function getUsedStepsString(): string
     {
@@ -22,7 +24,7 @@
     }
 </script>
 
-<div bind:this={ref} class="wrapper">
+<div bind:this={ref} class="wrapper" class:bottom-margin={bottomMargin} style="--bottom-margin: {bottomMarginValue};">
     <Card>
         <span>{name}</span>
         {#if !usedSteps && summary}
@@ -31,7 +33,7 @@
                 <Button kind="transparent" icon={faAngleDown} fitted />
             </div>
         {:else}
-            <span class="amount">{amount}</span>
+            <span class="amount">{!amount || amount === "" ? "적당량" : amount}</span>
         {/if}
         {#if usedSteps}
             <div class="divider" />
@@ -64,7 +66,7 @@
         }
 
         &.bottom-margin {
-            margin-bottom: var(--space-xs);
+            margin-bottom: var(--bottom-margin);
         }
 
         & .summary-wrapper {
