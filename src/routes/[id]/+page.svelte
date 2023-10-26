@@ -226,8 +226,7 @@
                                 <Input placeholder="수량" value={ingredient.quantity ?? ""}{ingredient.unit ?? ""} on:change={e => {
                                     cache.ingredients[i].quantity = e.target.value;
                                     cache.ingredients[i].unit = "";
-                                }}
-                                    fittedHeight noPadding noDelete />
+                                }} fittedHeight noPadding noDelete />
                                 </div>
                             </div>
                             <div class="button-wrapper">
