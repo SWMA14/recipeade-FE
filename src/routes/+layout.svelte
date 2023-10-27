@@ -5,7 +5,7 @@
     import { onMount, setContext } from "svelte";
     import { writable } from "svelte/store";
     import { allVideos, stacks } from "../store";
-    import { goto } from "$app/navigation";
+    import { goto, onNavigate } from "$app/navigation";
     import { page } from "$app/stores";
     import { PUBLIC_API_ENDPOINT } from "$env/static/public";
     import { getAccessToken } from "$lib/auth";
@@ -48,6 +48,17 @@
             //     .then(result => result as VideoData[]);
 
         checkSignedIn();
+    });
+
+    onNavigate(navigation => {
+        if (!document.startViewTransition)
+            return;
+
+        return new Promise(resolve => document.startViewTransition(async () => {
+                resolve();
+                await navigation.complete;
+            })
+        );
     });
 
     async function checkSignedIn()
