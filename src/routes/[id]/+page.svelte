@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Share } from "@capacitor/share";
     import { SortableList } from "@jhubbardsf/svelte-sortablejs";
-    import { faClock, faGripLinesVertical, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+    import { faClock, faGripLinesVertical, faPlus, faTag, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
     import { PUBLIC_LANDING_ENDPOINT } from "$env/static/public";
@@ -19,7 +19,7 @@
     import Carousel from "$components/Carousel.svelte";
     import Ingredient from "$components/Ingredient.svelte";
     import Input from "$components/Input.svelte";
-    import Stack from "$components/Stack.svelte";
+    import Modal from "$components/Modal.svelte";
     import Step from "$components/Step.svelte";
     import Video from "$components/Video.svelte";
     import upperLeading from "./__upperBarComponents/leading.svelte";
@@ -57,20 +57,11 @@
         },
     });
 
-    const dynamicBarContext: DynamicBarContext = {
-        leadingProps: {
-            onClick: hideTagStack
-        },
-        mainProps: {
-            heading: "태그 수정"
-        }
-    };
-
     let isRendered = false;
     let device: "ios" | "android" | "web" = getContext("device");
     let recipe = $allVideos.find(x => x.youtubeVideoId === data.id) ?? data.video;
     let cache = {} as VideoData;
-    let shown = false;
+    let tagsModalShown = false;
 
     onMount(() => {
         isRendered = true;
@@ -80,6 +71,13 @@
             page_title: "recipeview_page"
         });
     });
+
+    function saveRecipe()
+    {
+        const index = $allVideos.findIndex(x => x.youtubeVideoId === data.id);
+        $allVideos[index] = structuredClone(cache);
+        recipe = cache;
+    }
 
     function onEditStart()
     {
@@ -99,33 +97,7 @@
         cache.ingredients = cache.ingredients.filter(x => x.name);
         cache.recipesteps = cache.recipesteps.filter(x => x.description);
 
-        const index = $allVideos.findIndex(x => x.youtubeVideoId === data.id);
-        $allVideos[index] = structuredClone(cache);
-        recipe = cache;
-    }
-
-    function showTagStack()
-    {
-        shown = true;
-    }
-
-    function hideTagStack()
-    {
-        shown = false;
-    }
-
-    async function onLikeClick()
-    {
-        if (await isLiked)
-        {
-            await removeLikedVideo(data.id);
-            isLiked = Promise.resolve(false);
-        }
-        else
-        {
-            await saveLikedVideo(data.id);
-            isLiked = Promise.resolve(true);
-        }
+        saveRecipe();
     }
 
     async function getCurrentTimestamp()
@@ -185,30 +157,46 @@
             url: `${PUBLIC_LANDING_ENDPOINT}/${data.id}`
         });
     }
+
+    function onTagClick(tag: string)
+    {
+        if (!cache.tags?.includes(tag))
+            cache.tags = [
+                ...(cache.tags ?? []),
+                tag
+            ];
+        else
+            cache.tags = cache.tags.filter(x => x !== tag);
+    }
+
+    function confident(x: any)
+    {
+        return x!;
+    }
 </script>
 
 {#if isRendered}
     <div class="section first" in:flyingFade={{ delay: 0 }}>
         <div class="badges">
-            <Badge dark rightMargin>{getCategoryById(data.video.difficulty)}</Badge>
-            <Badge dark rightMargin>{data.video.category}</Badge>
-            {#if isEditing}
-                <Button kind="badge" size="small" on:click={showTagStack}>태그 수정</Button>
-            {/if}
+            <div class="tags">
+                {#if isEditing && cache.tags}
+                    {#each cache.tags as tag (tag)}
+                        <Badge>{tag}</Badge>
+                    {/each}
+                {:else if recipe.tags}
+                    {#each recipe.tags as tag (tag)}
+                        <Badge>{tag}</Badge>
+                    {/each}
+                {/if}
+                {#if isEditing}
+                    <Button kind="gray" size="medium" style="width: fit-content;" icon={faTag} on:click={() => tagsModalShown = true}>태그 수정</Button>
+                {/if}
+            </div>
         </div>
         <h2>{data.video.youtubeTitle}</h2>
         <p class="statistics typo-body-2">
             조회수 {unitizeViews(data.video.youtubeViewCount)}회 · {data.video.channel.ChannelName}
-        </p> <!-- TODO: 업로드 날짜 -->
-        <!-- <div class="channel">
-            <div class="profile">
-                <img src="https://i.namu.wiki/i/d1A_wD4kuLHmOOFqJdVlOXVt1TWA9NfNt_HA0CS0Y_N0zayUAX8olMuv7odG2FiDLDQZIRBqbPQwBSArXfEJlQ.webp" alt="채널 이미지" />
-                {data.video.channel.ChannelName}
-            </div>
-            <div>
-                <Button size="small">구독</Button>
-            </div>
-        </div> -->
+        </p>
     </div>
     <div class="section" in:flyingFade={{ delay: 0 }}>
         <div class="title">
@@ -220,11 +208,11 @@
                     <Card bottomMargin="xs">
                         <div class="list-content">
                             <div class="ingredient" class:edit={isEditing}>
-                                <Input placeholder="재료명" value={ingredient.name} on:change={e => cache.ingredients[i].name = e.target.value}
+                                <Input placeholder="재료명" value={ingredient.name} on:change={e => cache.ingredients[i].name = confident(e.target).value}
                                     fittedHeight noPadding noDelete />
                                 <div style="color: var(--primary-500);">
                                 <Input placeholder="수량" value={ingredient.quantity ?? ""}{ingredient.unit ?? ""} on:change={e => {
-                                    cache.ingredients[i].quantity = e.target.value;
+                                    cache.ingredients[i].quantity = confident(e.target).value;
                                     cache.ingredients[i].unit = "";
                                 }} fittedHeight noPadding noDelete />
                                 </div>
@@ -263,7 +251,7 @@
                         <Card bottomMargin="xs">
                             <div class="list-content">
                                 <div class="step">
-                                    <Input placeholder="단계 설명" value={step.description} on:focusout={e => cache.recipesteps[i].description = e.target.textContent}
+                                    <Input placeholder="단계 설명" value={step.description} on:focusout={e => cache.recipesteps[i].description = confident(e.target).textContent}
                                         autoBreak fittedHeight noPadding noDelete />
                                     <div class="timestamp">
                                         <span>{step.timestamp}</span>
@@ -312,19 +300,25 @@
             {/if}
         </div>
     {/if}
-    {#if shown}
-        <Stack {dynamicBarContext} onBack={hideTagStack}>
-            <div class="tags">
+    <Modal bind:shown={tagsModalShown}>
+        <Card backgroundColor="white">
+            <div class="heading">
+                <h3>태그 수정</h3>
+                <Button kind="transparent" icon={faXmark} fitted on:click={() => tagsModalShown = false} />
+                </div>
+            <div class="tags bottom-margin">
                 {#each tags as tag (tag)}
                     <div class="tag">
-                        <Button kind="badge" size="small">
+                        <Button kind={cache.tags?.includes(tag) ? "primary" : "gray"} size="medium" style="width: fit-content;" badge
+                            on:click={() => onTagClick(tag)}>
                             {tag}
                         </Button>
                     </div>
                 {/each}
             </div>
-        </Stack>
-    {/if}
+            <Button on:click={() => tagsModalShown = false}>닫기</Button>
+        </Card>
+    </Modal>
 {/if}
 
 <style lang="postcss">
@@ -394,28 +388,6 @@
         }
     }
 
-    /* .channel {
-        width: 100%;
-        margin-top: var(--space-xs);
-        padding-bottom: var(--space-xs);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .profile {
-        display: flex;
-        align-items: center;
-    }
-
-    .profile img {
-        width: var(--space-m);
-        height: var(--space-m);
-        margin-right: var(--space-2xs);
-        object-fit: cover;
-        border-radius: var(--radius-big);
-    } */
-
     .list-content {
         display: flex;
         align-items: center;
@@ -478,15 +450,24 @@
         }
     }
 
+    .heading {
+        margin-bottom: var(--space-xs);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
     .tags {
         display: flex;
         flex-wrap: wrap;
-        align-items: center;
-        justify-content: center;
+        gap: var(--space-2xs);
+
+        &.bottom-margin {
+            margin-bottom: var(--space-xs);
+        }
 
         & .tag {
-            margin-right: var(--space-2xs);
-            margin-bottom: var(--space-2xs);
+            width: fit-content;
         }
     }
 </style>
