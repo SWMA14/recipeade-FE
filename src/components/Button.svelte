@@ -6,7 +6,7 @@
     import type { ButtonType, SpaceType } from "$lib/types";
 
     export let kind: ButtonType = "primary";
-    export let size: "default" | "small" = "default";
+    export let size: "default" | "medium" | "small" = "default";
     export let icon: SolidIconDefinition | BrandIconDefinition | undefined = undefined;
     export let leftMargin: SpaceType | undefined = undefined;
     export let rightMargin: SpaceType | undefined = undefined;
@@ -14,6 +14,7 @@
     export let noHover = false;
     export let selected = false;
     export let fitted = false;
+    export let badge = false;
     export let progress: number | undefined = undefined;
     export let style: string | undefined = undefined;
 
@@ -26,7 +27,7 @@
 </script>
 
 <button class="kind-{kind} size-{size}" {...$$restProps} class:no-hover={noHover || device !== "web"} class:typo-body-2={size === "small"}
-    class:left-margin={leftMargin} class:right-margin={rightMargin} class:bottom-margin={bottomMargin} class:selected class:progress class:fitted
+    class:left-margin={leftMargin} class:right-margin={rightMargin} class:bottom-margin={bottomMargin} class:selected class:progress class:fitted class:badge
     style="--progress: {progress ?? 0}%; --left-margin: {leftMarginValue}; --right-margin: {rightMarginValue}; --bottom-margin: {bottomMarginValue};
     --color: var(--kind-{kind}-color); --background-color: var(--kind-{kind}-background-color); --hover: var(--kind-{kind}-hover-background-color);
     --selected-hover: var(--kind-{kind}-selected-hover-background-color); {style ?? ""}"
@@ -50,8 +51,8 @@
         --kind-primary-light-hover-background-color: var(--primary-200);
         --kind-primary-light-selected-hover-background-color: var(--primary-600);
         --kind-gray-color: var(--gray-900);
-        --kind-gray-background-color: var(--gray-200);
-        --kind-gray-hover-background-color: var(--gray-300);
+        --kind-gray-background-color: var(--gray-50);
+        --kind-gray-hover-background-color: var(--gray-200);
         --kind-gray-selected-hover-background-color: var(--gray-800);
         --kind-info-color: var(--white);
         --kind-info-background-color: var(--info-500);
@@ -71,20 +72,16 @@
         --kind-danger-selected-hover-background-color: var(--danger-100);
         --kind-white-color: var(--gray-900);
         --kind-white-background-color: var(--white);
-        --kind-white-hover-background-color: var(--gray-100);
+        --kind-white-hover-background-color: var(--gray-50);
         --kind-white-selected-hover-background-color: var(--gray-800);
         --kind-black-color: var(--white);
         --kind-black-background-color: var(--gray-900);
         --kind-black-hover-background-color: var(--gray-800);
-        --kind-black-selected-hover-background-color: var(--gray-100);
+        --kind-black-selected-hover-background-color: var(--gray-50);
         --kind-transparent-color: var(--gray-400);
         --kind-transparent-background-color: transparent;
         --kind-transparent-hover-background-color: transparent;
         --kind-transparent-selected-hover-background-color: var(--gray-500);
-        --kind-badge-color: var(--primary-500);
-        --kind-badge-background-color: var(--white);
-        --kind-badge-hover-background-color: var(--gray-100);
-        --kind-badge-selected-hover-background-color: var(--primary-600);
 
         width: 100%;
         height: var(--space-xl);
@@ -105,11 +102,8 @@
             }
         }
 
-        &.kind-badge {
-            width: var(--space-xxl);
-            height: var(--space-s);
-            border: 1px solid var(--kind-badge-color);
-            border-radius: var(--radius-big);
+        &.size-medium {
+            height: var(--space-m);
         }
 
         &.size-small {
@@ -129,6 +123,10 @@
             width: fit-content;
             height: fit-content;
             padding: 0;
+        }
+
+        &.badge {
+            border-radius: var(--radius-big);
         }
 
         & .icon-margin {

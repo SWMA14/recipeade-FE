@@ -13,6 +13,7 @@ export interface VideoData
     ingredients: Ingredient[];
     recipesteps: Step[];
     channel: Channel;
+    tags?: string[];
 }
 
 interface Ingredient

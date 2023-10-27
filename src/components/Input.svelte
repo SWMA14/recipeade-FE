@@ -66,7 +66,7 @@
         padding: var(--space-xs);
         padding-right: var(--space-l);
         border-radius: var(--radius);
-        background-color: var(--gray-100);
+        background-color: var(--gray-50);
 
         &.fitted-height {
             height: unset;

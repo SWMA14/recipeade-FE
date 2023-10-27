@@ -10,22 +10,22 @@ export const DUMMY_VIDEO = {
     ingredients: [
         {
             name: "버터",
-            quantity: null,
+            quantity: "200g",
             unit: null
         },
         {
             name: "무염 소금",
-            quantity: null,
+            quantity: "10g",
             unit: null
         },
         {
             name: "파마산 치즈가루",
-            quantity: null,
+            quantity: "3스푼",
             unit: null
         },
         {
             name: "통 마늘",
-            quantity: null,
+            quantity: "5개",
             unit: null
         },
         {
@@ -35,7 +35,7 @@ export const DUMMY_VIDEO = {
         },
         {
             name: "허브",
-            quantity: null,
+            quantity: "10g",
             unit: null
         },
         {
