@@ -31,23 +31,11 @@
     {
         return target!;
     }
-
-    function getTimedGreeting()
-    {
-        const hour = new Date().getHours();
-
-        if (hour >= 6 && hour < 12)
-            return $_("page.home.morningGreeting");
-        else if (hour >= 12 && hour < 18)
-            return $_("page.home.afternoonGreeting");
-        else
-            return $_("page.home.eveningGreeting");
-    }
 </script>
 
 <div class="section" in:flyingFade={{ delay: 0 }}>
     <div class="title">
-        <h2>{@html getTimedGreeting()}</h2>
+        <h2>{@html $_("page.home.greeting")}</h2>
         <div class="buttons">
             <Button kind="transparent" size="small">{$_("page.home.editRecipes")}</Button>
         </div>

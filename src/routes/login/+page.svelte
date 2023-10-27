@@ -84,6 +84,16 @@
             console.log("cancelled")
     });
 
+    async function finishSignIn(result: any)
+    {
+        await saveAuthTokens(result["access_token"], result["refresh_token"]);
+
+        if (await getIsOnboarded())
+            goto("/");
+        else
+            isSignedIn = true;
+    }
+
     async function signInWithApple()
     {
         const options: SignInWithAppleOptions = {
@@ -94,8 +104,7 @@
         };
 
         SignInWithApple.authorize(options)
-            .then(async signedInfo => {
-                const result = await fetch(`${PUBLIC_API_ENDPOINT}/login/oauth/apple`, {
+            .then(async signedInfo => await fetch(`${PUBLIC_API_ENDPOINT}/login/oauth/apple`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -104,22 +113,13 @@
                         "token_type": "id_token",
                         "token": signedInfo.response.identityToken
                     })
-                }).then(response => response.json());
-
-                await saveAuthTokens(result["access_token"], result["refresh_token"]);
-
-                if (await getIsOnboarded())
-                    goto("/");
-                else
-                    isSignedIn = true;
-            });
+                }).then(response => response.json()).then(finishSignIn));
     }
 
     function signInWithGoogle()
     {
         GoogleAuth.signIn()
-            .then(async signedInfo => {
-                const result = await fetch(`${PUBLIC_API_ENDPOINT}/login/oauth/google`, {
+            .then(async signedInfo => await fetch(`${PUBLIC_API_ENDPOINT}/login/oauth/google`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -128,15 +128,7 @@
                         "token_type": "id_token",
                         "token": signedInfo.authentication.idToken
                     })
-                }).then(response => response.json());
-
-                await saveAuthTokens(result["access_token"], result["refresh_token"]);
-
-                if (await getIsOnboarded())
-                    goto("/");
-                else
-                    isSignedIn = true;
-            });
+                }).then(response => response.json()).then(finishSignIn));
     }
 
     function signInWithEmail()
@@ -174,8 +166,12 @@
 <div class="container">
     {#if !isSignedIn && !isSigningWithEmail}
         <div class="tall login">
-            <div class="slogan">
+            <!-- <div class="slogan">
                 <h1>{@html $_("page.login.slogan")}</h1>
+            </div> -->
+            <div class="logo">
+                <img src="/images/icon-transparent.png" alt="로고" />
+                <img src="/images/typo.png" alt="타이포그래피" />
             </div>
             <div class="buttons">
                 {#if device !== "android"}
@@ -239,6 +235,21 @@
             height: -webkit-fill-available;
             display: flex;
             align-items: center;
+        }
+
+        & .logo {
+            width: 55%;
+            max-width: calc(var(--space-3xl) * 4);
+            margin: 0 auto;
+            height: -webkit-fill-available;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            & img:nth-child(1) {
+                margin-bottom: calc(var(--space-xs) * -1);
+            }
         }
 
         & h1 {

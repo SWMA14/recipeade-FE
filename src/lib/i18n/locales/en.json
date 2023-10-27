@@ -23,9 +23,7 @@
             "surveyStart": "Start"
         },
         "home": {
-            "morningGreeting": "Good<br>Morning",
-            "afternoonGreeting": "Have a<br>Happy Lunch",
-            "eveningGreeting": "What's<br>For Dinner?",
+            "greeting": "What Are You<br>Cooking Today?",
             "editRecipes": "Edit",
             "addRecipe": "Add Recipe",
             "addRecipeModalTitle": "Add Recipe With a Link",
