@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Share } from "@capacitor/share";
     import { SortableList } from "@jhubbardsf/svelte-sortablejs";
-    import { faClock, faGripLinesVertical, faPlus, faTag, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
+    import { faCheck, faClock, faExpand, faGripLinesVertical, faPlus, faShare, faTag, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
     import { PUBLIC_LANDING_ENDPOINT } from "$env/static/public";
@@ -22,26 +22,16 @@
     import Modal from "$components/Modal.svelte";
     import Step from "$components/Step.svelte";
     import Video from "$components/Video.svelte";
-    import upperLeading from "./__upperBarComponents/leading.svelte";
-    import upperTrailing from "./__upperBarComponents/trailing.svelte";
     import lowerLeading from "./__lowerBarComponents/leading.svelte";
     import lowerMain from "./__lowerBarComponents/main.svelte";
 
     export let data;
 
     let isEditing = false;
-    let isLiked = getLikedVideos().then(videos => videos.some(x => x.id === data.id));
 
     $: getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
-        leading: upperLeading,
-        leadingProps: {
-            onClick: () => history.back()
-        },
-        trailing: upperTrailing,
-        trailingProps: {
-            onClick: share
-        },
-        isBackgroundShown: true
+        ...x,
+        isHidden: true
     });
     $: getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
         leading: lowerLeading,
@@ -176,29 +166,34 @@
 </script>
 
 {#if isRendered}
-    <div class="section first" in:flyingFade={{ delay: 0 }}>
-        <div class="badges">
-            <div class="tags">
-                {#if isEditing && cache.tags}
-                    {#each cache.tags as tag (tag)}
-                        <Badge>{tag}</Badge>
-                    {/each}
-                {:else if recipe.tags}
-                    {#each recipe.tags as tag (tag)}
-                        <Badge>{tag}</Badge>
-                    {/each}
-                {/if}
-                {#if isEditing}
-                    <Button kind="gray" size="medium" style="width: fit-content;" icon={faTag} on:click={() => tagsModalShown = true}>태그 수정</Button>
-                {/if}
-            </div>
+    <div class="section" in:flyingFade={{ delay: 0 }}>
+        <div class="tags" class:bottom-margin-less={isEditing || recipe.tags?.length}>
+            {#if isEditing && cache.tags}
+                {#each cache.tags as tag (tag)}
+                    <Badge>{tag}</Badge>
+                {/each}
+            {:else if recipe.tags}
+                {#each recipe.tags as tag (tag)}
+                    <Badge>{tag}</Badge>
+                {/each}
+            {/if}
+            {#if isEditing}
+                <Button kind="gray" size="medium" style="width: fit-content;" icon={faTag} on:click={() => tagsModalShown = true}>태그 수정</Button>
+            {/if}
         </div>
         <h2>{data.video.youtubeTitle}</h2>
         <p class="statistics typo-body-2">
             조회수 {unitizeViews(data.video.youtubeViewCount)}회 · {data.video.channel.ChannelName}
         </p>
+        {#if !isEditing}
+            <div class="buttons">
+                <Button icon={faCheck} style="width: fit-content;" rightMargin="xs">저장됨</Button>
+                <Button kind="gray" icon={faShare} style="width: var(--space-xl);" rightMargin="xs" on:click={share} />
+                <Button kind="gray" icon={faExpand} style="width: var(--space-xl);" />
+            </div>
+        {/if}
     </div>
-    <div class="section" in:flyingFade={{ delay: 0 }}>
+    <div class="section second" in:flyingFade={{ delay: 0 }}>
         <div class="title">
             <h2>재료</h2>
         </div>
@@ -326,8 +321,8 @@
         width: 100%;
         margin-bottom: var(--space-m);
 
-        &.first {
-            margin-top: var(--space-2xl);
+        &.second {
+            margin-top: var(--space-3xl);
         }
 
         &.last {
@@ -345,14 +340,13 @@
         justify-content: space-between;
     }
 
-    .badges {
-        margin-bottom: var(--space-2xs);
-        display: flex;
-        align-items: center;
-    }
-
     .statistics {
         color: var(--gray-700);
+    }
+
+    .buttons {
+        margin-top: var(--space-xs);
+        display: flex;
     }
 
     .review {
@@ -461,6 +455,10 @@
         display: flex;
         flex-wrap: wrap;
         gap: var(--space-2xs);
+
+        &.bottom-margin-less {
+            margin-bottom: var(--space-3xs);
+        }
 
         &.bottom-margin {
             margin-bottom: var(--space-xs);

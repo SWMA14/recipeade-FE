@@ -223,7 +223,7 @@
         <Card topMargin="2xs">
             <div class="expandable">
                 <div class="badge-header">
-                    <Badge primary icon={faStar} rightMargin>Pro</Badge>
+                    <Badge primary small icon={faStar} rightMargin>Pro</Badge>
                     <h3>{$_("page.recipe.commentsTip")}</h3>
                 </div>
                 <div class="button-wrapper">
@@ -280,9 +280,5 @@
 
     .tip-explain strong {
         color: var(--info-500);
-    }
-
-    .section {
-        margin-top: var(--space-2xl);
     }
 </style>
