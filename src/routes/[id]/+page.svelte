@@ -4,6 +4,7 @@
     import { faAngleDown, faCheck, faClock, faGripLinesVertical, faPlus, faShare, faTag, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
+    import { goto } from "$app/navigation";
     import { PUBLIC_LANDING_ENDPOINT } from "$env/static/public";
     import { analyticsService } from "$lib/analytics";
     import type { DynamicBarContext } from "$lib/dynamicBar";
@@ -184,7 +185,7 @@
         </div>
         <div class="title no-margin">
             <h2>{data.video.youtubeTitle}</h2>
-            <Button kind="white" style="width: var(--space-xl);" icon={faAngleDown} on:click={() => history.back()} />
+            <Button kind="white" style="width: var(--space-xl);" icon={faAngleDown} on:click={() => goto("/discover")} />
         </div>
         <p class="statistics typo-body-2">
             조회수 {unitizeViews(data.video.youtubeViewCount)}회 · {data.video.channel.ChannelName}
@@ -232,7 +233,8 @@
         {:else}
             <AsymmetricGrid>
                 {#each recipe.ingredients as ingredient (ingredient.name)}
-                    <Ingredient name={ingredient.name} amount={ingredient.quantity ?? ""}{ingredient.unit ?? ""} />
+                    <Ingredient name={ingredient.name} amount={ingredient.quantity ?? ""}{ingredient.unit ?? ""} 
+                        usedSteps={ingredient.usedSteps} />
                 {/each}
             </AsymmetricGrid>
         {/if}

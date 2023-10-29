@@ -7,6 +7,7 @@
     import type { YouTubePlayer } from "youtube-player/dist/types";
     import { MetaTags } from "svelte-meta-tags";
     import { faArrowRight, faRepeat } from "@fortawesome/free-solid-svg-icons";
+    import { analyticsService } from "$lib/analytics";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { pausableTweened } from "$lib/pausableTween";
     import { duration, flyingFade } from "$lib/transition";
@@ -17,28 +18,25 @@
     import Card from "$components/Card.svelte";
     import Carousel from "$components/Carousel.svelte";
     import Ingredient from "$components/Ingredient.svelte";
-    import { analyticsService } from "$lib/analytics";
+    import main from "./__lowerBarComponents/main.svelte";
 
     export let data;
 
     getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
-        ...x,
-        trailing: undefined,
-        trailingProps: undefined
+        isHidden: true
     });
     getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
-        ...x,
-        isHidden: true
+        main
     });
 
     const progressDuration = 0;
     const title = data.video.youtubeTitle;
     const description = "";
 
-    let steps: Step[] = data.video.recipesteps.map(step => ({
+    let steps = data.video.recipesteps.map(step => ({
         seconds: timestampToSeconds(step.timestamp),
         description: step.description
-    } as Step));
+    }) as Step);
     let ingredients = data.video.ingredients.map(ingredient => ({
         ...ingredient,
         usedSteps: getUsedStepsString(ingredient.name)
@@ -68,12 +66,22 @@
     let isCommentsTipExpanded = false;
     let isIngredientsExpanded = false;
 
+    let stepsWidth: Promise<string>[];
+
     onMount(async () => {
         analyticsService.setScreenName("recipe_cook");
         analyticsService.logEvent("recipe_cook_page", {
             page_title: "recipe_cook_page"
         });
         isRendered = true;
+
+        stepsWidth = steps.map(async (step, i) => {
+            const duration = await player.getDuration();
+            const start = step.seconds;
+            const end = i + 1 < steps.length ? steps[i + 1].seconds : duration;
+
+            return `calc(200vw * ${(end - start) / duration})`;
+        });
 
         window.addEventListener("message", event => {
             if (player && event.source === videoContentWindow)
@@ -192,11 +200,13 @@
             <div style="margin-top: 1rem;">
                 <Carousel leftOverflow rightOverflow>
                     {#each [...Array(steps.length).keys()] as i}
+                        {#await stepsWidth[i] then width}
                         <Button id="step-button-{i}" on:click={() => selectStep(i)} selected={i === selectedStep}
                             leftMargin={i === 0 ? "m" : undefined} rightMargin={i < steps.length - 1 ? "xs" : "m"}
                             progress={i === selectedStep ? $progress * 100 : 0}>
-                            <div style="width: var(--space-3xl);">{i + 1}</div>
+                            <div style="min-width: var(--space-xs); width: {width}; max-width: 50vw;">{i + 1}</div>
                         </Button>
+                        {/await}
                     {/each}
                 </Carousel>
             </div>
@@ -208,8 +218,7 @@
                 <div class="used-ingredients">
                     {#each ingredients as ingredient, i (ingredient.name)}
                         {#if includes(steps[selectedStep].description, ingredient.name)}
-                            <Ingredient white name={ingredient.name} amount={ingredient.quantity ?? ""}{ingredient.unit ?? ""}
-                                usedSteps={getUsedSteps(ingredient.name)} />
+                            <Ingredient white name={ingredient.name} amount={ingredient.quantity ?? ""}{ingredient.unit ?? ""} />
                         {/if}
                     {/each}
                 </div>
