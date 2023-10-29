@@ -24,6 +24,7 @@
     export let scrollSnap = false;
     export let square = false;
     export let squareOverflowSafeArea = false;
+    export let onClick: (() => void) | undefined = undefined;
 
     let container: HTMLElement;
     let player: YouTubePlayer | HTMLElement;
@@ -80,7 +81,9 @@
     }
 </script>
 
-<div class="container" class:skeleton
+<svelte:window on:scroll={checkVideoVisible} />
+
+<div class="container" class:skeleton role="button" tabindex="0" on:click={onClick} on:keydown={onClick}
     style="--card-background-color: var(--{backgroundColor}); --left-margin: {leftMarginValue}; --right-margin: {rightMarginValue};
     --top-margin: {topMarginValue}; --bottom-margin: {bottomMarginValue};"
     class:no-radius={noRadius} class:no-padding={noPadding} class:no-min-width={noMinWidth} class:large-padding={largePadding}
