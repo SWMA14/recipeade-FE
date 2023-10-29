@@ -112,7 +112,8 @@
             {
                 name: "",
                 quantity: "",
-                unit: ""
+                unit: "",
+                usedSteps: undefined
             }
         ];
     }
@@ -130,6 +131,7 @@
             ...cache.recipesteps,
             {
                 description: "",
+                seconds: 0,
                 timestamp: await getCurrentTimestamp()
             }
         ];

@@ -10,8 +10,8 @@
         playerVars: {
             autoplay: 1,
             modestbranding: 1,
-            controls: 1,
-            fs: 1,
+            controls: 0,
+            fs: 0,
             rel: 0
         }
     };

@@ -16,17 +16,20 @@ export interface VideoData
     tags?: string[];
 }
 
-interface Ingredient
+export interface Ingredient
 {
     name: string;
     quantity: number | string | null;
     unit: string | null;
+    usedSteps: number[] | undefined;
 }
 
-interface Step
+export interface Step
 {
-    description: string;
+    seconds: number;
     timestamp: string;
+    // ingredients: string[];
+    description: string;
 }
 
 interface Channel
@@ -103,4 +106,22 @@ export async function clearLikedVideos()
     await Preferences.remove({
         key: "likedVideos"
     });
+}
+
+function includes(source: string, target: string): boolean
+{
+    const splitted = target.split(" ");
+
+    return splitted.some(x => source.includes(x));
+}
+
+export function getUsedSteps(steps: Step[], ingredient: string): number[] | undefined
+{
+    const result = [] as number[];
+
+    for (let i = 0; i < steps.length; i++)
+        if (includes(steps[i].description, ingredient))
+            result.push(i);
+
+    return result.length > 0 ? result : undefined;
 }

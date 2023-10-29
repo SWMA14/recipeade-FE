@@ -7,11 +7,10 @@
     import type { YouTubePlayer } from "youtube-player/dist/types";
     import { MetaTags } from "svelte-meta-tags";
     import { faArrowRight, faRepeat } from "@fortawesome/free-solid-svg-icons";
-    import type { Step } from "$lib/step";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { pausableTweened } from "$lib/pausableTween";
     import { duration, flyingFade } from "$lib/transition";
-    import { timestampToSeconds } from "$lib/video";
+    import { timestampToSeconds, type Step } from "$lib/video";
     import { sharedPlayer } from "../../../store";
     import Badge from "$components/Badge.svelte";
     import Button from "$components/Button.svelte";
