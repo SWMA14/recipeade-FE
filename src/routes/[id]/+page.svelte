@@ -1,16 +1,15 @@
 <script lang="ts">
     import { Share } from "@capacitor/share";
     import { SortableList } from "@jhubbardsf/svelte-sortablejs";
-    import { faCheck, faClock, faExpand, faGripLinesVertical, faPlus, faShare, faTag, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
+    import { faAngleDown, faCheck, faClock, faGripLinesVertical, faPlus, faShare, faTag, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
     import { PUBLIC_LANDING_ENDPOINT } from "$env/static/public";
     import { analyticsService } from "$lib/analytics";
-    import { getCategoryById } from "$lib/category";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { tags } from "$lib/tag";
     import { flyingFade } from "$lib/transition";
-    import { unitizeViews, getLikedVideos, saveLikedVideo, removeLikedVideo, type VideoData } from "$lib/video";
+    import { unitizeViews, type VideoData } from "$lib/video";
     import { allVideos, sharedPlayer } from "../../store";
     import AsymmetricGrid from "$components/AsymmetricGrid.svelte";
     import Badge from "$components/Badge.svelte";
@@ -181,7 +180,10 @@
                 <Button kind="gray" size="medium" style="width: fit-content;" icon={faTag} on:click={() => tagsModalShown = true}>태그 수정</Button>
             {/if}
         </div>
-        <h2>{data.video.youtubeTitle}</h2>
+        <div class="title no-margin">
+            <h2>{data.video.youtubeTitle}</h2>
+            <Button kind="white" style="width: var(--space-xl);" icon={faAngleDown} on:click={() => history.back()} />
+        </div>
         <p class="statistics typo-body-2">
             조회수 {unitizeViews(data.video.youtubeViewCount)}회 · {data.video.channel.ChannelName}
         </p>
@@ -189,7 +191,6 @@
             <div class="buttons">
                 <Button icon={faCheck} style="width: fit-content;" rightMargin="xs">저장됨</Button>
                 <Button kind="gray" icon={faShare} style="width: var(--space-xl);" rightMargin="xs" on:click={share} />
-                <Button kind="gray" icon={faExpand} style="width: var(--space-xl);" />
             </div>
         {/if}
     </div>
@@ -337,7 +338,12 @@
     .title {
         margin-bottom: var(--space-xs);
         display: flex;
+        align-items: center;
         justify-content: space-between;
+
+        &.no-margin {
+            margin-bottom: 0;
+        }
     }
 
     .statistics {

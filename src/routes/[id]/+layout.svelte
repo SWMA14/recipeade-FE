@@ -10,8 +10,8 @@
         playerVars: {
             autoplay: 1,
             modestbranding: 1,
-            controls: 0,
-            fs: 0,
+            controls: 1,
+            fs: 1,
             rel: 0
         }
     };
@@ -50,6 +50,7 @@
         z-index: -1;
         border-radius: 0 0 var(--radius) var(--radius);
     }
+
     .player-container {
         width: 100%;
         max-height: 50vh;
