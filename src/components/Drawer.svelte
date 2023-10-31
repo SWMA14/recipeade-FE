@@ -25,6 +25,7 @@
 
         main.style.borderRadius = `calc(var(--radius) * ${modifier})`;
         main.style.transform = `scale(${scale}) translate3d(0, calc(env(safe-area-inset-top) + var(--space-xs) * ${modifier}), 0)`;
+        document.body.classList.add("drawer-shown");
     }
 
     onMount(() => {
@@ -43,6 +44,7 @@
 
         main.style.transform = "";
         main.style.removeProperty("border-radius");
+        document.body.classList.remove("drawer-shown");
 
         shown = false;
         $stacks = $stacks.slice(0, -1);
