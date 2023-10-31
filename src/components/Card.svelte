@@ -3,6 +3,7 @@
     import type { Options, YouTubePlayer } from "youtube-player/dist/types";
     import { onMount } from "svelte";
     import type { SpaceType } from "$lib/types";
+    import Skeleton from "$components/Skeleton.svelte";
 
     export let skeleton = false;
     export let backgroundColor = "gray-50";
@@ -91,7 +92,9 @@
     class:top-margin={topMargin} class:bottom-margin={bottomMargin} class:square class:overflow-safe-area={squareOverflowSafeArea}
     class:visible-overflow={visibleOverflow}>
     {#if skeleton}
-        <div class="skeleton-overlay" />
+        <div class="skeleton-overlay">
+            <Skeleton />
+        </div>
     {/if}
     {#if heading || body || modifier}
         <div class="texts" class:flex-end={!heading} class:large-padding={largePadding}
@@ -141,8 +144,7 @@
         position: absolute;
         top: 0;
         left: 0;
-        background-color: var(--gray-200);
-        z-index: 1;
+        z-index: 10;
     }
 
     .texts {

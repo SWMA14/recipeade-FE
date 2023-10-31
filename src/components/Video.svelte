@@ -6,6 +6,7 @@
     import Badge from "$components/Badge.svelte";
     import Card from "$components/Card.svelte";
     import Carousel from "$components/Carousel.svelte";
+    import Skeleton from "$components/Skeleton.svelte";
 
     export let skeleton = false;
     export let video: VideoData;
@@ -17,7 +18,6 @@
     export let selected = false;
     export let onSelect: ((selected: boolean, video: VideoData) => void) | undefined = undefined;
 
-
     function onClick()
     {
         if (!selectable)
@@ -28,52 +28,60 @@
     }
 </script>
 
-<Card {skeleton} backgroundColor={selected ? "gray-900" : "gray-50"} visibleOverflow noPadding {leftMargin} {rightMargin} {bottomMargin}
-    columnFlex scrollSnap>
-    {#if video.temporary}
-        <div class="overlay">
-            <h2>생성 중</h2>
-            <div />
-        </div>
-    {/if}
-    <a class:overflow={verbose} href={selectable || video.temporary ? "#" : `/${video.youtubeVideoId}`} on:click={onClick}>
-        {#if verbose}
-            <Carousel>
-                <div class="verbose fitter left-margin">
+{#if skeleton}
+    <Skeleton {leftMargin} {rightMargin} {bottomMargin}>
+        <div class="fitter" />
+    </Skeleton>
+    <Skeleton kind="body" bottomMargin="xs" />
+    <Skeleton kind="smallBody" bottomMargin="xs" />
+{:else}
+    <Card backgroundColor={selected ? "gray-900" : "gray-50"} visibleOverflow noPadding {leftMargin} {rightMargin} {bottomMargin}
+        columnFlex scrollSnap>
+        {#if video.temporary}
+            <div class="overlay">
+                <h2>생성 중</h2>
+                <div />
+            </div>
+        {/if}
+        <a class:overflow={verbose} href={selectable || video.temporary ? "#" : `/${video.youtubeVideoId}`} on:click={onClick}>
+            {#if verbose}
+                <Carousel>
+                    <div class="verbose fitter left-margin">
+                        <div>
+                            <img alt="영상 썸네일" src={video.youtubeThumbnail.replace("/default", "/sddefault")} />
+                        </div>
+                    </div>
+                    {#each [...Array(video.recipesteps.length + 1).keys()] as i (i)}
+                        {@const modifier = i === 0 ? "재료 준비" : `${i}단계`}
+                        {@const body = i === 0 ?
+                            video.ingredients.map(x => 
+                                `${x.name}${[0, null].some(invalid => invalid === x.quantity) ? "" : ` ${x.quantity}`}${x.unit ?? ""}`
+                            ).join(", ") :
+                            video.recipesteps[i - 1].description}
+                        <Card backgroundColor="primary-200" leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs"
+                            columnFlex scrollSnap
+                            {modifier} {body} />
+                    {/each}
+                </Carousel>
+            {:else}
+                <div class="fitter">
                     <div>
                         <img alt="영상 썸네일" src={video.youtubeThumbnail.replace("/default", "/sddefault")} />
                     </div>
                 </div>
-                {#each [...Array(video.recipesteps.length + 1).keys()] as i (i)}
-                    {@const modifier = i === 0 ? "재료 준비" : `${i}단계`}
-                    {@const body = i === 0 ?
-                        video.ingredients.map(x => 
-                            `${x.name}${[0, null].some(invalid => invalid === x.quantity) ? "" : ` ${x.quantity}`}${x.unit ?? ""}`
-                        ).join(", ") :
-                        video.recipesteps[i - 1].description}
-                    <Card backgroundColor="primary-200" leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs"
-                        columnFlex scrollSnap
-                        {modifier} {body} />
-                {/each}
-            </Carousel>
-        {:else}
-            <div class="fitter">
-                <div>
-                    <img alt="영상 썸네일" src={video.youtubeThumbnail.replace("/default", "/sddefault")} />
-                </div>
+            {/if}
+        </a>
+        <div class="info" class:selected>
+            <a class="upper typo-body-1" href={selectable ? "#" : `/${video.youtubeVideoId}`} on:click={onClick}>{video.youtubeTitle}</a>
+            <span class="lower typo-body-2">{video.channel} · 조회수 {unitizeViews(video.youtubeViewCount)}회</span>
+            <div class="badges">
+                <!-- <Badge rightMargin>{getCategoryById(video.difficulty)}</Badge>
+                <Badge rightMargin>{video.category}</Badge> -->
+                <!-- <Badge>★ 5.0</Badge> -->
             </div>
-        {/if}
-    </a>
-    <div class="info" class:selected>
-        <a class="upper typo-body-1" href={selectable ? "#" : `/${video.youtubeVideoId}`} on:click={onClick}>{video.youtubeTitle}</a>
-        <span class="lower typo-body-2">{video.channel} · 조회수 {unitizeViews(video.youtubeViewCount)}회</span>
-        <div class="badges">
-            <!-- <Badge rightMargin>{getCategoryById(video.difficulty)}</Badge>
-            <Badge rightMargin>{video.category}</Badge> -->
-            <!-- <Badge>★ 5.0</Badge> -->
         </div>
-    </div>
-</Card>
+    </Card>
+{/if}
 
 <style lang="postcss">
     .overlay {

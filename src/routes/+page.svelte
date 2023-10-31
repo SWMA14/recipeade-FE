@@ -157,7 +157,7 @@
     </Modal>
     {#if !isRendered}
         {#each Array(3) as _}
-            <Video video={DUMMY_VIDEO} skeleton />
+            <Video video={DUMMY_VIDEO} bottomMargin="xs" skeleton />
         {/each}
     {:else}
         {#key isEditing}
