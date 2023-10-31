@@ -12,13 +12,21 @@
     import { type VideoData, convertApiToVideoData } from "$lib/video";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
+    import Drawer from "$components/Drawer.svelte";
     import Input from "$components/Input.svelte";
-    import Modal from "$components/Modal.svelte";
     import Video from "$components/Video.svelte";
     import leading from "./__lowerBarComponents/leading.svelte";
     import main from "./__lowerBarComponents/main.svelte";
 
     let isEditing = false;
+    let isRendered = false;
+    let recipeAddDrawerShown = false;
+    let recipeAddDrawerShow: () => void;
+    let recipeAddDrawerHide: () => void;
+    let recipeAddDrawerValue: string;
+    let recipeAddAlreadyExists = false;
+    let recipeAddInvalid = false;
+    let selectedVideos: VideoData[] = [];
 
     getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
         isHidden: true
@@ -33,16 +41,11 @@
         mainProps: {
             isEditing,
             selected: selectedVideos.length,
-            onEditExit: endEditRecipes
+            onEditExit: endEditRecipes,
+            isAddingRecipe: recipeAddDrawerShown,
+            onAddRecipe: () => addRecipe(recipeAddDrawerValue)
         }
     });
-
-    let isRendered = false;
-    let recipeAddModalShown = false;
-    let recipeAddModalValue: string;
-    let recipeAddAlreadyExists = false;
-    let recipeAddInvalid = false;
-    let selectedVideos: VideoData[] = [];
 
     onMount(async () => {
         if (await getAccessToken() !== null)
@@ -92,15 +95,16 @@
             method: "POST",
             body: id
         }).then(response => response.json());
-
+        
         $savedVideos = [{
-                youtubeVideoId: id,
-                youtubeTitle: info["title"],
+            youtubeVideoId: id,
+            youtubeTitle: info["title"],
                 youtubeThumbnail: info["thumbnail"],
                 youtubeViewCount: info["viewCounts"],
                 channel: info["channel"],
                 temporary: true
             } as VideoData, ...$savedVideos];
+        recipeAddDrawerHide();
     }
 
     async function endEditRecipes()
@@ -130,31 +134,23 @@
         </div>
     </div>
     {#if !isEditing}
-        <Button kind="gray" icon={faPlus} bottomMargin="xs" on:click={() => recipeAddModalShown = true}>{$_("page.home.addRecipe")}</Button>
+        <Button kind="gray" icon={faPlus} bottomMargin="xs" on:click={recipeAddDrawerShow}>{$_("page.home.addRecipe")}</Button>
     {/if}
-    <Modal bind:shown={recipeAddModalShown}>
-        <Card backgroundColor="white" bottomMargin="2xs">
-            <div class="heading">
-                <h3>{$_("page.home.addRecipeModalTitle")}</h3>
-                <Button kind="transparent" icon={faXmark} fitted on:click={() => recipeAddModalShown = false} />
-            </div>
-            <img src="/images/guide-link-copy.png" alt="링크 복사 방법" />
-            <span class="guide">{$_("page.home.addRecipeModalDescription")}</span>
-        </Card>
-        <Card backgroundColor="white">
-            <Input bottomMargin="xs" placeholder={$_("page.home.addRecipeModalInputPlaceholder")} valueChanged={value => recipeAddModalValue = value} />
-            <Button on:click={() => addRecipe(recipeAddModalValue)}>{$_("page.home.addRecipeModalSubmit")}</Button>
-            {#if recipeAddInvalid}
-                <Card backgroundColor="danger-100" topMargin="xs">
-                    올바르지 않은 링크예요.
-                </Card>
-            {:else if recipeAddAlreadyExists}
-                <Card backgroundColor="danger-100" topMargin="xs">
-                    이미 저장된 레시피예요.
-                </Card>
-            {/if}
-        </Card>
-    </Modal>
+    <Drawer bind:shown={recipeAddDrawerShown} bind:show={recipeAddDrawerShow} bind:hide={recipeAddDrawerHide}>
+        <h3 class="add title">{$_("page.home.addRecipeModalTitle")}</h3>
+        <img src="/images/guide-link-copy.png" alt="링크 복사 방법" />
+        <span class="add guide">{$_("page.home.addRecipeModalDescription")}</span>
+        <Input placeholder={$_("page.home.addRecipeModalInputPlaceholder")} valueChanged={value => recipeAddDrawerValue = value} />
+        {#if recipeAddInvalid}
+            <Card backgroundColor="danger-100" topMargin="xs">
+                올바르지 않은 링크예요.
+            </Card>
+        {:else if recipeAddAlreadyExists}
+            <Card backgroundColor="danger-100" topMargin="xs">
+                이미 저장된 레시피예요.
+            </Card>
+        {/if}
+    </Drawer>
     {#if !isRendered}
         {#each Array(3) as _}
             <Video video={DUMMY_VIDEO} bottomMargin="xs" skeleton />
@@ -197,8 +193,14 @@
         justify-content: space-between;
     }
 
-    .guide {
-        margin-top: var(--space-xs);
+    .add {
+        &.title {
+            align-self: flex-start;
+        }
+
+        &.guide {
+            margin: var(--space-xs) 0;
+        }
     }
 
     .grid {

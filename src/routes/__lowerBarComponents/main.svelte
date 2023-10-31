@@ -8,6 +8,8 @@
     export let isEditing: boolean;
     export let selected = 0;
     export let onEditExit: () => void;
+    export let isAddingRecipe: boolean;
+    export let onAddRecipe: () => void;
 
     let tabs = [
         {
@@ -31,6 +33,8 @@
     {:else}
         <Button kind="primary-light">레시피 0개 삭제하기</Button>
     {/if}
+{:else if isAddingRecipe}
+    <Button on:click={onAddRecipe}>추가하기</Button>
 {:else}
     <Card backgroundColor="primary-500">
         <div class="content">
