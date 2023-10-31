@@ -14,9 +14,9 @@
     export let bottomMargin: SpaceType | undefined = undefined;
     export let verbose = false;
     export let selectable = false;
+    export let selected = false;
     export let onSelect: ((selected: boolean, video: VideoData) => void) | undefined = undefined;
 
-    let selected = false;
 
     function onClick()
     {

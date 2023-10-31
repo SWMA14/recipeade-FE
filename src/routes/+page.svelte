@@ -3,12 +3,13 @@
     import { _ } from "svelte-i18n";
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
-    import { allVideos, savedVideos } from "../store";
+    import { savedVideos } from "../store";
     import { PUBLIC_API_ENDPOINT } from "$env/static/public";
     import { authedFetch, getAccessToken } from "$lib/auth";
     import type { DynamicBarContext } from "$lib/dynamicBar";
+    import { DUMMY_VIDEO } from "$lib/dummy";
     import { flyingFade } from "$lib/transition";
-    import { type Step, type VideoData, convertApiToVideoData, timestampToSeconds } from "$lib/video";
+    import { type VideoData, convertApiToVideoData } from "$lib/video";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
     import Input from "$components/Input.svelte";
@@ -36,6 +37,7 @@
         }
     });
 
+    let isRendered = false;
     let recipeAddModalShown = false;
     let recipeAddModalValue: string;
     let recipeAddAlreadyExists = false;
@@ -53,10 +55,13 @@
                 .map(async (video: any) => convertApiToVideoData(video)));
 
             $savedVideos = [
-                ...pending.filter(x => !$savedVideos.map(x => x.youtubeVideoId).includes(x.youtubeVideoId)),
+                ...pending.filter(x => !videos.map(y => y.youtubeVideoId).includes(x.youtubeVideoId)),
                 ...videos
             ];
+            console.log($savedVideos)
         }
+
+        isRendered = true;
     });
 
     async function addRecipe(link: string)
@@ -150,18 +155,25 @@
             {/if}
         </Card>
     </Modal>
-    {#key isEditing}
-        {#if $savedVideos.length > 0}
-            {#each isEditing ? $savedVideos.filter(x => !x.temporary) : $savedVideos as video}
-                <Video {video} bottomMargin="xs" selectable={isEditing} onSelect={onVideoSelect} />
-            {/each}
-        {:else}
-            <div class="no-result">
-                <img src="/images/no-result.png" alt="저장한 레시피 없음" />
-                <span>{$_("page.home.noAddedRecipes")}</span>
-            </div>
-        {/if}
-    {/key}
+    {#if !isRendered}
+        {#each Array(3) as _}
+            <Video video={DUMMY_VIDEO} skeleton />
+        {/each}
+    {:else}
+        {#key isEditing}
+            {#if $savedVideos.length > 0}
+                {#each isEditing ? $savedVideos.filter(x => !x.temporary) : $savedVideos as video}
+                    <Video {video} bottomMargin="xs" selectable={isEditing}
+                        selected={isEditing ? selectedVideos.includes(video) : false} onSelect={onVideoSelect} />
+                {/each}
+            {:else}
+                <div class="no-result">
+                    <img src="/images/no-result.png" alt="저장한 레시피 없음" />
+                    <span>{$_("page.home.noAddedRecipes")}</span>
+                </div>
+            {/if}
+        {/key}
+    {/if}
 </div>
 
 <style lang="postcss">
