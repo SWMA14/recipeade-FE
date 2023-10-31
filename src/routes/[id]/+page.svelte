@@ -43,6 +43,7 @@
         },
         main: lowerMain,
         mainProps: {
+            fitted: false,
             isEditing,
             onEditExit
         },

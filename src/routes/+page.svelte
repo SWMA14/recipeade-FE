@@ -39,6 +39,7 @@
         },
         main,
         mainProps: {
+            fitted: !isEditing && !recipeAddDrawerShown,
             isEditing,
             selected: selectedVideos.length,
             onEditExit: endEditRecipes,
