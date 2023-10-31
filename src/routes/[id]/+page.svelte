@@ -185,10 +185,11 @@
         </div>
         <div class="title no-margin">
             <h2>{data.video.youtubeTitle}</h2>
-            <Button kind="white" style="width: var(--space-xl);" icon={faAngleDown} on:click={() => goto("/discover")} />
+             <!-- TODO: possible infinite loop when used with history.back() -->
+            <Button kind="white" style="width: var(--space-xl);" icon={faAngleDown} on:click={() => goto("/")} />
         </div>
         <p class="statistics typo-body-2">
-            조회수 {unitizeViews(data.video.youtubeViewCount)}회 · {data.video.channel.ChannelName}
+            조회수 {unitizeViews(data.video.youtubeViewCount)}회 · {data.video.channel}
         </p>
         {#if !isEditing}
             <div class="buttons">
@@ -239,7 +240,7 @@
             </AsymmetricGrid>
         {/if}
     </div>
-    <div class="section" class:last={data.recommended.length === 0 || isEditing} class:ios={data.recommended.length === 0 && device === "ios"}
+    <div class="section last" class:ios={device === "ios"}
         in:flyingFade={{ delay: 0 }}>
         <div class="title">
             <h2>단계</h2>
@@ -284,7 +285,7 @@
             {/each}
         {/if}
     </div>
-    {#if !isEditing}
+    <!-- {#if !isEditing}
         <div class="section last" class:ios={device === "ios"} in:flyingFade={{ delay: 0 }}>
             {#if data.recommended.length > 0}
                 <Carousel leftOverflow rightOverflow heading="이 레시피는 어때요?" canShowAll>
@@ -299,7 +300,7 @@
                 </Carousel>
             {/if}
         </div>
-    {/if}
+    {/if} -->
     <Modal bind:shown={tagsModalShown}>
         <Card backgroundColor="white">
             <div class="heading">

@@ -14,6 +14,7 @@
     export let bottomMargin: SpaceType | undefined = undefined;
     export let verbose = false;
     export let selectable = false;
+    export let onSelect: ((selected: boolean, video: VideoData) => void) | undefined = undefined;
 
     let selected = false;
 
@@ -23,13 +24,19 @@
             return;
 
         selected = !selected;
-        $surveyedVideos = selected ? [...$surveyedVideos, video.youtubeVideoId] : $surveyedVideos.filter(x => x !== video.youtubeVideoId);
+        onSelect?.(selected, video);
     }
 </script>
 
-<Card {skeleton} backgroundColor={selected ? "primary-100" : "gray-50"} visibleOverflow noPadding {leftMargin} {rightMargin} {bottomMargin}
+<Card {skeleton} backgroundColor={selected ? "gray-900" : "gray-50"} visibleOverflow noPadding {leftMargin} {rightMargin} {bottomMargin}
     columnFlex scrollSnap>
-    <a class:overflow={verbose} href={selectable ? "#" : `/${video.youtubeVideoId}`} on:click={onClick}>
+    {#if video.temporary}
+        <div class="overlay">
+            <h2>생성 중</h2>
+            <div />
+        </div>
+    {/if}
+    <a class:overflow={verbose} href={selectable || video.temporary ? "#" : `/${video.youtubeVideoId}`} on:click={onClick}>
         {#if verbose}
             <Carousel>
                 <div class="verbose fitter left-margin">
@@ -57,18 +64,44 @@
             </div>
         {/if}
     </a>
-    <div class="info">
+    <div class="info" class:selected>
         <a class="upper typo-body-1" href={selectable ? "#" : `/${video.youtubeVideoId}`} on:click={onClick}>{video.youtubeTitle}</a>
-        <span class="lower typo-body-2">{video.channel.ChannelName} · 조회수 {unitizeViews(video.youtubeViewCount)}회</span>
+        <span class="lower typo-body-2">{video.channel} · 조회수 {unitizeViews(video.youtubeViewCount)}회</span>
         <div class="badges">
-            <Badge rightMargin>{getCategoryById(video.difficulty)}</Badge>
-            <Badge rightMargin>{video.category}</Badge>
+            <!-- <Badge rightMargin>{getCategoryById(video.difficulty)}</Badge>
+            <Badge rightMargin>{video.category}</Badge> -->
             <!-- <Badge>★ 5.0</Badge> -->
         </div>
     </div>
 </Card>
 
 <style lang="postcss">
+    .overlay {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius);
+        overflow: hidden;
+
+        & h2 {
+            color: var(--white);
+            z-index: 3;
+        }
+
+        & div {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            z-index: 2;
+            background-color: var(--gray-900);
+            opacity: 0.8;
+        }
+    }
+
     .overflow {
         margin: 0 calc(var(--space-xs) * -1);
     }
@@ -111,6 +144,10 @@
         flex-shrink: 0;
         display: flex;
         flex-direction: column;
+
+        &.selected {
+            color: var(--white);
+        }
     }
 
     .upper {

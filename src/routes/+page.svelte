@@ -1,35 +1,145 @@
 <script lang="ts">
     import { faPlus, faXmark } from "@fortawesome/free-solid-svg-icons";
     import { _ } from "svelte-i18n";
-    import { getContext } from "svelte";
+    import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
-    import { allVideos } from "../store";
+    import { allVideos, savedVideos } from "../store";
+    import { PUBLIC_API_ENDPOINT } from "$env/static/public";
+    import { authedFetch, getAccessToken } from "$lib/auth";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { flyingFade } from "$lib/transition";
-    import { getLikedVideos, clearLikedVideos } from "$lib/video";
+    import { type Step, type VideoData, timestampToSeconds } from "$lib/video";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
     import Input from "$components/Input.svelte";
     import Modal from "$components/Modal.svelte";
     import Video from "$components/Video.svelte";
-    // import upperMain from "./__upperBarComponents/main.svelte";
-    import lowerMain from "./__lowerBarComponents/main.svelte";
+    import leading from "./__lowerBarComponents/leading.svelte";
+    import main from "./__lowerBarComponents/main.svelte";
+
+    let isEditing = false;
 
     getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
-        ...x,
         isHidden: true
     });
-    getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
-        main: lowerMain
+    $: getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
+        leading: isEditing ? leading : undefined,
+        leadingProps: {
+            isEditing,
+            onEditCancel: () => isEditing = false
+        },
+        main,
+        mainProps: {
+            isEditing,
+            selected: selectedVideos.length,
+            onEditExit: endEditRecipes
+        }
     });
 
-    let updateVidoes = {};
     let recipeAddModalShown = false;
     let recipeAddModalValue: string;
+    let recipeAddAlreadyExists = false;
+    let recipeAddInvalid = false;
+    let selectedVideos: VideoData[] = [];
 
-    function confident(target: any | undefined): any
+    onMount(async () => {
+        if (await getAccessToken() !== null)
+        {
+            const pending = $savedVideos.filter(x => x.temporary);
+            const result = await authedFetch(`${PUBLIC_API_ENDPOINT}/customize/recipes`)
+                .then(response => response.json())
+                .catch(() => []);
+            console.log(result);
+
+            $savedVideos = await Promise.all(result.map(async (video: any) => {
+                const info = await fetch("/api/video", {
+                    method: "POST",
+                    body: video["sourceId"]
+                }).then(response => response.json());
+
+                let converted: VideoData = {
+                    youtubeVideoId: video["sourceId"],
+                    youtubeTitle: info["title"],
+                    youtubeViewCount: info["viewCounts"],
+                    difficulty: video["difficulty"],
+                    category: video["category"],
+                    youtubeThumbnail: info["thumbnail"],
+                    id: video["id"],
+                    channel: info["channel"],
+                    ingredients: video["ingredients"],
+                    recipesteps: video["steps"].map((step: any) => ({
+                        seconds: timestampToSeconds(step["timestamp"]),
+                        timestamp: step["timestamp"],
+                        description: step["step"]
+                    })),
+                    tags: video["tags"]
+                };
+
+                return converted;
+            }));
+
+            $savedVideos = [
+                ...pending.filter(x => !$savedVideos.map(x => x.youtubeVideoId).includes(x.youtubeVideoId)),
+                ...$savedVideos
+            ];
+        }
+    });
+
+    async function addRecipe(link: string)
     {
-        return target!;
+        const result = await authedFetch(`${PUBLIC_API_ENDPOINT}/customize/create_default?sourceLink=${link}`, {
+            method: "POST"
+        });
+
+        if (result.status === 500)
+        {
+            recipeAddAlreadyExists = true;
+            setTimeout(() => recipeAddAlreadyExists = false, 3000);
+
+            return;
+        }
+
+        const id = link.match(/.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/)?.[1];
+
+        if (id === undefined)
+        {
+            recipeAddInvalid = true;
+            setTimeout(() => recipeAddInvalid = false, 3000);
+
+            return;
+        }
+
+        const info = await fetch("/api/video", {
+            method: "POST",
+            body: id
+        }).then(response => response.json());
+
+        $savedVideos = [{
+                youtubeVideoId: id,
+                youtubeTitle: info["title"],
+                youtubeThumbnail: info["thumbnail"],
+                youtubeViewCount: info["viewCounts"],
+                channel: info["channel"],
+                temporary: true
+            } as VideoData, ...$savedVideos];
+    }
+
+    async function endEditRecipes()
+    {
+        $savedVideos = $savedVideos.filter(x => !selectedVideos.includes(x));
+        await Promise.all(selectedVideos
+            .map(video => authedFetch(`${PUBLIC_API_ENDPOINT}/customize/${video.id}`, {
+                method: "DELETE"
+            })));
+        selectedVideos = [];
+    }
+
+    function onVideoSelect(selected: boolean, video: VideoData)
+    {
+        if (selected)
+            selectedVideos = [...selectedVideos, video];
+        else
+            selectedVideos = selectedVideos.filter(x => x !== video);
     }
 </script>
 
@@ -37,10 +147,12 @@
     <div class="title">
         <h2>{@html $_("page.home.greeting")}</h2>
         <div class="buttons">
-            <Button kind="transparent" size="small">{$_("page.home.editRecipes")}</Button>
+            <Button kind="transparent" size="small" on:click={() => isEditing = !isEditing}>{$_("page.home.editRecipes")}</Button>
         </div>
     </div>
-    <Button kind="gray" icon={faPlus} on:click={() => recipeAddModalShown = true}>{$_("page.home.addRecipe")}</Button>
+    {#if !isEditing}
+        <Button kind="gray" icon={faPlus} bottomMargin="xs" on:click={() => recipeAddModalShown = true}>{$_("page.home.addRecipe")}</Button>
+    {/if}
     <Modal bind:shown={recipeAddModalShown}>
         <Card backgroundColor="white" bottomMargin="2xs">
             <div class="heading">
@@ -52,32 +164,36 @@
         </Card>
         <Card backgroundColor="white">
             <Input bottomMargin="xs" placeholder={$_("page.home.addRecipeModalInputPlaceholder")} valueChanged={value => recipeAddModalValue = value} />
-            <Button>{$_("page.home.addRecipeModalSubmit")}</Button>
+            <Button on:click={() => addRecipe(recipeAddModalValue)}>{$_("page.home.addRecipeModalSubmit")}</Button>
+            {#if recipeAddInvalid}
+                <Card backgroundColor="danger-100" topMargin="xs">
+                    올바르지 않은 링크예요.
+                </Card>
+            {:else if recipeAddAlreadyExists}
+                <Card backgroundColor="danger-100" topMargin="xs">
+                    이미 저장된 레시피예요.
+                </Card>
+            {/if}
         </Card>
     </Modal>
-    {#key updateVidoes}
-        {#await getLikedVideos() then likedVideos}
-            {@const videos = likedVideos.map(video => confident($allVideos.find(x => x.youtubeVideoId === video.id)))}
-            <div class="grid">
-                {#if likedVideos.length > 0}
-                    {#each videos as video (video.youtubeThumbnail)}
-                        <Video {video} verbose bottomMargin="xs" />
-                    {/each}
-                {:else}
-                    <div class="no-result">
-                        <img src="/images/no-result.png" alt="저장한 레시피 없음" />
-                        <span>{$_("page.home.noAddedRecipes")}</span>
-                    </div>
-                {/if}
+    {#key isEditing}
+        {#if $savedVideos.length > 0}
+            {#each isEditing ? $savedVideos.filter(x => !x.temporary) : $savedVideos as video}
+                <Video {video} bottomMargin="xs" selectable={isEditing} onSelect={onVideoSelect} />
+            {/each}
+        {:else}
+            <div class="no-result">
+                <img src="/images/no-result.png" alt="저장한 레시피 없음" />
+                <span>{$_("page.home.noAddedRecipes")}</span>
             </div>
-        {/await}
+        {/if}
     {/key}
 </div>
 
 <style lang="postcss">
     .section {
         width: 100%;
-        margin-bottom: var(--space-3xl);
+        padding-bottom: var(--space-3xl);
     }
 
     .title {

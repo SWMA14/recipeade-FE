@@ -1,5 +1,3 @@
-import { Preferences } from "@capacitor/preferences";
-
 export interface VideoData
 {
     youtubeVideoId: string;
@@ -8,12 +6,12 @@ export interface VideoData
     difficulty: number;
     category: string;
     youtubeThumbnail: string;
-    id: number;
-    rating: number;
+    id: string;
     ingredients: Ingredient[];
     recipesteps: Step[];
-    channel: Channel;
+    channel: string;
     tags?: string[];
+    temporary?: boolean;
 }
 
 export interface Ingredient
@@ -30,17 +28,6 @@ export interface Step
     timestamp: string;
     // ingredients: string[];
     description: string;
-}
-
-interface Channel
-{
-    channelID: string;
-    ChannelName: string;
-    id: number;
-}
-
-interface LikedVideo {
-    id: string;
 }
 
 export function unitizeViews(views: number): string
@@ -64,48 +51,6 @@ export function timestampToSeconds(timestamp: string): number
     const [minute, second] = match.split(":").map((x) => parseInt(x));
 
     return minute * 60 + second;
-}
-
-export async function getLikedVideos(): Promise<LikedVideo[]>
-{
-    const result = await Preferences.get({
-        key: "likedVideos"
-    });
-
-    return JSON.parse(result.value ?? "[]") as LikedVideo[];
-}
-
-export async function saveLikedVideo(id: string)
-{
-    const videos = await getLikedVideos();
-
-    if (!videos.some(x => x.id === id))
-        await Preferences.set({
-            key: "likedVideos",
-            value: JSON.stringify([
-                {
-                    id
-                },
-                ...videos
-            ])
-        });
-}
-
-export async function removeLikedVideo(id: string)
-{
-    const videos = await getLikedVideos();
-
-    await Preferences.set({
-        key: "likedVideos",
-        value: JSON.stringify(videos.filter(x => x.id !== id))
-    });
-}
-
-export async function clearLikedVideos()
-{
-    await Preferences.remove({
-        key: "likedVideos"
-    });
 }
 
 function includes(source: string, target: string): boolean
