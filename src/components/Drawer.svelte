@@ -4,7 +4,7 @@
     import { expoOut } from "svelte/easing";
     import { stacks } from "../store";
 
-    export let shown: boolean;
+    export let shown = false;
     export let top = "10%";
 
     let innerWidth = 0;
@@ -25,15 +25,19 @@
 
         main.style.borderRadius = `calc(var(--radius) * ${modifier})`;
         main.style.transform = `scale(${scale}) translate3d(0, calc(env(safe-area-inset-top) + var(--space-xs) * ${modifier}), 0)`;
-
-        $stacks = [...$stacks, hide];
     }
 
     onMount(() => {
         return hide;
     });
 
-    function hide()
+    export function show()
+    {
+        shown = true;
+        $stacks = [...$stacks, hide];
+    }
+
+    export function hide()
     {
         const main = document.querySelector("main")!;
 
@@ -95,7 +99,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        background-color: var(--gray-50);
+        background-color: var(--white);
         border-radius: var(--radius) var(--radius) 0 0;
         touch-action: none;
 
