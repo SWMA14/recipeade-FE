@@ -70,3 +70,44 @@ export function getUsedSteps(steps: Step[], ingredient: string): number[] | unde
 
     return result.length > 0 ? result : undefined;
 }
+
+export async function convertApiToVideoData(video: any): Promise<VideoData>
+{
+    const info = await fetch("/api/videoInfo", {
+        method: "POST",
+        body: video["sourceId"]
+    }).then(response => response.json());
+
+    return {
+        youtubeVideoId: video["sourceId"],
+        youtubeTitle: info["title"],
+        youtubeViewCount: info["viewCounts"],
+        difficulty: video["difficulty"],
+        category: video["category"],
+        youtubeThumbnail: info["thumbnail"],
+        id: video["id"],
+        channel: info["channel"],
+        ingredients: video["ingredients"],
+        recipesteps: video["steps"].map((step: any) => ({
+            seconds: timestampToSeconds(step["timestamp"]),
+            timestamp: step["timestamp"],
+            description: step["step"]
+        })),
+        tags: video["tags"]
+    };
+}
+
+export function convertVideoDataToApi(video: VideoData)
+{
+    return {
+        title: video.youtubeTitle,
+        steps: video.recipesteps.map(step => ({
+            step: step.description,
+            timestamp: step.timestamp
+        })),
+        ingredients: video.ingredients,
+        tags: video.tags ?? "",
+        difficulty: video.difficulty,
+        category: video.category
+    };
+}

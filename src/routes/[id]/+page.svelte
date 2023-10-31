@@ -5,12 +5,12 @@
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
     import { goto } from "$app/navigation";
-    import { PUBLIC_LANDING_ENDPOINT } from "$env/static/public";
+    import { PUBLIC_API_ENDPOINT, PUBLIC_LANDING_ENDPOINT } from "$env/static/public";
     import { analyticsService } from "$lib/analytics";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { tags } from "$lib/tag";
     import { flyingFade } from "$lib/transition";
-    import { unitizeViews, type VideoData } from "$lib/video";
+    import { type VideoData, convertVideoDataToApi, unitizeViews } from "$lib/video";
     import { allVideos, sharedPlayer } from "../../store";
     import AsymmetricGrid from "$components/AsymmetricGrid.svelte";
     import Badge from "$components/Badge.svelte";
@@ -24,6 +24,7 @@
     import Video from "$components/Video.svelte";
     import lowerLeading from "./__lowerBarComponents/leading.svelte";
     import lowerMain from "./__lowerBarComponents/main.svelte";
+  import { authedFetch } from "$lib/auth";
 
     export let data;
 
@@ -64,9 +65,17 @@
 
     function saveRecipe()
     {
-        const index = $allVideos.findIndex(x => x.youtubeVideoId === data.id);
-        $allVideos[index] = structuredClone(cache);
+        // const index = $allVideos.findIndex(x => x.youtubeVideoId === data.id);
+        // $allVideos[index] = structuredClone(cache);
         recipe = cache;
+
+        console.log(authedFetch(`${PUBLIC_API_ENDPOINT}/customize/update/${data.video.id}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(convertVideoDataToApi(recipe))
+        }));
     }
 
     function onEditStart()

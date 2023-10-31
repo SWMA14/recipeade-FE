@@ -8,7 +8,7 @@
     import { authedFetch, getAccessToken } from "$lib/auth";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { flyingFade } from "$lib/transition";
-    import { type Step, type VideoData, timestampToSeconds } from "$lib/video";
+    import { type Step, type VideoData, convertApiToVideoData, timestampToSeconds } from "$lib/video";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
     import Input from "$components/Input.svelte";
@@ -49,38 +49,12 @@
             const result = await authedFetch(`${PUBLIC_API_ENDPOINT}/customize/recipes`)
                 .then(response => response.json())
                 .catch(() => []);
-            console.log(result);
-
-            $savedVideos = await Promise.all(result.map(async (video: any) => {
-                const info = await fetch("/api/video", {
-                    method: "POST",
-                    body: video["sourceId"]
-                }).then(response => response.json());
-
-                let converted: VideoData = {
-                    youtubeVideoId: video["sourceId"],
-                    youtubeTitle: info["title"],
-                    youtubeViewCount: info["viewCounts"],
-                    difficulty: video["difficulty"],
-                    category: video["category"],
-                    youtubeThumbnail: info["thumbnail"],
-                    id: video["id"],
-                    channel: info["channel"],
-                    ingredients: video["ingredients"],
-                    recipesteps: video["steps"].map((step: any) => ({
-                        seconds: timestampToSeconds(step["timestamp"]),
-                        timestamp: step["timestamp"],
-                        description: step["step"]
-                    })),
-                    tags: video["tags"]
-                };
-
-                return converted;
-            }));
+            const videos = await Promise.all(result
+                .map(async (video: any) => convertApiToVideoData(video)));
 
             $savedVideos = [
                 ...pending.filter(x => !$savedVideos.map(x => x.youtubeVideoId).includes(x.youtubeVideoId)),
-                ...$savedVideos
+                ...videos
             ];
         }
     });
@@ -109,7 +83,7 @@
             return;
         }
 
-        const info = await fetch("/api/video", {
+        const info = await fetch("/api/videoInfo", {
             method: "POST",
             body: id
         }).then(response => response.json());
