@@ -20,7 +20,6 @@
         isHidden: true
     } as DynamicBarContext);
     let lowerBarContext = writable({} as DynamicBarContext);
-    let fitted = true;
 
     Device.getInfo()
         .then(x => device = x.platform)
@@ -29,9 +28,6 @@
     $: setContext("device", device);
     setContext("upperBar", upperBarContext);
     setContext("lowerBar", lowerBarContext);
-
-    $: if ($lowerBarContext.mainProps && "fitted" in $lowerBarContext.mainProps)
-        fitted = $lowerBarContext.mainProps.fitted as boolean;
 
     onMount(async () => {
         App.addListener("backButton", () => {
@@ -83,7 +79,7 @@
     </div>
 {/if}
 {#if !$lowerBarContext.isHidden}
-    <div class="navigation bottom" class:ios={device === "ios"} class:fitted transition:flyingFade={{ duration: duration * 2 }}>
+    <div class="navigation bottom" class:ios={device === "ios"} class:fitted={$lowerBarContext.isFitted} transition:flyingFade={{ duration: duration * 2 }}>
         <DynamicBar leading={$lowerBarContext.leading} leadingProps={$lowerBarContext.leadingProps}
             main={$lowerBarContext.main} mainProps={$lowerBarContext.mainProps}
             trailing={$lowerBarContext.trailing} trailingProps={$lowerBarContext.trailingProps} />

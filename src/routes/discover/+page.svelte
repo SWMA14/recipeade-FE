@@ -20,9 +20,7 @@
     });
     getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
         main,
-        mainProps: {
-            fitted: true
-        }
+        isFitted: true
     });
 
     const title = "레시피에이드";

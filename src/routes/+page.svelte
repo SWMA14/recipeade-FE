@@ -39,13 +39,13 @@
         },
         main,
         mainProps: {
-            fitted: !isEditing && !recipeAddDrawerShown,
             isEditing,
             selected: selectedVideos.length,
             onEditExit: endEditRecipes,
             isAddingRecipe: recipeAddDrawerShown,
             onAddRecipe: () => addRecipe(recipeAddDrawerValue)
-        }
+        },
+        isFitted: !isEditing && !recipeAddDrawerShown
     });
 
     onMount(async () => {

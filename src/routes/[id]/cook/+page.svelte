@@ -26,10 +26,7 @@
         isHidden: true
     });
     getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
-        main,
-        mainProps: {
-            fitted: false
-        }
+        main
     });
 
     const progressDuration = 0;

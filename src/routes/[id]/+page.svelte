@@ -31,7 +31,6 @@
     let isEditing = false;
 
     $: getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
-        ...x,
         isHidden: true
     });
     $: getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
@@ -43,10 +42,9 @@
         },
         main: lowerMain,
         mainProps: {
-            fitted: false,
             isEditing,
             onEditExit
-        },
+        }
     });
 
     let isRendered = false;
