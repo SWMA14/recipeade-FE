@@ -1,6 +1,7 @@
 <script lang="ts">
-    import Fa from "svelte-fa";
+    import { _ } from "svelte-i18n";
     import { faBookmark, faFire, faGear } from "@fortawesome/free-solid-svg-icons";
+    import Fa from "svelte-fa";
     import { page } from "$app/stores";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
@@ -29,12 +30,14 @@
 
 {#if isEditing}
     {#if selected > 0}
-        <Button on:click={onEditExit}>레시피 {selected}개 삭제하기</Button>
+        <Button on:click={onEditExit}>
+            {$_(`page.home.deleteRecipes${selected === 1 ? "Singular" : ""}`, { values: { count: selected }})}
+        </Button>
     {:else}
-        <Button kind="primary-light">레시피 0개 삭제하기</Button>
+        <Button kind="primary-light">{$_("page.home.deleteNoRecipes")}</Button>
     {/if}
 {:else if isAddingRecipe}
-    <Button on:click={onAddRecipe}>추가하기</Button>
+    <Button on:click={onAddRecipe}>{$_("page.home.addRecipeModalSubmit")}</Button>
 {:else}
     <Card backgroundColor="primary-500">
         <div class="content">

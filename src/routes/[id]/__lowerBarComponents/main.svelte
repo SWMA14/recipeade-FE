@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { _ } from "svelte-i18n";
     import { page } from "$app/stores";
     import { goto } from "$app/navigation";
     import Button from "$components/Button.svelte";
@@ -8,7 +9,7 @@
 </script>
 
 {#if isEditing}
-    <Button on:click={onEditExit}>저장하기</Button>
+    <Button on:click={onEditExit}>{$_("page.recipe.saveRecipe")}</Button>
 {:else}
-    <Button on:click={() => goto(`/${$page.params.id}/cook`)}>요리 시작하기</Button>
+    <Button on:click={() => goto(`/${$page.params.id}/cook`)}>{$_("page.recipe.startCooking")}</Button>
 {/if}

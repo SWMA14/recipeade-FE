@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { _ } from "svelte-i18n";
     import { surveyedVideos } from "../store";
     import { getCategoryById } from "$lib/category";
     import type { SpaceType } from "$lib/types";
@@ -39,7 +40,7 @@
         columnFlex scrollSnap>
         {#if video.temporary}
             <div class="overlay">
-                <h2>생성 중</h2>
+                <h2>{$_("page.home.addRecipePending")}</h2>
                 <div />
             </div>
         {/if}
@@ -73,7 +74,7 @@
         </a>
         <div class="info" class:selected>
             <a class="upper typo-body-1" href={selectable ? "#" : `/${video.youtubeVideoId}`} on:click={onClick}>{video.youtubeTitle}</a>
-            <span class="lower typo-body-2">{video.channel} · 조회수 {unitizeViews(video.youtubeViewCount)}회</span>
+            <span class="lower typo-body-2">{video.channel} · {$_("page.recipe.viewCounts", { values: { count: unitizeViews(video.youtubeViewCount, $_("locale")) }})}</span>
             <div class="badges">
                 <!-- <Badge rightMargin>{getCategoryById(video.difficulty)}</Badge>
                 <Badge rightMargin>{video.category}</Badge> -->

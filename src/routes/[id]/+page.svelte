@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { _ } from "svelte-i18n";
     import { Share } from "@capacitor/share";
     import { SortableList } from "@jhubbardsf/svelte-sortablejs";
     import { faAngleDown, faCheck, faClock, faGripLinesVertical, faPlus, faShare, faTag, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
@@ -7,6 +8,7 @@
     import { goto } from "$app/navigation";
     import { PUBLIC_API_ENDPOINT, PUBLIC_LANDING_ENDPOINT } from "$env/static/public";
     import { analyticsService } from "$lib/analytics";
+    import { authedFetch } from "$lib/auth";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { tags } from "$lib/tag";
     import { flyingFade } from "$lib/transition";
@@ -24,7 +26,6 @@
     import Video from "$components/Video.svelte";
     import lowerLeading from "./__lowerBarComponents/leading.svelte";
     import lowerMain from "./__lowerBarComponents/main.svelte";
-  import { authedFetch } from "$lib/auth";
 
     export let data;
 
@@ -153,7 +154,7 @@
 
         await Share.share({
             title: data.video.youtubeTitle,
-            text: "레시피에이드에서 YouTube 레시피 영상에서 중요한 부분만을 손쉽게 확인하고 따라하세요.",
+            text: $_("page.recipe.shareText"),
             url: `${PUBLIC_LANDING_ENDPOINT}/${data.id}`
         });
     }
@@ -188,7 +189,9 @@
                 {/each}
             {/if}
             {#if isEditing}
-                <Button kind="gray" size="medium" style="width: fit-content;" icon={faTag} on:click={() => tagsModalShown = true}>태그 수정</Button>
+                <Button kind="gray" size="medium" style="width: fit-content;" icon={faTag} on:click={() => tagsModalShown = true}>
+                    {$_("page.recipe.editTags")}
+                </Button>
             {/if}
         </div>
         <div class="title no-margin">
@@ -197,7 +200,7 @@
             <Button kind="white" style="width: var(--space-xl);" icon={faAngleDown} on:click={() => goto("/")} />
         </div>
         <p class="statistics typo-body-2">
-            조회수 {unitizeViews(data.video.youtubeViewCount)}회 · {data.video.channel}
+            {$_("page.recipe.viewCounts", { values: { count: unitizeViews(data.video.youtubeViewCount, $_("locale")) }})} · {data.video.channel}
         </p>
         {#if !isEditing}
             <div class="buttons">
@@ -208,7 +211,7 @@
     </div>
     <div class="section second" in:flyingFade={{ delay: 0 }}>
         <div class="title">
-            <h2>재료</h2>
+            <h2>{$_("page.recipe.ingredients")}</h2>
         </div>
         {#if isEditing}
             <SortableList class="sortable-list" handle=".handle" onEnd={handleIngredientsSort}>
@@ -216,13 +219,14 @@
                     <Card bottomMargin="xs">
                         <div class="list-content">
                             <div class="ingredient" class:edit={isEditing}>
-                                <Input placeholder="재료명" value={ingredient.name} on:change={e => cache.ingredients[i].name = confident(e.target).value}
-                                    fittedHeight noPadding noDelete />
+                                <Input placeholder={$_("page.recipe.addIngredientName")} value={ingredient.name}
+                                    on:change={e => cache.ingredients[i].name = confident(e.target).value} fittedHeight noPadding noDelete />
                                 <div style="color: var(--primary-500);">
-                                <Input placeholder="수량" value={ingredient.quantity ?? ""}{ingredient.unit ?? ""} on:change={e => {
-                                    cache.ingredients[i].quantity = confident(e.target).value;
-                                    cache.ingredients[i].unit = "";
-                                }} fittedHeight noPadding noDelete />
+                                <Input placeholder={$_("page.recipe.addIngredientAmount")} value={ingredient.quantity ?? ""}{ingredient.unit ?? ""}
+                                    on:change={e => {
+                                        cache.ingredients[i].quantity = confident(e.target).value;
+                                        cache.ingredients[i].unit = "";
+                                    }} fittedHeight noPadding noDelete />
                                 </div>
                             </div>
                             <div class="button-wrapper">
@@ -237,7 +241,7 @@
                         </div>
                     </Card>
                 {/each}
-                <Button kind="gray" icon={faPlus} on:click={addIngredient}>재료 추가하기</Button>
+                <Button kind="gray" icon={faPlus} on:click={addIngredient}>{$_("page.recipe.addIngredient")}</Button>
             </SortableList>
         {:else}
             <AsymmetricGrid>
@@ -251,7 +255,7 @@
     <div class="section last" class:ios={device === "ios"}
         in:flyingFade={{ delay: 0 }}>
         <div class="title">
-            <h2>단계</h2>
+            <h2>{$_("page.recipe.steps")}</h2>
         </div>
         {#if isEditing}
             <div class="steps">
@@ -260,14 +264,15 @@
                         <Card bottomMargin="xs">
                             <div class="list-content">
                                 <div class="step">
-                                    <Input placeholder="단계 설명" value={step.description} on:focusout={e => cache.recipesteps[i].description = confident(e.target).textContent}
+                                    <Input placeholder={$_("page.recipe.addStepDescription")} value={step.description}
+                                        on:focusout={e => cache.recipesteps[i].description = confident(e.target).textContent}
                                         autoBreak fittedHeight noPadding noDelete />
                                     <div class="timestamp">
                                         <span>{step.timestamp}</span>
                                         <div class="button-wrapper">
                                             <Button size="small" style="width: fit-content;" icon={faClock}
                                                 on:click={async () => cache.recipesteps[i].timestamp = await getCurrentTimestamp()}>
-                                                현재 시간으로
+                                                {$_("page.recipe.changeStepTimestamp")}
                                             </Button>
                                         </div>
                                     </div>
@@ -285,7 +290,7 @@
                         </Card>
                     {/each}
                 </SortableList>
-                <Button kind="gray" icon={faPlus} on:click={addStep}>단계 추가하기</Button>
+                <Button kind="gray" icon={faPlus} on:click={addStep}>{$_("page.recipe.addStep")}</Button>
             </div>
         {:else}
             {#each recipe.recipesteps as step, i (step.description)}

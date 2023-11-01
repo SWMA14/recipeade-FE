@@ -30,18 +30,29 @@ export interface Step
     description: string;
 }
 
-export function unitizeViews(views: number): string
+export function unitizeViews(views: number, locale: string): string
 {
     if (views < 1000)
         return views.toString();
-    else if (views < 10000)
-        return `${(views / 1000).toFixed(1)}천`;
-    else if (views < 1000000)
-        return `${(views / 10000).toFixed(1)}만`;
-    else if (views < 10000000)
-        return `${(views / 1000000).toFixed(1)}백만`;
+
+    if (locale === "ko")
+    {
+        if (views < 10000)
+            return `${(views / 1000).toFixed(1)}천`;
+        else if (views < 1000000)
+            return `${(views / 10000).toFixed(1)}만`;
+        else if (views < 10000000)
+            return `${(views / 1000000).toFixed(1)}백만`;
+        else
+            return `${(views / 10000000).toFixed(1)}천만`;
+    }
     else
-        return `${(views / 10000000).toFixed(1)}천만`;
+    {
+        if (views < 1000000)
+            return `${(views / 1000).toFixed(1)}K`;
+        else
+            return `${(views / 1000000).toFixed(1)}M`;
+    }
 }
 
 export function timestampToSeconds(timestamp: string): number

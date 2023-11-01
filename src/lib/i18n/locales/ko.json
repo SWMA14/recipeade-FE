@@ -1,4 +1,5 @@
 {
+    "locale": "ko",
     "page": {
         "login": {
             "slogan": "시원한 에이드처럼<br>불편함을 싹<br>내려 드릴게요",
@@ -30,7 +31,13 @@
             "addRecipeModalDescription": "레시피로 만들고 싶은 YouTube 영상의 공유 버튼을 누르면 링크를 복사할 수 있어요. 복사한 링크를 아래에 붙여 넣으면 레시피가 추가돼요.",
             "addRecipeModalInputPlaceholder": "YouTube 영상 링크",
             "addRecipeModalSubmit": "추가하기",
-            "noAddedRecipes": "저장한 레시피가 없어요."
+            "addRecipeModalInvalidLink": "올바르지 않은 링크예요.",
+            "addRecipeModalAlreadySaved": "이미 저장된 레시피예요.",
+            "addRecipePending": "생성 중",
+            "noAddedRecipes": "저장한 레시피가 없어요.",
+            "deleteRecipes": "레시피 {count}개 삭제",
+            "deleteRecipesSingular": "레시피 1개 삭제",
+            "deleteNoRecipes": "레시피 0개 삭제"
         },
         "settings": {
             "heading": "설정",
@@ -50,7 +57,20 @@
             "commentsTipExplainTitle": "이게 뭐죠?",
             "commentsTipExplainDescription": "AI로 영상의 댓글을 분석해 요리에 도움되는 팁들을 정리해 드려요.",
             "ingredients": "재료",
-            "ingredientsUsedStep": "{step}단계"
+            "ingredientsUsedStep": "{step}단계",
+            "steps": "단계",
+            "startCooking": "요리 시작하기",
+            "editTags": "태그 수정",
+            "addIngredient": "재료 추가하기",
+            "addIngredientName": "재료명",
+            "addIngredientAmount": "수량",
+            "changeStepTimestamp": "현재 시간으로",
+            "addStep": "단계 추가하기",
+            "addStepDescription": "단계 설명",
+            "saveRecipe": "저장하기",
+            "goBack": "돌아가기",
+            "shareText": "레시피에이드에서 YouTube 레시피 영상에서 중요한 부분만을 손쉽게 확인하고 따라하세요.",
+            "viewCounts": "조회수 {count}회"
         }
     }
 }

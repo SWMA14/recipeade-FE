@@ -129,7 +129,7 @@
 
 <div class="section" in:flyingFade={{ delay: 0 }}>
     <div class="title">
-        <h2>{@html $_("page.home.greeting")}</h2>
+        <h1>{@html $_("page.home.greeting")}</h1>
         <div class="buttons">
             <Button kind="transparent" size="small" on:click={() => isEditing = !isEditing}>{$_("page.home.editRecipes")}</Button>
         </div>
@@ -138,17 +138,17 @@
         <Button kind="gray" icon={faPlus} bottomMargin="xs" on:click={recipeAddDrawerShow}>{$_("page.home.addRecipe")}</Button>
     {/if}
     <Drawer bind:shown={recipeAddDrawerShown} bind:show={recipeAddDrawerShow} bind:hide={recipeAddDrawerHide}>
-        <h3 class="add title">{$_("page.home.addRecipeModalTitle")}</h3>
+        <h3 class="add heading">{$_("page.home.addRecipeModalTitle")}</h3>
         <img src="/images/guide-link-copy.png" alt="링크 복사 방법" />
         <span class="add guide">{$_("page.home.addRecipeModalDescription")}</span>
         <Input placeholder={$_("page.home.addRecipeModalInputPlaceholder")} valueChanged={value => recipeAddDrawerValue = value} />
         {#if recipeAddInvalid}
             <Card backgroundColor="danger-100" topMargin="xs">
-                올바르지 않은 링크예요.
+                {$_("page.home.addRecipeModalInvalidLink")}
             </Card>
         {:else if recipeAddAlreadyExists}
             <Card backgroundColor="danger-100" topMargin="xs">
-                이미 저장된 레시피예요.
+                {$_("page.home.addRecipeModalAlreadySaved")}
             </Card>
         {/if}
     </Drawer>
@@ -187,16 +187,10 @@
         justify-content: space-between;
     }
 
-    .heading {
-        margin-bottom: var(--space-xs);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
     .add {
-        &.title {
+        &.heading {
             align-self: flex-start;
+            margin-bottom: var(--space-m);
         }
 
         &.guide {
