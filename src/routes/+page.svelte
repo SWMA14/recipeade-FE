@@ -140,7 +140,9 @@
     <div class="title">
         <h1>{@html $_("page.home.greeting")}</h1>
         <div class="buttons">
-            <Button kind="transparent" size="small" on:click={() => isEditing = !isEditing}>{$_("page.home.editRecipes")}</Button>
+            <Button kind="transparent" size="small" on:click={() => isEditing ? exitEditRecipes() : isEditing = true}>
+                {$_("page.home.editRecipes")}
+            </Button>
         </div>
     </div>
     {#if !isEditing}
