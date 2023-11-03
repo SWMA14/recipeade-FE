@@ -7,12 +7,11 @@ export function flyingFade(node: HTMLElement, { delay = 0, easing = quartOut, y 
     return {
         delay,
         duration,
+        easing,
         css: (t: number) => {
-            const eased = easing(t);
-
             return `
-                transform: translateY(${y * (1 - eased)}px);
-                opacity: ${eased};
+                transform: translateY(${y * (1 - t)}px);
+                opacity: ${t};
             `;
         }
     };
@@ -23,15 +22,14 @@ export function growingFade(node: HTMLElement, { delay = 0, easing = quartOut, w
     return {
         delay,
         duration,
+        easing,
         css: (t: number) => {
-            const eased = easing(t);
-
             return `
-                width: calc(${width} * ${eased});
-                min-width: calc(${width} * ${eased});
-                ${leftMargin !== "" ? `margin-left: calc(${leftMargin} * ${eased});` : ""}
-                ${rightMargin !== "" ? `margin-right: calc(${rightMargin} * ${eased});` : ""}
-                opacity: ${eased};
+                width: calc(${width} * ${t});
+                min-width: calc(${width} * ${t});
+                ${leftMargin !== "" ? `margin-left: calc(${leftMargin} * ${t});` : ""}
+                ${rightMargin !== "" ? `margin-right: calc(${rightMargin} * ${t});` : ""}
+                opacity: ${t};
             `;
         }
     }
