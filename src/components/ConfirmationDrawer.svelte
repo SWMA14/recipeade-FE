@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { _ } from "svelte-i18n";
     import { getContext } from "svelte";
     import type { Writable } from "svelte/store";
     import type { DynamicBarContext } from "$lib/dynamicBar";
@@ -9,7 +10,7 @@
     export let shown = false;
     export let show: (() => void) | undefined = undefined;
     export let hide: (() => void) | undefined = undefined;
-    export let confirmText = "확인";
+    export let confirmText = $_("page.confirm");
     export let onConfirm: () => void;
     export let onCancel: (() => void) | undefined = undefined;
 
@@ -41,5 +42,5 @@
     <Button kind="gray" on:click={() => {
             hide?.();
             cancelAndrevertDynamicBar();
-        }}>취소</Button>
+        }}>{$_("page.cancel")}</Button>
 </Drawer>

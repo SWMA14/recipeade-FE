@@ -183,7 +183,8 @@
         </Card>
     {/if}
 </Drawer>
-<ConfirmationDrawer bind:show={recipeDeleteDrawerShow} bind:hide={recipeDeleteDrawerHide} onConfirm={endEditRecipes} />
+<ConfirmationDrawer bind:show={recipeDeleteDrawerShow} bind:hide={recipeDeleteDrawerHide} onConfirm={endEditRecipes}
+    confirmText={$_("page.home.deleteRecipesConfirm")} />
 
 <style lang="postcss">
     .section {

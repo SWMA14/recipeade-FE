@@ -19,6 +19,7 @@
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
     import Carousel from "$components/Carousel.svelte";
+    import ConfirmationDrawer from "$components/ConfirmationDrawer.svelte";
     import Ingredient from "$components/Ingredient.svelte";
     import Input from "$components/Input.svelte";
     import Modal from "$components/Modal.svelte";
@@ -29,7 +30,11 @@
 
     export let data;
 
+    let recipe = $allVideos.find(x => x.youtubeVideoId === data.id) ?? data.video;
+    let cache = {} as VideoData;
     let isEditing = false;
+    let recipeSaveCancelDrawerShow: () => void;
+    let recipeSaveCancelDrawerHide: () => void;
 
     $: getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
         isHidden: true
@@ -39,7 +44,7 @@
         leadingProps: {
             isEditing,
             onEditStart,
-            onEditCancel
+            onEditCancel: JSON.stringify(recipe) === JSON.stringify(cache) ? onEditCancel : recipeSaveCancelDrawerShow
         },
         main: lowerMain,
         mainProps: {
@@ -50,8 +55,6 @@
 
     let isRendered = false;
     let device: "ios" | "android" | "web" = getContext("device");
-    let recipe = $allVideos.find(x => x.youtubeVideoId === data.id) ?? data.video;
-    let cache = {} as VideoData;
     let tagsModalShown = false;
 
     onMount(() => {
@@ -333,6 +336,8 @@
             <Button on:click={() => tagsModalShown = false}>닫기</Button>
         </Card>
     </Modal>
+    <ConfirmationDrawer bind:show={recipeSaveCancelDrawerShow} bind:hide={recipeSaveCancelDrawerHide} onConfirm={onEditCancel}
+        confirmText={$_("page.recipe.leaveWithoutSaving")} />
 {/if}
 
 <style lang="postcss">

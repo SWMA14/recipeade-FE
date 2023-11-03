@@ -1,6 +1,8 @@
 {
     "locale": "en",
     "page": {
+        "cancel": "Cancel",
+        "confirm": "Confirm",
         "login": {
             "slogan": "Just Like Ade,<br>Cooling Down<br>Discomforts",
             "signInWithApple": "Continue with Apple",
@@ -37,7 +39,8 @@
             "noAddedRecipes": "There's no added recipes yet.",
             "deleteRecipes": "Delete {count} recipes",
             "deleteRecipesSingular": "Delete 1 recipe",
-            "deleteNoRecipes": "Delete 0 recipe"
+            "deleteNoRecipes": "Delete 0 recipe",
+            "deleteRecipesConfirm": "Delete"
         },
         "settings": {
             "heading": "Settings",
@@ -70,7 +73,8 @@
             "saveRecipe": "Save",
             "goBack": "Go back",
             "shareText": "Discover and easily follow the key highlights in YouTube recipe videos, with Recipeade.",
-            "viewCounts": "{count} views"
+            "viewCounts": "{count} views",
+            "leaveWithoutSaving": "Leave without saving"
         }
     }
 }

@@ -1,6 +1,8 @@
 {
     "locale": "ko",
     "page": {
+        "cancel": "취소",
+        "confirm": "확인",
         "login": {
             "slogan": "시원한 에이드처럼<br>불편함을 싹<br>내려 드릴게요",
             "signInWithApple": "Apple로 계속하기",
@@ -37,7 +39,8 @@
             "noAddedRecipes": "저장한 레시피가 없어요.",
             "deleteRecipes": "레시피 {count}개 삭제",
             "deleteRecipesSingular": "레시피 1개 삭제",
-            "deleteNoRecipes": "레시피 0개 삭제"
+            "deleteNoRecipes": "레시피 0개 삭제",
+            "deleteRecipesConfirm": "삭제하기"
         },
         "settings": {
             "heading": "설정",
@@ -70,7 +73,8 @@
             "saveRecipe": "저장하기",
             "goBack": "돌아가기",
             "shareText": "레시피에이드에서 YouTube 레시피 영상에서 중요한 부분만을 손쉽게 확인하고 따라하세요.",
-            "viewCounts": "조회수 {count}회"
+            "viewCounts": "조회수 {count}회",
+            "leaveWithoutSaving": "저장하지 않고 떠나기"
         }
     }
 }
