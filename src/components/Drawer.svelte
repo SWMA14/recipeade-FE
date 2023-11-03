@@ -1,11 +1,15 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onMount, getContext } from "svelte";
     import { fade, fly } from "svelte/transition";
     import { expoOut } from "svelte/easing";
     import { stacks } from "../store";
 
     export let shown = false;
     export let top = "10%";
+    export let onShow: (() => void) | undefined = undefined;
+    export let onHide: (() => void) | undefined = undefined;
+
+    const device: "ios" | "android" | "web" = getContext("device");
 
     let innerWidth = 0;
     let drawerHeight = 0;
@@ -36,6 +40,7 @@
     {
         shown = true;
         $stacks = [...$stacks, hide];
+        onShow?.();
     }
 
     export function hide()
@@ -48,6 +53,7 @@
 
         shown = false;
         $stacks = $stacks.slice(0, -1);
+        onHide?.();
     }
 
     function startTouch(e: MouseEvent | TouchEvent)
@@ -80,7 +86,7 @@
 <svelte:window bind:innerWidth />
 
 {#if shown}
-    <div class="drawer" class:transition={!pressed} style="--top: {drawerTop};"
+    <div class="drawer" class:transition={!pressed} class:ios={device === "ios"} style="--top: {drawerTop};"
         in:fly={{ y: "100vh", opacity: 1, easing: expoOut, duration: 600 }} out:fly={{ y: "100vh", opacity: 1, duration: 350 }}
         bind:clientHeight={drawerHeight} on:touchstart={startTouch} on:touchmove={moveTouch} on:touchend={endTouch}>
         <div class="handle" />

@@ -12,6 +12,7 @@
     import { type VideoData, convertApiToVideoData } from "$lib/video";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
+    import ConfirmationDrawer from "$components/ConfirmationDrawer.svelte";
     import Drawer from "$components/Drawer.svelte";
     import Input from "$components/Input.svelte";
     import Video from "$components/Video.svelte";
@@ -27,6 +28,8 @@
     let recipeAddAlreadyExists = false;
     let recipeAddInvalid = false;
     let selectedVideos: VideoData[] = [];
+    let recipeDeleteDrawerShow: () => void;
+    let recipeDeleteDrawerHide: () => void;
 
     getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
         isHidden: true
@@ -35,13 +38,13 @@
         leading: isEditing ? leading : undefined,
         leadingProps: {
             isEditing,
-            onEditCancel: () => isEditing = false
+            onEditCancel: exitEditRecipes
         },
         main,
         mainProps: {
             isEditing,
             selected: selectedVideos.length,
-            onEditExit: endEditRecipes,
+            onDeleteRecipes: recipeDeleteDrawerShow,
             isAddingRecipe: recipeAddDrawerShown,
             onAddRecipe: () => addRecipe(recipeAddDrawerValue)
         },
@@ -115,6 +118,12 @@
             .map(video => authedFetch(`${PUBLIC_API_ENDPOINT}/customize/${video.id}`, {
                 method: "DELETE"
             })));
+        exitEditRecipes();
+    }
+
+    function exitEditRecipes()
+    {
+        isEditing = false;
         selectedVideos = [];
     }
 
@@ -137,21 +146,6 @@
     {#if !isEditing}
         <Button kind="gray" icon={faPlus} bottomMargin="xs" on:click={recipeAddDrawerShow}>{$_("page.home.addRecipe")}</Button>
     {/if}
-    <Drawer bind:shown={recipeAddDrawerShown} bind:show={recipeAddDrawerShow} bind:hide={recipeAddDrawerHide}>
-        <h3 class="add heading">{$_("page.home.addRecipeModalTitle")}</h3>
-        <img src="/images/guide-link-copy.png" alt="링크 복사 방법" />
-        <span class="add guide">{$_("page.home.addRecipeModalDescription")}</span>
-        <Input placeholder={$_("page.home.addRecipeModalInputPlaceholder")} valueChanged={value => recipeAddDrawerValue = value} />
-        {#if recipeAddInvalid}
-            <Card backgroundColor="danger-100" topMargin="xs">
-                {$_("page.home.addRecipeModalInvalidLink")}
-            </Card>
-        {:else if recipeAddAlreadyExists}
-            <Card backgroundColor="danger-100" topMargin="xs">
-                {$_("page.home.addRecipeModalAlreadySaved")}
-            </Card>
-        {/if}
-    </Drawer>
     {#if !isRendered}
         {#each Array(3) as _}
             <Video video={DUMMY_VIDEO} bottomMargin="xs" skeleton />
@@ -172,6 +166,22 @@
         {/key}
     {/if}
 </div>
+<Drawer bind:shown={recipeAddDrawerShown} bind:show={recipeAddDrawerShow} bind:hide={recipeAddDrawerHide}>
+    <h3 class="add heading">{$_("page.home.addRecipeModalTitle")}</h3>
+    <img src="/images/guide-link-copy.png" alt="링크 복사 방법" />
+    <span class="add guide">{$_("page.home.addRecipeModalDescription")}</span>
+    <Input placeholder={$_("page.home.addRecipeModalInputPlaceholder")} valueChanged={value => recipeAddDrawerValue = value} />
+    {#if recipeAddInvalid}
+        <Card backgroundColor="danger-100" topMargin="xs">
+            {$_("page.home.addRecipeModalInvalidLink")}
+        </Card>
+    {:else if recipeAddAlreadyExists}
+        <Card backgroundColor="danger-100" topMargin="xs">
+            {$_("page.home.addRecipeModalAlreadySaved")}
+        </Card>
+    {/if}
+</Drawer>
+<ConfirmationDrawer bind:show={recipeDeleteDrawerShow} bind:hide={recipeDeleteDrawerHide} onConfirm={endEditRecipes} />
 
 <style lang="postcss">
     .section {

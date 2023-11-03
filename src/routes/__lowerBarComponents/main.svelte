@@ -8,7 +8,7 @@
 
     export let isEditing: boolean;
     export let selected = 0;
-    export let onEditExit: () => void;
+    export let onDeleteRecipes: () => void;
     export let isAddingRecipe: boolean;
     export let onAddRecipe: () => void;
 
@@ -30,7 +30,7 @@
 
 {#if isEditing}
     {#if selected > 0}
-        <Button on:click={onEditExit}>
+        <Button on:click={onDeleteRecipes}>
             {$_(`page.home.deleteRecipes${selected === 1 ? "Singular" : ""}`, { values: { count: selected }})}
         </Button>
     {:else}
