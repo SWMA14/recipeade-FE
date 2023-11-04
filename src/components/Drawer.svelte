@@ -5,7 +5,6 @@
     import { stacks } from "../store";
 
     export let shown = false;
-    export let top = "10%";
     export let onShow: (() => void) | undefined = undefined;
     export let onHide: (() => void) | undefined = undefined;
 
@@ -13,7 +12,7 @@
 
     let innerWidth = 0;
     let drawerHeight = 0;
-    let drawerTop = top;
+    let drawerBottomAdjustment = 0;
     let pressed = false;
     let startY = 0;
     let oldY = 0;
@@ -68,7 +67,7 @@
             return;
 
         oldY = e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
-        drawerTop = `calc(${top} + ${Math.max(oldY - startY, 0)}px)`;
+        drawerBottomAdjustment = Math.max(oldY - startY, 0);
     }
 
     function endTouch()
@@ -79,17 +78,17 @@
             hide();
 
         startY = oldY = 0;
-        drawerTop = top;
+        drawerBottomAdjustment = 0;
     }
 </script>
 
 <svelte:window bind:innerWidth />
 
 {#if shown}
-    <div class="drawer" class:transition={!pressed} class:ios={device === "ios"} style="--top: {drawerTop};"
+    <div class="drawer" class:transition={!pressed} class:ios={device === "ios"} style="--bottom: {drawerBottomAdjustment}px;"
         in:fly={{ y: "100vh", opacity: 1, easing: expoOut, duration: 600 }} out:fly={{ y: "100vh", opacity: 1, duration: 350 }}
         bind:clientHeight={drawerHeight} on:touchstart={startTouch} on:touchmove={moveTouch} on:touchend={endTouch}>
-        <div class="handle" />
+        <div class="handle"  />
         <slot />
     </div>
     <div class="overlay" role="button" tabindex="0" on:keydown={hide} on:click={hide} transition:fade={{ duration: 350 }} />
@@ -98,11 +97,12 @@
 <style lang="postcss">
     .drawer {
         width: calc(100% + var(--space-m));
-        height: 100%;
+        height: fit-content;
         padding: var(--space-xs);
+        padding-bottom: calc(var(--space-3xl) + var(--space-xs));
         position: fixed;
-        top: var(--top);
         left: calc(var(--space-xs) * -1);
+        bottom: calc(var(--space-xl) * -1 - var(--bottom));
         z-index: 999;
         display: flex;
         flex-direction: column;
@@ -113,6 +113,10 @@
 
         &.transition {
             transition: top 0.25s;
+        }
+
+        &.ios {
+            padding-bottom: calc(var(--space-3xl) + var(--space-s));
         }
 
         & .handle {

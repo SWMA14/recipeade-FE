@@ -38,7 +38,7 @@
     }
 </script>
 
-<Drawer top="calc(100vh - var(--space-3xl) * 2 - var(--space-2xs))" bind:shown bind:show onShow={updateLowerBar} bind:hide onHide={cancelAndrevertDynamicBar}>
+<Drawer bind:shown bind:show onShow={updateLowerBar} bind:hide onHide={cancelAndrevertDynamicBar}>
     <Button kind="gray" on:click={() => {
             hide?.();
             cancelAndrevertDynamicBar();
