@@ -4,6 +4,7 @@
     import { expoOut } from "svelte/easing";
     import { stacks } from "../store";
 
+    export let heading: string | undefined = undefined;
     export let shown = false;
     export let onShow: (() => void) | undefined = undefined;
     export let onHide: (() => void) | undefined = undefined;
@@ -89,6 +90,9 @@
         in:fly={{ y: "100vh", opacity: 1, easing: expoOut, duration: 600 }} out:fly={{ y: "100vh", opacity: 1, duration: 350 }}
         bind:clientHeight={drawerHeight} on:touchstart={startTouch} on:touchmove={moveTouch} on:touchend={endTouch}>
         <div class="handle"  />
+        {#if heading}
+            <h3>{heading}</h3>
+        {/if}
         <slot />
     </div>
     <div class="overlay" role="button" tabindex="0" on:keydown={hide} on:click={hide} transition:fade={{ duration: 350 }} />
@@ -125,6 +129,11 @@
             margin-bottom: var(--space-m);
             background-color: var(--gray-200);
             border-radius: var(--radius-big);
+        }
+
+        & h3 {
+            align-self: flex-start;
+            margin-bottom: var(--space-m);
         }
     }
 

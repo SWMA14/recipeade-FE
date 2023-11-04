@@ -168,8 +168,8 @@
         {/key}
     {/if}
 </div>
-<Drawer bind:shown={recipeAddDrawerShown} bind:show={recipeAddDrawerShow} bind:hide={recipeAddDrawerHide}>
-    <h3 class="add heading">{$_("page.home.addRecipeModalTitle")}</h3>
+<Drawer heading={$_("page.home.addRecipeModalTitle")} bind:shown={recipeAddDrawerShown}
+    bind:show={recipeAddDrawerShow} bind:hide={recipeAddDrawerHide}>
     <img src="/images/guide-link-copy.png" alt="링크 복사 방법" />
     <span class="add guide">{$_("page.home.addRecipeModalDescription")}</span>
     <Input placeholder={$_("page.home.addRecipeModalInputPlaceholder")} valueChanged={value => recipeAddDrawerValue = value} />
