@@ -1,4 +1,4 @@
-import { json } from "@sveltejs/kit";
+import { error, json } from "@sveltejs/kit";
 
 export async function POST({ fetch, request })
 {
@@ -6,16 +6,26 @@ export async function POST({ fetch, request })
     const channelRegex = /(?<="ownerChannelName":").+?(?=")/;
     const viewCountsRegex = /(?<="viewCount":{"videoViewCountRenderer":{"viewCount":{"simpleText":").+?(?=")/;
     const dateRegex = /(?<="dateText":{"simpleText":").+?(?=")/;
-    const id = await request.text();
+    const idRegex = /.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/;
+    const url = await request.text();
 
-    const result = await fetch(`https://www.youtube.com/watch?v=${id}`)
+    const result = await fetch(url)
         .then(response => response.text());
 
+    const title = result.match(titleRegex)?.[0];
+    const channel = result.match(channelRegex)?.[0];
+    const viewCounts = parseInt(result.match(viewCountsRegex)?.[0].replace(/\D/g, "") ?? "0");
+    const date = result.match(dateRegex)?.[0];
+    const id = url.match(idRegex)?.[1];
+
+    if (!title || !channel || !date)
+        throw error(400, "Invalid video ID");
+
     return json({
-        title: result.match(titleRegex)?.[0] ?? undefined,
-        channel: result.match(channelRegex)?.[0] ?? undefined,
-        viewCounts: parseInt(result.match(viewCountsRegex)?.[0].replace(/\D/g, "") ?? "0"),
-        date: result.match(dateRegex)?.[0] ?? undefined,
+        title,
+        channel,
+        viewCounts,
+        date,
         thumbnail: `https://i.ytimg.com/vi/${id}/sddefault.jpg`
     });
 }
