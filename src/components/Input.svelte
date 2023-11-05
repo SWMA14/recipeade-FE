@@ -5,8 +5,8 @@
 
     export let placeholder = "";
     export let icon: IconDefinition | undefined = undefined;
-    export let iconClicked: () => void = () => {};
-    export let valueChanged: (value: string) => void = () => {};
+    export let iconClicked: (() => void) | undefined = undefined;
+    export let valueChanged: ((value: string) => void) | undefined = undefined;
     export let value: string = "";
     export let autoBreak = false;
     export let fittedHeight = false;
@@ -14,13 +14,13 @@
     export let noDelete = false;
     export let bottomMargin: SpaceType | undefined = undefined;
 
-    $: valueChanged(value);
+    $: valueChanged?.(value);
 
     let bottomMarginValue = bottomMargin ? `var(--space-${bottomMargin})` : undefined;
 </script>
 
 <div class="container" class:bottom-margin={bottomMargin} style="--bottom-margin: {bottomMarginValue};">
-    {#if icon}
+    {#if icon && iconClicked}
         <div class="button">
             <Button kind="transparent" {icon} on:click={iconClicked} />
         </div>

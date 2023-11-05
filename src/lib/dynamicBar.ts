@@ -10,4 +10,5 @@ export interface DynamicBarContext
     trailingProps?: object;
     isHidden?: boolean;
     isBackgroundShown?: boolean;
+    isFitted?: boolean;
 }

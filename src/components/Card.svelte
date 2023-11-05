@@ -3,6 +3,7 @@
     import type { Options, YouTubePlayer } from "youtube-player/dist/types";
     import { onMount } from "svelte";
     import type { SpaceType } from "$lib/types";
+    import Skeleton from "$components/Skeleton.svelte";
 
     export let skeleton = false;
     export let backgroundColor = "gray-50";
@@ -24,6 +25,7 @@
     export let scrollSnap = false;
     export let square = false;
     export let squareOverflowSafeArea = false;
+    export let onClick: (() => void) | undefined = undefined;
 
     let container: HTMLElement;
     let player: YouTubePlayer | HTMLElement;
@@ -80,7 +82,9 @@
     }
 </script>
 
-<div class="container" class:skeleton
+<svelte:window on:scroll={checkVideoVisible} />
+
+<div class="container" class:skeleton role="button" tabindex="0" on:click={onClick} on:keydown={onClick}
     style="--card-background-color: var(--{backgroundColor}); --left-margin: {leftMarginValue}; --right-margin: {rightMarginValue};
     --top-margin: {topMarginValue}; --bottom-margin: {bottomMarginValue};"
     class:no-radius={noRadius} class:no-padding={noPadding} class:no-min-width={noMinWidth} class:large-padding={largePadding}
@@ -88,7 +92,9 @@
     class:top-margin={topMargin} class:bottom-margin={bottomMargin} class:square class:overflow-safe-area={squareOverflowSafeArea}
     class:visible-overflow={visibleOverflow}>
     {#if skeleton}
-        <div class="skeleton-overlay" />
+        <div class="skeleton-overlay">
+            <Skeleton />
+        </div>
     {/if}
     {#if heading || body || modifier}
         <div class="texts" class:flex-end={!heading} class:large-padding={largePadding}
@@ -138,8 +144,7 @@
         position: absolute;
         top: 0;
         left: 0;
-        background-color: var(--gray-200);
-        z-index: 1;
+        z-index: 10;
     }
 
     .texts {

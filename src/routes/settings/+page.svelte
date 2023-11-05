@@ -14,7 +14,8 @@
         main: upperMain
     });
     getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
-        main: lowerMain
+        main: lowerMain,
+        isFitted: true
     });
 
     async function signOut()

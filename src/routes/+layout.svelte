@@ -79,7 +79,7 @@
     </div>
 {/if}
 {#if !$lowerBarContext.isHidden}
-    <div class="navigation bottom" class:ios={device === "ios"} transition:flyingFade={{ duration: duration * 2 }}>
+    <div class="navigation bottom" class:ios={device === "ios"} class:fitted={$lowerBarContext.isFitted} transition:flyingFade={{ duration: duration * 2 }}>
         <DynamicBar leading={$lowerBarContext.leading} leadingProps={$lowerBarContext.leadingProps}
             main={$lowerBarContext.main} mainProps={$lowerBarContext.mainProps}
             trailing={$lowerBarContext.trailing} trailingProps={$lowerBarContext.trailingProps} />
@@ -91,19 +91,12 @@
     main {
         width: 100%;
         height: 100%;
-        /* max-width: var(--max-width); */
         margin: 0 auto;
-        /* margin-top: env(safe-area-inset-top); */
         padding: 0 var(--space-xs);
         display: flex;
         flex-direction: column;
         align-items: center;
-    }
-
-    @media only screen and (min-width: 48rem) {
-        main {
-            /* padding: 0; */
-        }
+        background-color: var(--white);
     }
 
     .navigation {
@@ -125,9 +118,15 @@
         &.bottom {
             width: calc(100% - var(--space-xs) * 2);
             bottom: var(--space-xs);
-            left: var(--space-xs);
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
             flex-direction: column;
+            transition: width 0.5s cubic-bezier(0.32, 0.72, 0, 1) 0s;
+
+            &.fitted {
+                width: calc(100% - var(--space-2xl) * 4);
+            }
 
             &.ios {
                 bottom: var(--space-s);

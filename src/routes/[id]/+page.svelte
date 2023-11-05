@@ -1,66 +1,60 @@
 <script lang="ts">
+    import { _ } from "svelte-i18n";
     import { Share } from "@capacitor/share";
     import { SortableList } from "@jhubbardsf/svelte-sortablejs";
-    import { faClock, faGripLinesVertical, faPlus, faTag, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
+    import { faAngleDown, faCheck, faClock, faGripLinesVertical, faPlus, faShare, faTag, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
-    import { PUBLIC_LANDING_ENDPOINT } from "$env/static/public";
+    import { goto } from "$app/navigation";
+    import { PUBLIC_API_ENDPOINT, PUBLIC_LANDING_ENDPOINT } from "$env/static/public";
     import { analyticsService } from "$lib/analytics";
-    import { getCategoryById } from "$lib/category";
+    import { authedFetch } from "$lib/auth";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { tags } from "$lib/tag";
     import { flyingFade } from "$lib/transition";
-    import { unitizeViews, getLikedVideos, saveLikedVideo, removeLikedVideo, type VideoData } from "$lib/video";
+    import { type VideoData, convertVideoDataToApi, unitizeViews } from "$lib/video";
     import { allVideos, sharedPlayer } from "../../store";
     import AsymmetricGrid from "$components/AsymmetricGrid.svelte";
     import Badge from "$components/Badge.svelte";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
     import Carousel from "$components/Carousel.svelte";
+    import ConfirmationDrawer from "$components/ConfirmationDrawer.svelte";
     import Ingredient from "$components/Ingredient.svelte";
     import Input from "$components/Input.svelte";
     import Modal from "$components/Modal.svelte";
     import Step from "$components/Step.svelte";
     import Video from "$components/Video.svelte";
-    import upperLeading from "./__upperBarComponents/leading.svelte";
-    import upperTrailing from "./__upperBarComponents/trailing.svelte";
     import lowerLeading from "./__lowerBarComponents/leading.svelte";
     import lowerMain from "./__lowerBarComponents/main.svelte";
 
     export let data;
 
+    let recipe = $allVideos.find(x => x.youtubeVideoId === data.id) ?? data.video;
+    let cache = {} as VideoData;
     let isEditing = false;
-    let isLiked = getLikedVideos().then(videos => videos.some(x => x.id === data.id));
+    let recipeSaveCancelDrawerShow: () => void;
+    let recipeSaveCancelDrawerHide: () => void;
 
     $: getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
-        leading: upperLeading,
-        leadingProps: {
-            onClick: () => history.back()
-        },
-        trailing: upperTrailing,
-        trailingProps: {
-            onClick: share
-        },
-        isBackgroundShown: true
+        isHidden: true
     });
     $: getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
         leading: lowerLeading,
         leadingProps: {
             isEditing,
             onEditStart,
-            onEditCancel
+            onEditCancel: JSON.stringify(recipe) === JSON.stringify(cache) ? onEditCancel : recipeSaveCancelDrawerShow
         },
         main: lowerMain,
         mainProps: {
             isEditing,
             onEditExit
-        },
+        }
     });
 
     let isRendered = false;
     let device: "ios" | "android" | "web" = getContext("device");
-    let recipe = $allVideos.find(x => x.youtubeVideoId === data.id) ?? data.video;
-    let cache = {} as VideoData;
     let tagsModalShown = false;
 
     onMount(() => {
@@ -74,9 +68,17 @@
 
     function saveRecipe()
     {
-        const index = $allVideos.findIndex(x => x.youtubeVideoId === data.id);
-        $allVideos[index] = structuredClone(cache);
+        // const index = $allVideos.findIndex(x => x.youtubeVideoId === data.id);
+        // $allVideos[index] = structuredClone(cache);
         recipe = cache;
+
+        console.log(authedFetch(`${PUBLIC_API_ENDPOINT}/customize/update/${data.video.id}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(convertVideoDataToApi(recipe))
+        }));
     }
 
     function onEditStart()
@@ -123,7 +125,8 @@
             {
                 name: "",
                 quantity: "",
-                unit: ""
+                unit: "",
+                usedSteps: undefined
             }
         ];
     }
@@ -141,6 +144,7 @@
             ...cache.recipesteps,
             {
                 description: "",
+                seconds: 0,
                 timestamp: await getCurrentTimestamp()
             }
         ];
@@ -153,7 +157,7 @@
 
         await Share.share({
             title: data.video.youtubeTitle,
-            text: "레시피에이드에서 YouTube 레시피 영상에서 중요한 부분만을 손쉽게 확인하고 따라하세요.",
+            text: $_("page.recipe.shareText"),
             url: `${PUBLIC_LANDING_ENDPOINT}/${data.id}`
         });
     }
@@ -176,31 +180,41 @@
 </script>
 
 {#if isRendered}
-    <div class="section first" in:flyingFade={{ delay: 0 }}>
-        <div class="badges">
-            <div class="tags">
-                {#if isEditing && cache.tags}
-                    {#each cache.tags as tag (tag)}
-                        <Badge>{tag}</Badge>
-                    {/each}
-                {:else if recipe.tags}
-                    {#each recipe.tags as tag (tag)}
-                        <Badge>{tag}</Badge>
-                    {/each}
-                {/if}
-                {#if isEditing}
-                    <Button kind="gray" size="medium" style="width: fit-content;" icon={faTag} on:click={() => tagsModalShown = true}>태그 수정</Button>
-                {/if}
-            </div>
-        </div>
-        <h2>{data.video.youtubeTitle}</h2>
-        <p class="statistics typo-body-2">
-            조회수 {unitizeViews(data.video.youtubeViewCount)}회 · {data.video.channel.ChannelName}
-        </p>
-    </div>
     <div class="section" in:flyingFade={{ delay: 0 }}>
+        <div class="tags" class:bottom-margin-less={isEditing || recipe.tags?.length}>
+            {#if isEditing && cache.tags}
+                {#each cache.tags as tag (tag)}
+                    <Badge>{tag}</Badge>
+                {/each}
+            {:else if recipe.tags}
+                {#each recipe.tags as tag (tag)}
+                    <Badge>{tag}</Badge>
+                {/each}
+            {/if}
+            {#if isEditing}
+                <Button kind="gray" size="medium" style="width: fit-content;" icon={faTag} on:click={() => tagsModalShown = true}>
+                    {$_("page.recipe.editTags")}
+                </Button>
+            {/if}
+        </div>
+        <div class="title no-margin">
+            <h2>{data.video.youtubeTitle}</h2>
+             <!-- TODO: possible infinite loop when used with history.back() -->
+            <Button kind="white" style="width: var(--space-xl);" icon={faAngleDown} on:click={() => goto("/")} />
+        </div>
+        <p class="statistics typo-body-2">
+            {$_("page.recipe.viewCounts", { values: { count: unitizeViews(data.video.youtubeViewCount, $_("locale")) }})} · {data.video.channel}
+        </p>
+        {#if !isEditing}
+            <div class="buttons">
+                <Button icon={faCheck} style="width: fit-content;" rightMargin="xs">저장됨</Button>
+                <Button kind="gray" icon={faShare} style="width: var(--space-xl);" rightMargin="xs" on:click={share} />
+            </div>
+        {/if}
+    </div>
+    <div class="section second" in:flyingFade={{ delay: 0 }}>
         <div class="title">
-            <h2>재료</h2>
+            <h2>{$_("page.recipe.ingredients")}</h2>
         </div>
         {#if isEditing}
             <SortableList class="sortable-list" handle=".handle" onEnd={handleIngredientsSort}>
@@ -208,13 +222,14 @@
                     <Card bottomMargin="xs">
                         <div class="list-content">
                             <div class="ingredient" class:edit={isEditing}>
-                                <Input placeholder="재료명" value={ingredient.name} on:change={e => cache.ingredients[i].name = confident(e.target).value}
-                                    fittedHeight noPadding noDelete />
+                                <Input placeholder={$_("page.recipe.addIngredientName")} value={ingredient.name}
+                                    on:change={e => cache.ingredients[i].name = confident(e.target).value} fittedHeight noPadding noDelete />
                                 <div style="color: var(--primary-500);">
-                                <Input placeholder="수량" value={ingredient.quantity ?? ""}{ingredient.unit ?? ""} on:change={e => {
-                                    cache.ingredients[i].quantity = confident(e.target).value;
-                                    cache.ingredients[i].unit = "";
-                                }} fittedHeight noPadding noDelete />
+                                <Input placeholder={$_("page.recipe.addIngredientAmount")} value={ingredient.quantity ?? ""}{ingredient.unit ?? ""}
+                                    on:change={e => {
+                                        cache.ingredients[i].quantity = confident(e.target).value;
+                                        cache.ingredients[i].unit = "";
+                                    }} fittedHeight noPadding noDelete />
                                 </div>
                             </div>
                             <div class="button-wrapper">
@@ -229,20 +244,21 @@
                         </div>
                     </Card>
                 {/each}
-                <Button kind="gray" icon={faPlus} on:click={addIngredient}>재료 추가하기</Button>
+                <Button kind="gray" icon={faPlus} on:click={addIngredient}>{$_("page.recipe.addIngredient")}</Button>
             </SortableList>
         {:else}
             <AsymmetricGrid>
                 {#each recipe.ingredients as ingredient (ingredient.name)}
-                    <Ingredient name={ingredient.name} amount={ingredient.quantity ?? ""}{ingredient.unit ?? ""} />
+                    <Ingredient name={ingredient.name} amount={ingredient.quantity ?? ""}{ingredient.unit ?? ""} 
+                        usedSteps={ingredient.usedSteps} />
                 {/each}
             </AsymmetricGrid>
         {/if}
     </div>
-    <div class="section" class:last={data.recommended.length === 0 || isEditing} class:ios={data.recommended.length === 0 && device === "ios"}
+    <div class="section last" class:ios={device === "ios"}
         in:flyingFade={{ delay: 0 }}>
         <div class="title">
-            <h2>단계</h2>
+            <h2>{$_("page.recipe.steps")}</h2>
         </div>
         {#if isEditing}
             <div class="steps">
@@ -251,14 +267,15 @@
                         <Card bottomMargin="xs">
                             <div class="list-content">
                                 <div class="step">
-                                    <Input placeholder="단계 설명" value={step.description} on:focusout={e => cache.recipesteps[i].description = confident(e.target).textContent}
+                                    <Input placeholder={$_("page.recipe.addStepDescription")} value={step.description}
+                                        on:focusout={e => cache.recipesteps[i].description = confident(e.target).textContent}
                                         autoBreak fittedHeight noPadding noDelete />
                                     <div class="timestamp">
                                         <span>{step.timestamp}</span>
                                         <div class="button-wrapper">
                                             <Button size="small" style="width: fit-content;" icon={faClock}
                                                 on:click={async () => cache.recipesteps[i].timestamp = await getCurrentTimestamp()}>
-                                                현재 시간으로
+                                                {$_("page.recipe.changeStepTimestamp")}
                                             </Button>
                                         </div>
                                     </div>
@@ -276,7 +293,7 @@
                         </Card>
                     {/each}
                 </SortableList>
-                <Button kind="gray" icon={faPlus} on:click={addStep}>단계 추가하기</Button>
+                <Button kind="gray" icon={faPlus} on:click={addStep}>{$_("page.recipe.addStep")}</Button>
             </div>
         {:else}
             {#each recipe.recipesteps as step, i (step.description)}
@@ -284,7 +301,7 @@
             {/each}
         {/if}
     </div>
-    {#if !isEditing}
+    <!-- {#if !isEditing}
         <div class="section last" class:ios={device === "ios"} in:flyingFade={{ delay: 0 }}>
             {#if data.recommended.length > 0}
                 <Carousel leftOverflow rightOverflow heading="이 레시피는 어때요?" canShowAll>
@@ -299,7 +316,7 @@
                 </Carousel>
             {/if}
         </div>
-    {/if}
+    {/if} -->
     <Modal bind:shown={tagsModalShown}>
         <Card backgroundColor="white">
             <div class="heading">
@@ -319,6 +336,8 @@
             <Button on:click={() => tagsModalShown = false}>닫기</Button>
         </Card>
     </Modal>
+    <ConfirmationDrawer bind:show={recipeSaveCancelDrawerShow} bind:hide={recipeSaveCancelDrawerHide} onConfirm={onEditCancel}
+        confirmText={$_("page.recipe.leaveWithoutSaving")} />
 {/if}
 
 <style lang="postcss">
@@ -326,8 +345,8 @@
         width: 100%;
         margin-bottom: var(--space-m);
 
-        &.first {
-            margin-top: var(--space-2xl);
+        &.second {
+            margin-top: var(--space-3xl);
         }
 
         &.last {
@@ -342,17 +361,21 @@
     .title {
         margin-bottom: var(--space-xs);
         display: flex;
-        justify-content: space-between;
-    }
-
-    .badges {
-        margin-bottom: var(--space-2xs);
-        display: flex;
         align-items: center;
+        justify-content: space-between;
+
+        &.no-margin {
+            margin-bottom: 0;
+        }
     }
 
     .statistics {
         color: var(--gray-700);
+    }
+
+    .buttons {
+        margin-top: var(--space-xs);
+        display: flex;
     }
 
     .review {
@@ -461,6 +484,10 @@
         display: flex;
         flex-wrap: wrap;
         gap: var(--space-2xs);
+
+        &.bottom-margin-less {
+            margin-bottom: var(--space-3xs);
+        }
 
         &.bottom-margin {
             margin-bottom: var(--space-xs);

@@ -58,6 +58,9 @@ export async function authedFetch(input: RequestInfo | URL, init?: RequestInit):
     {
         const refresh = await fetch("https://recipeade.net/login/refresh", {
             method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({
                 "token_type": "refresh_token",
                 "token": await getRefreshToken()

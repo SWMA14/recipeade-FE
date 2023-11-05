@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { faPenToSquare, faXmark } from "@fortawesome/free-solid-svg-icons";
+    import { faPen, faXmark } from "@fortawesome/free-solid-svg-icons";
     import Button from "$components/Button.svelte";
 
     export let isEditing: boolean;
@@ -7,4 +7,4 @@
     export let onEditCancel: () => void;
 </script>
 
-<Button kind="black" noHover icon={isEditing ? faXmark : faPenToSquare} on:click={isEditing ? onEditCancel : onEditStart} />
+<Button kind="black" noHover icon={isEditing ? faXmark : faPen} on:click={isEditing ? onEditCancel : onEditStart} />

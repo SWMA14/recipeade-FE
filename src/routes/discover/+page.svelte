@@ -19,7 +19,8 @@
         isHidden: true
     });
     getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
-        main
+        main,
+        isFitted: true
     });
 
     const title = "레시피에이드";

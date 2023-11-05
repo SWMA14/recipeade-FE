@@ -1,5 +1,3 @@
-import { Preferences } from "@capacitor/preferences";
-
 export interface VideoData
 {
     youtubeVideoId: string;
@@ -8,50 +6,53 @@ export interface VideoData
     difficulty: number;
     category: string;
     youtubeThumbnail: string;
-    id: number;
-    rating: number;
+    id: string;
     ingredients: Ingredient[];
     recipesteps: Step[];
-    channel: Channel;
+    channel: string;
     tags?: string[];
+    temporary?: boolean;
 }
 
-interface Ingredient
+export interface Ingredient
 {
     name: string;
     quantity: number | string | null;
     unit: string | null;
+    usedSteps: number[] | undefined;
 }
 
-interface Step
+export interface Step
 {
-    description: string;
+    seconds: number;
     timestamp: string;
+    // ingredients: string[];
+    description: string;
 }
 
-interface Channel
-{
-    channelID: string;
-    ChannelName: string;
-    id: number;
-}
-
-interface LikedVideo {
-    id: string;
-}
-
-export function unitizeViews(views: number): string
+export function unitizeViews(views: number, locale: string): string
 {
     if (views < 1000)
         return views.toString();
-    else if (views < 10000)
-        return `${(views / 1000).toFixed(1)}천`;
-    else if (views < 1000000)
-        return `${(views / 10000).toFixed(1)}만`;
-    else if (views < 10000000)
-        return `${(views / 1000000).toFixed(1)}백만`;
+
+    if (locale === "ko")
+    {
+        if (views < 10000)
+            return `${(views / 1000).toFixed(1)}천`;
+        else if (views < 1000000)
+            return `${(views / 10000).toFixed(1)}만`;
+        else if (views < 10000000)
+            return `${(views / 1000000).toFixed(1)}백만`;
+        else
+            return `${(views / 10000000).toFixed(1)}천만`;
+    }
     else
-        return `${(views / 10000000).toFixed(1)}천만`;
+    {
+        if (views < 1000000)
+            return `${(views / 1000).toFixed(1)}K`;
+        else
+            return `${(views / 1000000).toFixed(1)}M`;
+    }
 }
 
 export function timestampToSeconds(timestamp: string): number
@@ -63,44 +64,61 @@ export function timestampToSeconds(timestamp: string): number
     return minute * 60 + second;
 }
 
-export async function getLikedVideos(): Promise<LikedVideo[]>
+function includes(source: string, target: string): boolean
 {
-    const result = await Preferences.get({
-        key: "likedVideos"
-    });
+    const splitted = target.split(" ");
 
-    return JSON.parse(result.value ?? "[]") as LikedVideo[];
+    return splitted.some(x => source.includes(x));
 }
 
-export async function saveLikedVideo(id: string)
+export function getUsedSteps(steps: Step[], ingredient: string): number[] | undefined
 {
-    const videos = await getLikedVideos();
+    const result = [] as number[];
 
-    if (!videos.some(x => x.id === id))
-        await Preferences.set({
-            key: "likedVideos",
-            value: JSON.stringify([
-                {
-                    id
-                },
-                ...videos
-            ])
-        });
+    for (let i = 0; i < steps.length; i++)
+        if (includes(steps[i].description, ingredient))
+            result.push(i);
+
+    return result.length > 0 ? result : undefined;
 }
 
-export async function removeLikedVideo(id: string)
+export async function convertApiToVideoData(video: any): Promise<VideoData>
 {
-    const videos = await getLikedVideos();
+    const info = await fetch("/api/videoInfo", {
+        method: "POST",
+        body: video["sourceId"]
+    }).then(response => response.json());
 
-    await Preferences.set({
-        key: "likedVideos",
-        value: JSON.stringify(videos.filter(x => x.id !== id))
-    });
+    return {
+        youtubeVideoId: video["sourceId"],
+        youtubeTitle: info["title"],
+        youtubeViewCount: info["viewCounts"],
+        difficulty: video["difficulty"],
+        category: video["category"],
+        youtubeThumbnail: info["thumbnail"],
+        id: video["id"],
+        channel: info["channel"],
+        ingredients: video["ingredients"],
+        recipesteps: video["steps"].map((step: any) => ({
+            seconds: timestampToSeconds(step["timestamp"]),
+            timestamp: step["timestamp"],
+            description: step["step"]
+        })),
+        tags: video["tags"]
+    };
 }
 
-export async function clearLikedVideos()
+export function convertVideoDataToApi(video: VideoData)
 {
-    await Preferences.remove({
-        key: "likedVideos"
-    });
+    return {
+        title: video.youtubeTitle,
+        steps: video.recipesteps.map(step => ({
+            step: step.description,
+            timestamp: step.timestamp
+        })),
+        ingredients: video.ingredients,
+        tags: video.tags ?? "",
+        difficulty: video.difficulty,
+        category: video.category
+    };
 }
