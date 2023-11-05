@@ -11,6 +11,7 @@
 
     const device: "ios" | "android" | "web" = getContext("device");
 
+    let modifier = 1;
     let innerWidth = 0;
     let drawerHeight = 0;
     let drawerBottomAdjustment = 0;
@@ -20,7 +21,7 @@
 
     $: if (shown)
     {
-        const modifier = Math.min(1, 1 - ((oldY - startY) / drawerHeight));
+        modifier = Math.min(1, 1 - ((oldY - startY) / drawerHeight));
         const medium = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--space-m"));
         const fontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
         const scale = (innerWidth - medium * fontSize * modifier) / innerWidth;
@@ -95,7 +96,8 @@
         {/if}
         <slot />
     </div>
-    <div class="overlay" role="button" tabindex="0" on:keydown={hide} on:click={hide} transition:fade={{ duration: 350 }} />
+    <div class="overlay" role="button" tabindex="0" style="--modifier: {modifier};"
+        on:keydown={hide} on:click={hide} transition:fade={{ duration: 350 }} />
 {/if}
 
 <style lang="postcss">
@@ -144,7 +146,7 @@
         top: 0;
         left: 0;
         z-index: 998;
-        background-color: rgba(0, 0, 0, var(--overlay-opacity));
+        background-color: rgba(0, 0, 0, calc(var(--overlay-opacity) * var(--modifier)));
         overflow-x: hidden;
     }
 </style>
