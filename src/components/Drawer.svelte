@@ -6,6 +6,7 @@
 
     export let heading: string | undefined = undefined;
     export let noBackgroundShrink = false;
+    export let noBottomPadding = false;
     export let shown = false;
     export let onShow: (() => void) | undefined = undefined;
     export let onHide: (() => void) | undefined = undefined;
@@ -92,7 +93,7 @@
 
 {#if shown}
     <div class="drawer" class:no-shrink={noBackgroundShrink} class:transition={!pressed} class:ios={device === "ios"}
-        style="--bottom: {drawerBottom - drawerBottomAdjustment}px;" bind:clientHeight={drawerHeight} 
+        class:no-bottom-padding={noBottomPadding} style="--bottom: {drawerBottom - drawerBottomAdjustment}px;" bind:clientHeight={drawerHeight} 
         in:fly={{ y: "100vh", opacity: 1, easing: expoOut, duration: 600 }} out:fly={{ y: "100vh", opacity: 1, duration: 350 }}
         on:touchstart={startTouch} on:touchmove={moveTouch} on:touchend={endTouch}>
         <div class="handle"  />
@@ -108,6 +109,7 @@
     .drawer {
         width: calc(100% + var(--space-m));
         height: fit-content;
+        max-height: 100%;
         padding: var(--space-xs);
         padding-bottom: calc(var(--space-3xl) + var(--space-m));
         position: fixed;
@@ -127,12 +129,16 @@
             bottom: calc(var(--bottom) * -1);
         }
 
+        &.no-bottom-padding {
+            padding-bottom: 0;
+        }
+
         &.transition {
             transition: top 0.25s;
         }
 
         &.ios {
-            padding-bottom: calc(var(--space-3xl) + var(--space-s));
+            padding-bottom: calc(var(--space-3xl) + var(--space-l));
         }
 
         & .handle {
