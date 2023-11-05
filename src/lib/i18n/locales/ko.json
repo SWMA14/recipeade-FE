@@ -23,7 +23,9 @@
             "onboardingOkay": "알겠어요",
             "surveyHeading": "어떤 레시피를 좋아하세요?",
             "surveySelectMore": "레시피 {count}개를 더 선택해 주세요",
-            "surveyStart": "시작하기"
+            "surveyStart": "시작하기",
+            "refreshAlertTitle": "다시 로그인해 주세요",
+            "refreshAlertText": "로그인 정보가 만료되었어요. 불편을 드려 죄송해요."
         },
         "home": {
             "greeting": "오늘은 어떤<br>요리를 해 볼까요?",

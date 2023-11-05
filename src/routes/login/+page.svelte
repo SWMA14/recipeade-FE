@@ -6,11 +6,13 @@
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
     import { allVideos, surveyedVideos } from "../../store";
+    import { page } from "$app/stores";
     import { beforeNavigate, goto } from "$app/navigation";
     import { browser } from "$app/environment";
     import { PUBLIC_API_ENDPOINT } from "$env/static/public";
     import { getAccessToken, getIsOnboarded, saveAuthTokens, saveOnboardingCompleted } from "$lib/auth";
     import type { DynamicBarContext } from "$lib/dynamicBar";
+    import AlertDrawer from "$components/AlertDrawer.svelte";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
     import Carousel from "$components/Carousel.svelte";
@@ -34,6 +36,9 @@
     let email = "";
     let emailValidating: Promise<boolean>;
     let password = "";
+
+    let refreshAlertShow: () => void;
+    let refreshAlertHide: () => void;
 
     $: getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
         isHidden: true
@@ -64,6 +69,8 @@
                 grantOfflineAccess: true
             });
 
+        if ($page.url.searchParams.has("alert"))
+            refreshAlertShow();
         // isOnboarded = await getIsOnboarded();
     });
 
@@ -212,6 +219,8 @@
         </div>
     {/if}
 </div>
+<AlertDrawer heading={$_("page.login.refreshAlertTitle")} text={$_("page.login.refreshAlertText")}
+    bind:show={refreshAlertShow} bind:hide={refreshAlertHide} />
 
 <style lang="postcss">
     .container {

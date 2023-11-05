@@ -23,7 +23,9 @@
             "onboardingOkay": "Got it",
             "surveyHeading": "Which recipes do you like?",
             "surveySelectMore": "Select {count} more",
-            "surveyStart": "Start"
+            "surveyStart": "Start",
+            "refreshAlertTitle": "Please sign in again",
+            "refreshAlertText": "Your sign-in information has expired. We apologize for the inconvenience."
         },
         "home": {
             "greeting": "What are you<br>Cooking today?",
