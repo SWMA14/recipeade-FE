@@ -3,9 +3,10 @@
     import { Share } from "@capacitor/share";
     import { SortableList } from "@jhubbardsf/svelte-sortablejs";
     import { faAngleDown, faCheck, faClock, faGripLinesVertical, faPlus, faShare, faTag, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
+    import type { NavigationTarget } from "@sveltejs/kit";
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
-    import { goto } from "$app/navigation";
+    import { beforeNavigate, goto } from "$app/navigation";
     import { PUBLIC_API_ENDPOINT, PUBLIC_LANDING_ENDPOINT } from "$env/static/public";
     import { analyticsService } from "$lib/analytics";
     import { authedFetch } from "$lib/auth";
@@ -14,6 +15,7 @@
     import { flyingFade } from "$lib/transition";
     import { type VideoData, convertVideoDataToApi, unitizeViews } from "$lib/video";
     import { allVideos, sharedPlayer } from "../../store";
+    import AlertDrawer from "$components/AlertDrawer.svelte";
     import AsymmetricGrid from "$components/AsymmetricGrid.svelte";
     import Badge from "$components/Badge.svelte";
     import Button from "$components/Button.svelte";
@@ -35,7 +37,11 @@
     let isEditing = false;
     let recipeSaveCancelDrawerShow: () => void;
     let recipeSaveCancelDrawerHide: () => void;
+    let recipeEditAlertDrawerShow: () => void;
+    let recipeEditAlertDrawerHide: () => void;
+    let navigateDestination: NavigationTarget | null = null;
 
+    $: anyChanges = JSON.stringify(recipe) !== JSON.stringify(cache);
     $: getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
         isHidden: true
     });
@@ -44,7 +50,7 @@
         leadingProps: {
             isEditing,
             onEditStart,
-            onEditCancel: JSON.stringify(recipe) === JSON.stringify(cache) ? onEditCancel : recipeSaveCancelDrawerShow
+            onEditCancel: anyChanges ? recipeSaveCancelDrawerShow : onEditCancel
         },
         main: lowerMain,
         mainProps: {
@@ -64,6 +70,15 @@
         analyticsService.logEvent("recipeview_page", {
             page_title: "recipeview_page"
         });
+    });
+
+    beforeNavigate(({ cancel, to }) => {
+        if (isEditing && anyChanges)
+        {
+            navigateDestination = to;
+            cancel();
+            recipeSaveCancelDrawerShow();
+        }
     });
 
     function saveRecipe()
@@ -90,6 +105,12 @@
     function onEditCancel()
     {
         isEditing = false;
+
+        if (navigateDestination)
+        {
+            goto(navigateDestination.url);
+            navigateDestination = null;
+        }
     }
 
     function onEditExit()
@@ -131,6 +152,17 @@
         ];
     }
 
+    function deleteIngrdient(index: number)
+    {
+        if (cache.ingredients.length === 1)
+            recipeEditAlertDrawerShow();
+        else
+        {
+            cache.ingredients.splice(index, 1);
+            cache = cache;
+        }
+    }
+
     function handleStepsSort(e: any)
     {
         const temp = cache.recipesteps[e.oldIndex];
@@ -148,6 +180,17 @@
                 timestamp: await getCurrentTimestamp()
             }
         ];
+    }
+
+    function deleteStep(index: number)
+    {
+        if (cache.recipesteps.length === 1)
+            recipeEditAlertDrawerShow();
+        else
+        {
+            cache.recipesteps.splice(index, 1);
+            cache = cache;
+        }
     }
 
     async function share()
@@ -200,7 +243,9 @@
         <div class="title no-margin">
             <h2>{data.video.youtubeTitle}</h2>
              <!-- TODO: possible infinite loop when used with history.back() -->
-            <Button kind="white" style="width: var(--space-xl);" icon={faAngleDown} on:click={() => goto("/")} />
+             {#if !isEditing}
+                <Button kind="white" style="width: var(--space-xl);" icon={faAngleDown} on:click={() => goto("/")} />
+            {/if}
         </div>
         <p class="statistics typo-body-2">
             {$_("page.recipe.viewCounts", { values: { count: unitizeViews(data.video.youtubeViewCount, $_("locale")) }})} · {data.video.channel}
@@ -233,10 +278,7 @@
                                 </div>
                             </div>
                             <div class="button-wrapper">
-                                <Button kind="transparent" size="small" icon={faTrash} on:click={() => {
-                                    cache.ingredients.splice(i, 1);
-                                    cache = cache;
-                                }} />
+                                <Button kind="transparent" size="small" icon={faTrash} on:click={() => deleteIngrdient(i)} />
                             </div>
                             <div class="button-wrapper handle">
                                 <Button kind="transparent" size="small" icon={faGripLinesVertical} />
@@ -281,10 +323,7 @@
                                     </div>
                                 </div>
                                 <div class="button-wrapper">
-                                    <Button kind="transparent" size="small" icon={faTrash} on:click={() => {
-                                        cache.recipesteps.splice(i, 1);
-                                        cache = cache;
-                                    }} />
+                                    <Button kind="transparent" size="small" icon={faTrash} on:click={() => deleteStep(i)} />
                                 </div>
                                 <div class="button-wrapper handle">
                                     <Button kind="transparent" size="small" icon={faGripLinesVertical} />
@@ -338,6 +377,8 @@
     </Modal>
     <ConfirmationDrawer bind:show={recipeSaveCancelDrawerShow} bind:hide={recipeSaveCancelDrawerHide} onConfirm={onEditCancel}
         confirmText={$_("page.recipe.leaveWithoutSaving")} />
+    <AlertDrawer heading="삭제할 수 없어요" text="마지막 재료 또는 단계는 삭제할 수 없어요."
+        bind:show={recipeEditAlertDrawerShow} bind:hide={recipeEditAlertDrawerHide} />
 {/if}
 
 <style lang="postcss">
