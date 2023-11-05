@@ -14,7 +14,9 @@
 
     let modifier = 1;
     let innerWidth = 0;
+    let innerHeight = 0;
     let drawerHeight = 0;
+    let drawerBottom = 0;
     let drawerBottomAdjustment = 0;
     let pressed = false;
     let startY = 0;
@@ -26,6 +28,7 @@
         const medium = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--space-m"));
         const fontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
         const scale = (innerWidth - medium * fontSize * modifier) / innerWidth;
+        drawerBottom = -innerHeight * (1 - scale);
 
         const main = document.querySelector("main")!;
 
@@ -85,12 +88,13 @@
     }
 </script>
 
-<svelte:window bind:innerWidth />
+<svelte:window bind:innerWidth bind:innerHeight />
 
 {#if shown}
-    <div class="drawer" class:no-shrink={noBackgroundShrink} class:transition={!pressed} class:ios={device === "ios"} style="--bottom: {drawerBottomAdjustment}px;"
+    <div class="drawer" class:no-shrink={noBackgroundShrink} class:transition={!pressed} class:ios={device === "ios"}
+        style="--bottom: {drawerBottom - drawerBottomAdjustment}px;" bind:clientHeight={drawerHeight} 
         in:fly={{ y: "100vh", opacity: 1, easing: expoOut, duration: 600 }} out:fly={{ y: "100vh", opacity: 1, duration: 350 }}
-        bind:clientHeight={drawerHeight} on:touchstart={startTouch} on:touchmove={moveTouch} on:touchend={endTouch}>
+        on:touchstart={startTouch} on:touchmove={moveTouch} on:touchend={endTouch}>
         <div class="handle"  />
         {#if heading}
             <h3>{heading}</h3>
@@ -105,10 +109,10 @@
         width: calc(100% + var(--space-m));
         height: fit-content;
         padding: var(--space-xs);
-        padding-bottom: calc(var(--space-3xl) + var(--space-xs));
+        padding-bottom: calc(var(--space-3xl) + var(--space-m));
         position: fixed;
         left: calc(var(--space-xs) * -1);
-        bottom: calc(var(--space-xl) * -1 - var(--bottom));
+        bottom: var(--bottom);
         z-index: 999;
         display: flex;
         flex-direction: column;
