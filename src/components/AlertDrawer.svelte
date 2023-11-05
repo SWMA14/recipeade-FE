@@ -6,8 +6,8 @@
     import Drawer from "$components/Drawer.svelte";
     import main from "./__confirmationDrawerLowerBarComponents/main.svelte";
 
-    export let heading: string | undefined = undefined;
-    export let text: string | undefined = undefined;
+    export let heading: string;
+    export let text: string;
     export let shown = false;
     export let show: (() => void) | undefined = undefined;
     export let hide: (() => void) | undefined = undefined;

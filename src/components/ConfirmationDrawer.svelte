@@ -7,6 +7,8 @@
     import Drawer from "$components/Drawer.svelte";
     import main from "./__confirmationDrawerLowerBarComponents/main.svelte";
 
+    export let heading: string | undefined = undefined;
+    export let text: string | undefined = undefined;
     export let shown = false;
     export let show: (() => void) | undefined = undefined;
     export let hide: (() => void) | undefined = undefined;
@@ -38,9 +40,19 @@
     }
 </script>
 
-<Drawer bind:shown bind:show onShow={updateLowerBar} bind:hide onHide={cancelAndrevertDynamicBar}>
+<Drawer {heading} bind:shown bind:show onShow={updateLowerBar} bind:hide onHide={cancelAndrevertDynamicBar}>
+    {#if text}
+        <span class="text">{text}</span>
+    {/if}
     <Button kind="gray" on:click={() => {
             hide?.();
             cancelAndrevertDynamicBar();
         }}>{$_("page.cancel")}</Button>
 </Drawer>
+
+<style>
+    .text {
+        align-self: flex-start;
+        margin-bottom: var(--space-xs);
+    }
+</style>
