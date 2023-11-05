@@ -65,10 +65,7 @@
         if (await getAccessToken() !== null)
         {
             const pending = $savedVideos.filter(x => x.temporary);
-            const result = await authedFetch(`${PUBLIC_API_ENDPOINT}/customize/recipes`)
-                .then(response => response.status === 404 ? [] : response.json());
-            const videos = await Promise.all(result
-                .map(async (video: any) => convertApiToVideoData(video)));
+            const videos = await fetchSavedRecipes();
 
             $savedVideos = [
                 ...pending.filter(x => !videos.map(y => y.youtubeVideoId).includes(x.youtubeVideoId)),
@@ -79,6 +76,15 @@
 
         isRendered = true;
     });
+
+    async function fetchSavedRecipes(): Promise<VideoData[]>
+    {
+        const result = await authedFetch(`${PUBLIC_API_ENDPOINT}/customize/recipes`)
+            .then(response => response.status === 404 ? [] : response.json());
+
+        return await Promise.all(result
+            .map(async (video: any) => convertApiToVideoData(video)));
+    }
 
     async function addRecipe(link: string)
     {
@@ -118,6 +124,16 @@
                 temporary: true
             } as VideoData, ...$savedVideos];
         recipeAddDrawerHide();
+
+        const interval = setInterval(async () => {
+            const videos = await fetchSavedRecipes();
+
+            if (videos.find(x => x.youtubeVideoId === id)?.ingredients !== undefined)
+            {
+                clearInterval(interval);
+                $savedVideos = videos;
+            }
+        }, 1000);
     }
 
     async function endEditRecipes()
