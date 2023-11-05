@@ -30,11 +30,13 @@
 </script>
 
 {#if skeleton}
-    <Skeleton {leftMargin} {rightMargin} {bottomMargin}>
-        <div class="fitter" />
-    </Skeleton>
-    <Skeleton kind="body" bottomMargin="xs" />
-    <Skeleton kind="smallBody" bottomMargin="xs" />
+    <Card backgroundColor="white" noPadding {leftMargin} {rightMargin} {bottomMargin}>
+        <Skeleton bottomMargin="xs">
+            <div class="fitter" />
+        </Skeleton>
+        <Skeleton kind="body" bottomMargin="xs" />
+        <Skeleton kind="smallBody"/>
+    </Card>
 {:else}
     <Card backgroundColor={selected ? "gray-900" : "gray-50"} visibleOverflow noPadding {leftMargin} {rightMargin} {bottomMargin}
         columnFlex scrollSnap>
