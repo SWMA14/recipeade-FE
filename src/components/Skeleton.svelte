@@ -49,7 +49,7 @@
     .skeleton {
         width: 100%;
         background-color: var(--gray-100);
-        animation: flicker 2s infinite alternate;
+        animation: flicker 1s infinite alternate;
         border-radius: var(--radius);
 
         &.heading {

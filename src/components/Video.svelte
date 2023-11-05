@@ -39,10 +39,7 @@
     <Card backgroundColor={selected ? "gray-900" : "gray-50"} visibleOverflow noPadding {leftMargin} {rightMargin} {bottomMargin}
         columnFlex scrollSnap>
         {#if video.temporary}
-            <div class="overlay">
-                <h2>{$_("page.home.addRecipePending")}</h2>
-                <div />
-            </div>
+            <!-- <div class="overlay" /> -->
         {/if}
         <a class:overflow={verbose} href={selectable || video.temporary ? "#" : `/${video.youtubeVideoId}`} on:click={onClick}>
             {#if verbose}
@@ -65,14 +62,14 @@
                     {/each}
                 </Carousel>
             {:else}
-                <div class="fitter">
+                <div class="fitter" class:pending={video.temporary}>
                     <div>
                         <img alt="영상 썸네일" src={video.youtubeThumbnail.replace("/default", "/sddefault")} />
                     </div>
                 </div>
             {/if}
         </a>
-        <div class="info" class:selected>
+        <div class="info" class:selected class:pending={video.temporary}>
             <a class="upper typo-body-1" href={selectable ? "#" : `/${video.youtubeVideoId}`} on:click={onClick}>{video.youtubeTitle}</a>
             <span class="lower typo-body-2">{video.channel} · {$_("page.recipe.viewCounts", { values: { count: unitizeViews(video.youtubeViewCount, $_("locale")) }})}</span>
             <div class="badges">
@@ -85,6 +82,16 @@
 {/if}
 
 <style lang="postcss">
+    @keyframes flicker {
+        0% {
+            opacity: 0.2;
+        }
+
+        100% {
+            opacity: 0.1;
+        }
+    }
+
     .overlay {
         width: 100%;
         height: 100%;
@@ -97,18 +104,12 @@
         overflow: hidden;
 
         & h2 {
-            color: var(--white);
             z-index: 3;
         }
+    }
 
-        & div {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            z-index: 2;
-            background-color: var(--gray-900);
-            opacity: 0.8;
-        }
+    .pending {
+        animation: flicker 1s infinite alternate;
     }
 
     .overflow {
