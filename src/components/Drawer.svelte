@@ -5,6 +5,7 @@
     import { stacks } from "../store";
 
     export let heading: string | undefined = undefined;
+    export let noBackgroundShrink = false;
     export let shown = false;
     export let onShow: (() => void) | undefined = undefined;
     export let onHide: (() => void) | undefined = undefined;
@@ -19,7 +20,7 @@
     let startY = 0;
     let oldY = 0;
 
-    $: if (shown)
+    $: if (!noBackgroundShrink && shown)
     {
         modifier = Math.min(1, 1 - ((oldY - startY) / drawerHeight));
         const medium = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--space-m"));
@@ -87,7 +88,7 @@
 <svelte:window bind:innerWidth />
 
 {#if shown}
-    <div class="drawer" class:transition={!pressed} class:ios={device === "ios"} style="--bottom: {drawerBottomAdjustment}px;"
+    <div class="drawer" class:no-shrink={noBackgroundShrink} class:transition={!pressed} class:ios={device === "ios"} style="--bottom: {drawerBottomAdjustment}px;"
         in:fly={{ y: "100vh", opacity: 1, easing: expoOut, duration: 600 }} out:fly={{ y: "100vh", opacity: 1, duration: 350 }}
         bind:clientHeight={drawerHeight} on:touchstart={startTouch} on:touchmove={moveTouch} on:touchend={endTouch}>
         <div class="handle"  />
@@ -96,8 +97,7 @@
         {/if}
         <slot />
     </div>
-    <div class="overlay" role="button" tabindex="0" style="--modifier: {modifier};"
-        on:keydown={hide} on:click={hide} transition:fade={{ duration: 350 }} />
+    <div class="overlay" role="button" tabindex="0" style="--modifier: {modifier};" on:keydown={hide} on:click={hide} transition:fade={{ duration: 350 }} />
 {/if}
 
 <style lang="postcss">
@@ -116,6 +116,12 @@
         background-color: var(--white);
         border-radius: var(--radius) var(--radius) 0 0;
         touch-action: none;
+
+        &.no-shrink {
+            width: 100%;
+            left: 0;
+            bottom: calc(var(--bottom) * -1);
+        }
 
         &.transition {
             transition: top 0.25s;

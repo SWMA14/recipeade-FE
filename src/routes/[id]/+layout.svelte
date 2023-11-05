@@ -23,7 +23,7 @@
     {
         player = Player(player, options);
         player.loadVideoById(data.id);
-        sharedPlayer.set(player);
+        $sharedPlayer = player;
     }
 
     beforeNavigate(({ from }) => {
