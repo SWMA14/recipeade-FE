@@ -3,6 +3,7 @@
     "page": {
         "cancel": "Cancel",
         "confirm": "Confirm",
+        "showAll": "Show All",
         "login": {
             "slogan": "Just Like Ade,<br>Cooling Down<br>Discomforts",
             "signInWithApple": "Continue with Apple",
@@ -56,7 +57,8 @@
             "featured": "Recommend<br>To You",
             "trendingOnYouTube": "Trending on YouTube",
             "easyToFollow": "Easy to follow",
-            "others": "There's a lot more"
+            "others": "There's a lot more",
+            "searchPlaceholder": "What are you cooking today?"
         },
         "recipe": {
             "autoNextStep": "Auto Next",

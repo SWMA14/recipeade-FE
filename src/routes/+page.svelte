@@ -181,7 +181,7 @@
     {/if}
     {#if !isRendered}
         {#each Array(3) as _}
-            <Video video={DUMMY_VIDEO} bottomMargin="xs" skeleton />
+            <Video skeleton video={DUMMY_VIDEO} bottomMargin="xs" />
         {/each}
     {:else}
         {#key isEditing}

@@ -4,14 +4,12 @@
     import type { Writable } from "svelte/store";
     import { MetaTags } from "svelte-meta-tags";
     import { allVideos } from "../../store";
-    import { goto } from "$app/navigation";
+    import { PUBLIC_API_ENDPOINT } from "$env/static/public";
     import { DUMMY_VIDEO } from "$lib/dummy";
     import type { DynamicBarContext } from "$lib/dynamicBar";
-    import type { VideoData } from "$lib/video";
+    import { type VideoData, type VideoOverview, VideoOverviewToEmptyData } from "$lib/video";
     import Carousel from "$components/Carousel.svelte";
     import Card from "$components/Card.svelte";
-    import Input from "$components/Input.svelte";
-    import Skeleton from "$components/Skeleton.svelte";
     import Video from "$components/Video.svelte";
     import main from "../__lowerBarComponents/main.svelte";
 
@@ -29,24 +27,37 @@
     let device: "ios" | "android" | "web" = getContext("device");
     let isRendered = false;
 
-    let random: VideoData;
-    let rest: VideoData[];
+    let random: VideoOverview;
+    let rest: VideoOverview[];
     let highViews: VideoData[];
-    let easy: VideoData[];
     let others: VideoData[];
 
     onMount(async () => {
-        // if ($allVideos.length === 0)
-        //     $allVideos = await fetch(`${PUBLIC_API_ENDPOINT}/recipe`)
-        //         .then(response => response.json())
-        //         .then(result => result as VideoData[]);
+        if ($allVideos.length === 0)
+        {
+            const result = await fetch(`${PUBLIC_API_ENDPOINT}/customize/getAllDefaults`)
+                .then(response => response.json());
+            $allVideos = await Promise.all(result.map(async (video: any) => {
+                const info = await fetch("/api/videoInfo", {
+                    method: "POST",
+                    body: video["video_id"]
+                }).then(response => response.json());
+
+                return {
+                    id: video["video_id"],
+                    ...info
+                } as VideoOverview;
+            }));
+        }
 
         random = $allVideos.sort(() => 0.5 - Math.random())[0];
         rest = $allVideos.filter(x => x !== random);
 
-        highViews = rest.sort((a, b) => b.youtubeViewCount - a.youtubeViewCount).slice(0, 5);
-        easy = rest.filter(x => x.difficulty <= 2);
-        others = rest.filter(x => !highViews.includes(x) && !easy.includes(x));
+        const tempHighViews = rest.sort((a, b) => b.viewCount - a.viewCount).slice(0, 5);
+        const tempOthers = rest.filter(x => !tempHighViews.includes(x));
+
+        highViews = tempHighViews.map(VideoOverviewToEmptyData);
+        others = tempOthers.map(VideoOverviewToEmptyData);
 
         isRendered = true;
     });
@@ -80,20 +91,22 @@
     {#if !isRendered}
         <Card skeleton noRadius largePadding square squareOverflowSafeArea={device === "ios"} />
     {:else}
-        <a href="/{random.youtubeVideoId}" style="height: 120%;">
-            <Card video={random.youtubeVideoId} noRadius largePadding darkOverlay={0.7}
+        <a href="/{random.id}" style="height: 120%;">
+            <Card video={random.id} noRadius largePadding darkOverlay={0.7}
                 square squareOverflowSafeArea={device === "ios"}
-                heading={$_("page.discover.featured")} modifier={random.channel.ChannelName} body={random.youtubeTitle} />
+                heading={$_("page.discover.featured")} modifier={random.channel} body={random.title} />
         </a>
     {/if}
 </div>
 <div class="section">
-    <Card>
-        <a class="fake-input" href="/search">어떤 요리를 해 볼까요?</a>
+    <Card skeleton={!isRendered}>
+        {#if isRendered}
+            <a class="fake-input" href="/search">{$_("page.discover.searchPlaceholder")}</a>
+        {/if}
     </Card>
 </div>
 <div class="section">
-    <Carousel skeleton={!isRendered} leftOverflow rightOverflow heading={$_("page.discover.trendingOnYouTube")} canShowAll>
+    <Carousel leftOverflow rightOverflow heading={isRendered ? $_("page.discover.trendingOnYouTube") : undefined} canShowAll={isRendered}>
         {#if !isRendered}
             <Video skeleton video={DUMMY_VIDEO} leftMargin="xs" rightMargin="xs" />
             <Video skeleton video={DUMMY_VIDEO} />
@@ -105,26 +118,7 @@
         <svelte:fragment slot="grid">
             {#if isRendered}
                 {#each highViews as video, i (video.youtubeThumbnail)}
-                    <Video {video} verbose bottomMargin="xs" />
-                {/each}
-            {/if}
-        </svelte:fragment>
-    </Carousel>
-</div>
-<div class="section">
-    <Carousel skeleton={!isRendered} leftOverflow rightOverflow heading={$_("page.discover.easyToFollow")} canShowAll>
-        {#if !isRendered}
-            <Video skeleton video={DUMMY_VIDEO} leftMargin="xs" rightMargin="xs" />
-            <Video skeleton video={DUMMY_VIDEO} />
-        {:else}
-            {#each easy as video, i (video.youtubeThumbnail)}
-                <Video {video} leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" />
-            {/each}
-        {/if}
-        <svelte:fragment slot="grid">
-            {#if isRendered}
-                {#each easy as video (video.youtubeThumbnail)}
-                    <Video {video} verbose bottomMargin="xs" />
+                    <Video {video} bottomMargin={i === highViews.length - 1 ? undefined : "xs"} />
                 {/each}
             {/if}
         </svelte:fragment>
@@ -132,9 +126,6 @@
 </div>
 <div class="section last" class:ios={device === "ios"}>
     {#if !isRendered}
-        <div class="grid-title">
-            <Skeleton />
-        </div>
         <div class="grid">
             <Video skeleton video={DUMMY_VIDEO} bottomMargin="xs" />
             <Video skeleton video={DUMMY_VIDEO} />
@@ -143,7 +134,7 @@
         <h2 class="grid-title">{$_("page.discover.others")}</h2>
         <div class="grid">
             {#each others as video (video.youtubeThumbnail)}
-                <Video {video} verbose bottomMargin="xs" />
+                <Video {video} bottomMargin="xs" />
             {/each}
         </div>
     {/if}
@@ -165,10 +156,10 @@
         }
 
         &.last {
-            margin-bottom: var(--space-3xl);
+            padding-bottom: var(--space-3xl);
 
             &.ios {
-                margin-bottom: calc(var(--space-3xl) + var(--space-2xs));
+                padding-bottom: calc(var(--space-3xl) + var(--space-2xs));
             }
         }
     }

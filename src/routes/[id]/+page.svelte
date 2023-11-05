@@ -14,7 +14,7 @@
     import { tags } from "$lib/tag";
     import { flyingFade } from "$lib/transition";
     import { type VideoData, convertVideoDataToApi, unitizeViews } from "$lib/video";
-    import { allVideos, sharedPlayer } from "../../store";
+    import { savedVideos, sharedPlayer } from "../../store";
     import AlertDrawer from "$components/AlertDrawer.svelte";
     import AsymmetricGrid from "$components/AsymmetricGrid.svelte";
     import Badge from "$components/Badge.svelte";
@@ -32,7 +32,7 @@
 
     export let data;
 
-    let recipe = $allVideos.find(x => x.youtubeVideoId === data.id) ?? data.video;
+    let recipe = $savedVideos.find(x => x.youtubeVideoId === data.id) ?? data.video;
     let cache = {} as VideoData;
     let isEditing = false;
     let recipeSaveCancelDrawerShow: () => void;
@@ -92,8 +92,6 @@
 
     function saveRecipe()
     {
-        // const index = $allVideos.findIndex(x => x.youtubeVideoId === data.id);
-        // $allVideos[index] = structuredClone(cache);
         recipe = cache;
 
         console.log(authedFetch(`${PUBLIC_API_ENDPOINT}/customize/update/${data.video.id}`, {
@@ -107,7 +105,7 @@
 
     function onEditStart()
     {
-        cache = structuredClone($allVideos.find(x => x.youtubeVideoId === data.id) ?? data.video);
+        cache = structuredClone($savedVideos.find(x => x.youtubeVideoId === data.id) ?? data.video);
         isEditing = true;
     }
 

@@ -211,12 +211,12 @@
                 {/each}
             </Carousel>
         </div>
-    {:else if !isSurveyed}
+    <!-- {:else if !isSurveyed}
         <div class="survey">
             {#each $allVideos as video (video.youtubeThumbnail)}
                 <Video {video} selectable verbose bottomMargin="xs" />
             {/each}
-        </div>
+        </div> -->
     {/if}
 </div>
 <AlertDrawer heading={$_("page.login.refreshAlertTitle")} text={$_("page.login.refreshAlertText")}
