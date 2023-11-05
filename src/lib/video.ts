@@ -35,7 +35,7 @@ export interface VideoOverview
     id: string;
     title: string;
     thumbnail: string;
-    viewCount: number;
+    viewCounts: number;
     date: string;
     channel: string;
 }
@@ -45,7 +45,7 @@ export function VideoOverviewToEmptyData(video: VideoOverview): VideoData
     return {
         youtubeVideoId: video.id,
         youtubeTitle: video.title,
-        youtubeViewCount: video.viewCount,
+        youtubeViewCount: video.viewCounts,
         difficulty: 0,
         category: "",
         youtubeThumbnail: video.thumbnail,
