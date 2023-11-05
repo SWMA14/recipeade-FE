@@ -62,17 +62,8 @@
     });
 
     onMount(async () => {
-        if (await getAccessToken() !== null)
-        {
-            const pending = $savedVideos.filter(x => x.temporary);
-            const videos = await fetchSavedRecipes();
-
-            $savedVideos = [
-                ...pending.filter(x => !videos.map(y => y.youtubeVideoId).includes(x.youtubeVideoId)),
-                ...videos
-            ];
-            console.log($savedVideos)
-        }
+        if (await getAccessToken() !== null && $savedVideos.length === 0)
+            $savedVideos = await fetchSavedRecipes();
 
         isRendered = true;
     });
@@ -237,8 +228,8 @@
         </Card>
     {/if}
 </Drawer>
-<ConfirmationDrawer bind:show={recipeDeleteDrawerShow} bind:hide={recipeDeleteDrawerHide} onConfirm={endEditRecipes}
-    confirmText={$_("page.home.deleteRecipesConfirm")} />
+<ConfirmationDrawer heading={$_("page.recipe.deleteRecipeConfirmHeading")} text={$_("page.recipe.deleteRecipeConfirmText")}
+    bind:show={recipeDeleteDrawerShow} bind:hide={recipeDeleteDrawerHide} onConfirm={endEditRecipes} confirmText={$_("page.home.deleteRecipesConfirm")} />
 
 <style lang="postcss">
     .section {
