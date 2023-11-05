@@ -251,7 +251,7 @@
             <h2>{data.video.youtubeTitle}</h2>
              <!-- TODO: possible infinite loop when used with history.back() -->
              {#if !isEditing}
-                <Button kind="white" style="width: var(--space-xl);" icon={faAngleDown} on:click={() => goto("/")} />
+                <Button kind="white" style="width: var(--space-xl);" icon={faAngleDown} on:click={() => history.back()} />
             {/if}
         </div>
         <p class="statistics typo-body-2">
