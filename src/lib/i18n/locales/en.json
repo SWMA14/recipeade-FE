@@ -77,7 +77,12 @@
             "goBack": "Go back",
             "shareText": "Discover and easily follow the key highlights in YouTube recipe videos, with Recipeade.",
             "viewCounts": "{count} views",
-            "leaveWithoutSaving": "Leave without saving"
+            "leaveWithoutSaving": "Leave without saving",
+            "saved": "Saved",
+            "deleteIngredientsOrStepsAlertHeading": "Unable to delete",
+            "deleteIngredientsOrStepsAlertText": "The last ingredient or step cannot be deleted.",
+            "deleteRecipeConfirmHeading": "Delete recipe?",
+            "deleteRecipeConfirmText": "Deleting the recipe will remove all the changes you made as well."
         }
     }
 }

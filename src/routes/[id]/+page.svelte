@@ -40,6 +40,8 @@
     let recipeEditAlertDrawerShow: () => void;
     let recipeEditAlertDrawerHide: () => void;
     let navigateDestination: NavigationTarget | null = null;
+    let recipeDeleteDrawerShow: () => void;
+    let recipeDeleteDrawerHide: () => void;
 
     $: anyChanges = JSON.stringify(recipe) !== JSON.stringify(cache);
     $: getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
@@ -80,6 +82,13 @@
             recipeSaveCancelDrawerShow();
         }
     });
+
+    function deleteRecipe()
+    {
+        authedFetch(`${PUBLIC_API_ENDPOINT}/customize/${data.video.id}`, {
+            method: "DELETE"
+        }).then(() => goto("/"));
+    }
 
     function saveRecipe()
     {
@@ -252,7 +261,9 @@
         </p>
         {#if !isEditing}
             <div class="buttons">
-                <Button icon={faCheck} style="width: fit-content;" rightMargin="xs">저장됨</Button>
+                <Button icon={faCheck} style="width: fit-content;" rightMargin="xs" on:click={recipeDeleteDrawerShow}>
+                    {$_("page.recipe.saved")}
+                </Button>
                 <Button kind="gray" icon={faShare} style="width: var(--space-xl);" rightMargin="xs" on:click={share} />
             </div>
         {/if}
@@ -377,8 +388,10 @@
     </Modal>
     <ConfirmationDrawer bind:show={recipeSaveCancelDrawerShow} bind:hide={recipeSaveCancelDrawerHide} onConfirm={onEditCancel}
         confirmText={$_("page.recipe.leaveWithoutSaving")} />
-    <AlertDrawer heading="삭제할 수 없어요" text="마지막 재료 또는 단계는 삭제할 수 없어요."
+    <AlertDrawer heading={$_("page.recipe.deleteIngredientsOrStepsAlertHeading")} text={$_("page.recipe.deleteIngredientsOrStepsAlertText")}
         bind:show={recipeEditAlertDrawerShow} bind:hide={recipeEditAlertDrawerHide} />
+    <ConfirmationDrawer heading={$_("page.recipe.deleteRecipeConfirmHeading")} text={$_("page.recipe.deleteRecipeConfirmText")} bind:show={recipeDeleteDrawerShow} bind:hide={recipeDeleteDrawerHide}
+        onConfirm={deleteRecipe} confirmText={$_("page.home.deleteRecipesConfirm")} />
 {/if}
 
 <style lang="postcss">

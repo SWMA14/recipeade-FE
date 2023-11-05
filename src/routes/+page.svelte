@@ -66,8 +66,7 @@
         {
             const pending = $savedVideos.filter(x => x.temporary);
             const result = await authedFetch(`${PUBLIC_API_ENDPOINT}/customize/recipes`)
-                .then(response => response.json())
-                .catch(() => []);
+                .then(response => response.status === 404 ? [] : response.json());
             const videos = await Promise.all(result
                 .map(async (video: any) => convertApiToVideoData(video)));
 
