@@ -86,7 +86,7 @@ export async function convertApiToVideoData(video: any): Promise<VideoData>
 {
     const info = await fetch("/api/videoInfo", {
         method: "POST",
-        body: `http://youtu.be/${video["sourceId"]}`
+        body: video["sourceId"]
     }).then(response => response.json());
 
     return {

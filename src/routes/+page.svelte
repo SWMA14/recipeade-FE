@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { faPlus, faXmark } from "@fortawesome/free-solid-svg-icons";
+    import { faPlus } from "@fortawesome/free-solid-svg-icons";
     import { _ } from "svelte-i18n";
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
@@ -15,6 +15,7 @@
     import ConfirmationDrawer from "$components/ConfirmationDrawer.svelte";
     import Drawer from "$components/Drawer.svelte";
     import Input from "$components/Input.svelte";
+    import Skeleton from "$components/Skeleton.svelte";
     import Video from "$components/Video.svelte";
     import leading from "./__lowerBarComponents/leading.svelte";
     import main from "./__lowerBarComponents/main.svelte";
@@ -27,18 +28,27 @@
     let recipeAddDrawerValue: string;
     let recipeAddAlreadyExists = false;
     let recipeAddInvalid = false;
+    let recipeAddLanguage = $_("locale");
+    let recipeAddPreview: Promise<any> | undefined = undefined;
     let selectedVideos: VideoData[] = [];
     let recipeDeleteDrawerShow: () => void;
     let recipeDeleteDrawerHide: () => void;
+
+    $: recipeAddId = recipeAddDrawerValue?.match(/.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/)?.[1];
+    $: recipeAddPreview = recipeAddId && recipeAddId.length === 11 ? fetch("/api/videoInfo", {
+            method: "POST",
+            body: recipeAddId
+        }).then(response => response?.json()) : undefined;
 
     getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
         isHidden: true
     });
     $: getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
-        leading: isEditing ? leading : undefined,
+        leading: isEditing || recipeAddDrawerShown ? leading : undefined,
         leadingProps: {
             isEditing,
-            onEditCancel: exitEditRecipes
+            onEditCancel: exitEditRecipes,
+            onAddCancel: recipeAddDrawerHide
         },
         main,
         mainProps: {
@@ -127,6 +137,12 @@
         selectedVideos = [];
     }
 
+    function exitAddRecipe()
+    {
+        recipeAddDrawerValue = "";
+        recipeAddPreview = undefined;
+    }
+
     function onVideoSelect(selected: boolean, video: VideoData)
     {
         if (selected)
@@ -169,10 +185,33 @@
     {/if}
 </div>
 <Drawer heading={$_("page.home.addRecipeModalTitle")} bind:shown={recipeAddDrawerShown}
-    bind:show={recipeAddDrawerShow} bind:hide={recipeAddDrawerHide}>
-    <img src="/images/guide-link-copy.png" alt="링크 복사 방법" />
+    bind:show={recipeAddDrawerShow} bind:hide={recipeAddDrawerHide} onHide={exitAddRecipe}>
     <span class="add guide">{$_("page.home.addRecipeModalDescription")}</span>
     <Input placeholder={$_("page.home.addRecipeModalInputPlaceholder")} valueChanged={value => recipeAddDrawerValue = value} />
+    {#if recipeAddPreview}
+        {#await recipeAddPreview}
+            <Skeleton kind="body" lines={2} topMargin="xs" />
+        {:then preview}
+            <div class="preview">
+                <img src={preview["thumbnail"].replace("sddefault", "mqdefault")} alt="레시피 썸네일" />
+                <div class="info">
+                    <span>{preview["title"]}</span>
+                    <span class="typo-body-2">{preview["channel"]}</span>
+                </div>
+            </div>
+        {/await}
+    {/if}
+    <div class="languages">
+        <span>{$_("page.home.addRecipeModalLanguageTitle")}</span>
+        <div class="buttons">
+            <Button kind="gray" rightMargin="xs" selected={recipeAddLanguage === "ko"} on:click={() => recipeAddLanguage = "ko"}>
+                {$_("page.home.addRecipeModalLanguageKo")}
+            </Button>
+            <Button kind="gray" selected={recipeAddLanguage === "en"} on:click={() => recipeAddLanguage = "en"}>
+                {$_("page.home.addRecipeModalLanguageEn")}
+            </Button>
+        </div>
+    </div>
     {#if recipeAddInvalid}
         <Card backgroundColor="danger-100" topMargin="xs">
             {$_("page.home.addRecipeModalInvalidLink")}
@@ -207,7 +246,47 @@
         }
 
         &.guide {
-            margin: var(--space-xs) 0;
+            margin-bottom: var(--space-xs);
+        }
+    }
+
+    .preview {
+        width: 100%;
+        height: var(--space-3xl);
+        margin-top: var(--space-xs);
+        display: flex;
+
+        & img {
+            height: 100%;
+            margin-right: var(--space-2xs);
+            border-radius: var(--radius);
+        }
+
+        & .info {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+
+            & span:nth-child(1) {
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+
+            & span:nth-child(2) {
+                color: var(--gray-800);
+            }
+        }
+
+    }
+
+    .languages {
+        width: 100%;
+        margin-top: var(--space-m);
+
+        & .buttons {
+            margin-top: var(--space-xs);
+            display: flex;
         }
     }
 
