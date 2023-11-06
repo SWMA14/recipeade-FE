@@ -66,22 +66,12 @@
     let isCommentsTipExpanded = false;
     let isIngredientsExpanded = false;
 
-    let stepsWidth: Promise<string>[];
-
     onMount(async () => {
         analyticsService.setScreenName("recipe_cook");
         analyticsService.logEvent("recipe_cook_page", {
             page_title: "recipe_cook_page"
         });
         isRendered = true;
-
-        stepsWidth = steps.map(async (step, i) => {
-            const duration = await player.getDuration();
-            const start = step.seconds;
-            const end = i + 1 < steps.length ? steps[i + 1].seconds : duration;
-
-            return `calc(200vw * ${(end - start) / duration})`;
-        });
 
         window.addEventListener("message", event => {
             if (player && event.source === videoContentWindow)
@@ -200,13 +190,11 @@
             <div style="margin-top: 1rem;">
                 <Carousel leftOverflow rightOverflow>
                     {#each [...Array(steps.length).keys()] as i}
-                        {#await stepsWidth[i] then width}
                         <Button id="step-button-{i}" on:click={() => selectStep(i)} selected={i === selectedStep}
                             leftMargin={i === 0 ? "m" : undefined} rightMargin={i < steps.length - 1 ? "xs" : "m"}
                             progress={i === selectedStep ? $progress * 100 : 0}>
-                            <div style="min-width: var(--space-xs); width: {width}; max-width: 50vw;">{i + 1}</div>
+                            <div style="width: var(--space-3xl);">{i + 1}</div>
                         </Button>
-                        {/await}
                     {/each}
                 </Carousel>
             </div>
