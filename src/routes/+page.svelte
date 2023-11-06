@@ -160,14 +160,18 @@
 
 <div class="section" in:flyingFade={{ delay: 0 }}>
     <div class="title">
-        <h1>{@html $_("page.home.greeting")}</h1>
-        <div class="buttons">
-            <Button kind="transparent" size="small" on:click={() => isEditing ? exitEditRecipes() : isEditing = true}>
-                {$_("page.home.editRecipes")}
-            </Button>
-        </div>
+        {#if !isRendered}
+            <Skeleton kind="heading" lines={2} />
+        {:else}
+            <h1>{@html $_("page.home.greeting")}</h1>
+            <div class="buttons">
+                <Button kind="transparent" size="small" on:click={() => isEditing ? exitEditRecipes() : isEditing = true}>
+                    {$_("page.home.editRecipes")}
+                </Button>
+            </div>
+        {/if}
     </div>
-    {#if !isEditing}
+    {#if !isEditing && isRendered}
         <Button kind="gray" icon={faPlus} bottomMargin="xs" on:click={recipeAddDrawerShow}>{$_("page.home.addRecipe")}</Button>
     {/if}
     {#if !isRendered}

@@ -30,7 +30,7 @@
 </script>
 
 {#if skeleton}
-    <Card backgroundColor="white" noPadding {leftMargin} {rightMargin} {bottomMargin}>
+    <Card backgroundColor="white" noRadius noPadding {leftMargin} {rightMargin} {bottomMargin}>
         <Skeleton bottomMargin="xs">
             <div class="fitter" />
         </Skeleton>
