@@ -3,7 +3,7 @@
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
     import { MetaTags } from "svelte-meta-tags";
-    import { allVideos } from "../../store";
+    import { allVideos, savedVideos } from "../../store";
     import { PUBLIC_API_ENDPOINT } from "$env/static/public";
     import { DUMMY_VIDEO } from "$lib/dummy";
     import type { DynamicBarContext } from "$lib/dynamicBar";
@@ -112,13 +112,15 @@
             <Video skeleton video={DUMMY_VIDEO} />
         {:else}
             {#each highViews as video, i (video.youtubeThumbnail)}
-                <Video {video} leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" />
+                <Video {video} leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs"
+                    saved={$savedVideos.some(x => x.youtubeVideoId === video.youtubeVideoId)} />
             {/each}
         {/if}
         <svelte:fragment slot="grid">
             {#if isRendered}
                 {#each highViews as video, i (video.youtubeThumbnail)}
-                    <Video {video} bottomMargin={i === highViews.length - 1 ? undefined : "xs"} />
+                    <Video {video} bottomMargin={i === highViews.length - 1 ? undefined : "xs"}
+                        saved={$savedVideos.some(x => x.youtubeVideoId === video.youtubeVideoId)} />
                 {/each}
             {/if}
         </svelte:fragment>
@@ -134,7 +136,7 @@
         <h2 class="grid-title">{$_("page.discover.others")}</h2>
         <div class="grid">
             {#each others as video (video.youtubeThumbnail)}
-                <Video {video} bottomMargin="xs" />
+                <Video {video} bottomMargin="xs" saved={$savedVideos.some(x => x.youtubeVideoId === video.youtubeVideoId)} />
             {/each}
         </div>
     {/if}

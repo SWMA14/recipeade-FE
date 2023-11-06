@@ -1,5 +1,7 @@
 <script lang="ts">
     import { _ } from "svelte-i18n";
+    import { faBookmark } from "@fortawesome/free-solid-svg-icons";
+    import Fa from "svelte-fa";
     import { surveyedVideos } from "../store";
     import { getCategoryById } from "$lib/category";
     import type { SpaceType } from "$lib/types";
@@ -18,6 +20,7 @@
     export let selectable = false;
     export let selected = false;
     export let onSelect: ((selected: boolean, video: VideoData) => void) | undefined = undefined;
+    export let saved = false;
 
     function onClick()
     {
@@ -43,6 +46,11 @@
         {#if video.temporary}
             <!-- <div class="overlay" /> -->
         {/if}
+        {#if saved}
+            <div class="saved-label">
+                <Fa icon={faBookmark} />
+            </div>
+        {/if}
         <a class:overflow={verbose} href={selectable || video.temporary ? "#" : `/${video.youtubeVideoId}`} on:click={onClick}>
             {#if verbose}
                 <Carousel>
@@ -65,7 +73,7 @@
                 </Carousel>
             {:else}
                 <div class="fitter" class:pending={video.temporary}>
-                    <div>
+                    <div class="image">
                         <img alt="영상 썸네일" src={video.youtubeThumbnail.replace("/default", "/sddefault")} />
                     </div>
                 </div>
@@ -133,7 +141,7 @@
         border-radius: var(--radius);
         overflow: hidden;
 
-        & div {
+        & .image {
             position: absolute;
             top: -16.75%;
             bottom: 0;
@@ -148,6 +156,21 @@
 
     .left-margin {
         margin-left: var(--space-xs);
+    }
+
+    .saved-label {
+        width: var(--space-xl);
+        height: var(--space-xl);
+        position: absolute;
+        top: 0;
+        left: calc(100% - var(--space-xl));
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--white);
+        border-radius: 0 0 0 var(--radius);
+        color: var(--primary-500);
     }
 
     .info {
