@@ -86,7 +86,8 @@
             "deleteIngredientsOrStepsAlertHeading": "Unable to delete",
             "deleteIngredientsOrStepsAlertText": "The last ingredient or step cannot be deleted.",
             "deleteRecipeConfirmHeading": "Delete recipe?",
-            "deleteRecipeConfirmText": "Deleting the recipe will remove all the changes you made as well."
+            "deleteRecipeConfirmText": "Deleting the recipe will remove all the changes you made as well.",
+            "overviewSave": "Save"
         }
     }
 }

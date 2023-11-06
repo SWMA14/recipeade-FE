@@ -86,7 +86,8 @@
             "deleteIngredientsOrStepsAlertHeading": "삭제할 수 없어요",
             "deleteIngredientsOrStepsAlertText": "마지막 재료 또는 단계는 삭제할 수 없어요.",
             "deleteRecipeConfirmHeading": "레시피를 삭제할까요?",
-            "deleteRecipeConfirmText": "레시피를 삭제하면 모든 수정 사항들도 사라져요."
+            "deleteRecipeConfirmText": "레시피를 삭제하면 모든 수정 사항들도 사라져요.",
+            "overviewSave": "저장하기"
         }
     }
 }
