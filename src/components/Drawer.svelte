@@ -17,7 +17,6 @@
     let innerWidth = 0;
     let innerHeight = 0;
     let drawerHeight = 0;
-    let drawerBottom = 0;
     let drawerBottomAdjustment = 0;
     let pressed = false;
     let startY = 0;
@@ -29,7 +28,6 @@
         const medium = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--space-m"));
         const fontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
         const scale = (innerWidth - medium * fontSize * modifier) / innerWidth;
-        drawerBottom = -innerHeight * (1 - scale);
 
         const main = document.querySelector("main")!;
 
@@ -60,6 +58,11 @@
         shown = false;
         $stacks = $stacks.slice(0, -1);
         onHide?.();
+    }
+
+    function moveToRoot(node: HTMLElement)
+    {
+        document.body.appendChild(node);
     }
 
     function startTouch(e: MouseEvent | TouchEvent)
@@ -93,10 +96,10 @@
 
 {#if shown}
     <div class="drawer" class:no-shrink={noBackgroundShrink} class:transition={!pressed} class:ios={device === "ios"}
-        class:no-bottom-padding={noBottomPadding} style="--bottom: {drawerBottom - drawerBottomAdjustment}px;" bind:clientHeight={drawerHeight} 
+        class:no-bottom-padding={noBottomPadding} style="--bottom: -{drawerBottomAdjustment}px;" bind:clientHeight={drawerHeight} 
         in:fly={{ y: "100vh", opacity: 1, easing: expoOut, duration: 600 }} out:fly={{ y: "100vh", opacity: 1, duration: 350 }}
-        on:touchstart={startTouch} on:touchmove={moveTouch} on:touchend={endTouch}>
-        <div class="handle"  />
+        on:touchstart={startTouch} on:touchmove={moveTouch} on:touchend={endTouch} use:moveToRoot>
+        <div class="handle" />
         {#if heading}
             <h3>{heading}</h3>
         {/if}
@@ -107,15 +110,15 @@
 
 <style lang="postcss">
     .drawer {
-        width: calc(100% + var(--space-m));
+        width: 100%;
         height: fit-content;
-        max-height: 100%;
+        max-height: 90%;
         padding: var(--space-xs);
         padding-bottom: calc(var(--space-3xl) + var(--space-m));
         position: fixed;
-        left: calc(var(--space-xs) * -1);
-        bottom: var(--bottom);
-        z-index: 999;
+        left: 0;
+        bottom: calc(var(--bottom) - var(--space-xs));
+        z-index: 998;
         display: flex;
         flex-direction: column;
         align-items: center;
