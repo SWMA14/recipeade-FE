@@ -116,7 +116,7 @@
             transition: width 0.5s cubic-bezier(0.32, 0.72, 0, 1) 0s;
 
             &.fitted {
-                width: calc(100% - var(--space-2xl) * 4);
+                width: calc(100% - var(--space-xl) * 4);
             }
 
             &.ios {
