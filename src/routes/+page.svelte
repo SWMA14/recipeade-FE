@@ -172,7 +172,11 @@
             </div>
         {/if}
     </div>
-    {#if !isEditing && isRendered}
+    {#if !isRendered}
+        <Card skeleton bottomMargin="xs">
+            <div style="height: var(--space-xs);" />
+        </Card>
+    {:else if !isEditing}
         <Button kind="gray" icon={faPlus} bottomMargin="xs" on:click={recipeAddDrawerShow}>{$_("page.home.addRecipe")}</Button>
     {/if}
     {#if !isRendered}
