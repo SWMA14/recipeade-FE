@@ -44,14 +44,16 @@
     <Card backgroundColor={selected ? "gray-900" : "gray-50"} visibleOverflow noPadding {leftMargin} {rightMargin} {bottomMargin}
         columnFlex scrollSnap>
         {#if video.temporary}
-            <!-- <div class="overlay" /> -->
+            <div class="overlay">
+                <Skeleton />
+            </div>
         {/if}
         {#if saved}
             <div class="saved-label">
                 <Fa icon={faBookmark} />
             </div>
         {/if}
-        <a class:overflow={verbose} href={selectable || video.temporary ? "#" : `/${video.youtubeVideoId}`} on:click={onClick}>
+        <a class:overflow={verbose} class:pending={video.temporary} href={selectable || video.temporary ? "#" : `/${video.youtubeVideoId}`} on:click={onClick}>
             {#if verbose}
                 <Carousel>
                     <div class="verbose fitter left-margin">
@@ -72,7 +74,7 @@
                     {/each}
                 </Carousel>
             {:else}
-                <div class="fitter" class:pending={video.temporary}>
+                <div class="fitter">
                     <div class="image">
                         <img alt="영상 썸네일" src={video.youtubeThumbnail.replace("/default", "/sddefault")} />
                     </div>
@@ -92,16 +94,6 @@
 {/if}
 
 <style lang="postcss">
-    @keyframes flicker {
-        0% {
-            opacity: 0.2;
-        }
-
-        100% {
-            opacity: 0.1;
-        }
-    }
-
     .overlay {
         width: 100%;
         height: 100%;
@@ -112,6 +104,7 @@
         justify-content: center;
         border-radius: var(--radius);
         overflow: hidden;
+        opacity: 0.4;
 
         & h2 {
             z-index: 3;
@@ -119,7 +112,7 @@
     }
 
     .pending {
-        animation: flicker 1s infinite alternate;
+        opacity: 0.2;
     }
 
     .overflow {
