@@ -1,5 +1,7 @@
 <script lang="ts">
     import { _ } from "svelte-i18n";
+    import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+    import Fa from "svelte-fa";
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
     import { MetaTags } from "svelte-meta-tags";
@@ -101,14 +103,19 @@
 <div class="section">
     <Card skeleton={!isRendered}>
         {#if isRendered}
-            <a class="fake-input" href="/search">{$_("page.discover.searchPlaceholder")}</a>
+            <a class="fake-input" href="/search">
+                <div class="icon">
+                    <Fa icon={faMagnifyingGlass} />
+                </div>
+                {$_("page.discover.searchPlaceholder")}
+            </a>
         {/if}
     </Card>
 </div>
 <div class="section">
     <Carousel leftOverflow rightOverflow heading={isRendered ? $_("page.discover.trendingOnYouTube") : undefined} canShowAll={isRendered}>
         {#if !isRendered}
-            <Video skeleton video={DUMMY_VIDEO} leftMargin="xs" rightMargin="xs" />
+            <Video skeleton video={DUMMY_VIDEO} rightMargin="xs" />
             <Video skeleton video={DUMMY_VIDEO} />
         {:else}
             {#each highViews as video, i (video.youtubeThumbnail)}
@@ -167,8 +174,13 @@
     }
 
     .fake-input {
+        display: flex;
         color: var(--gray-400);
         line-height: 1;
+
+        & .icon {
+            width: var(--space-s);
+        }
     }
 
     .grid {
