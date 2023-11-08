@@ -158,10 +158,10 @@
         }
 
         &.last {
-            padding-bottom: var(--space-3xl);
+            padding-bottom: var(--space-m);
 
             &.ios {
-                padding-bottom: calc(var(--space-3xl) + var(--space-2xs));
+                padding-bottom: calc(var(--space-m) + var(--space-2xs));
             }
         }
     }

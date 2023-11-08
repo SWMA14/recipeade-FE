@@ -88,6 +88,7 @@
         flex-direction: column;
         align-items: center;
         background-color: var(--white);
+        overflow: hidden;
     }
 
     .navigation {
