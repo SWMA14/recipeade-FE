@@ -112,7 +112,7 @@
             <Video skeleton video={DUMMY_VIDEO} />
         {:else}
             {#each highViews as video, i (video.youtubeThumbnail)}
-                <Video {video} leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs"
+                <Video {video} leftMargin={i === 0 ? "xs" : undefined} rightMargin={i === highViews.length - 1 ? undefined : "xs"}
                     saved={$savedVideos.some(x => x.youtubeVideoId === video.youtubeVideoId)} />
             {/each}
         {/if}

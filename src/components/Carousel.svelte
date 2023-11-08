@@ -81,6 +81,7 @@
     }
 
     .scroll {
+        padding: 0 var(--space-xs);
         display: flex;
         scroll-snap-type: x mandatory;
         scroll-padding-left: var(--space-xs);
