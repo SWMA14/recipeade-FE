@@ -162,7 +162,7 @@
         width: var(--space-xl);
         height: var(--space-xl);
         position: absolute;
-        top: 0;
+        top: -1px;
         left: calc(100% - var(--space-xl));
         z-index: 1;
         display: flex;
