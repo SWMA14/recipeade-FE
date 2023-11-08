@@ -20,6 +20,7 @@
     import leading from "./__lowerBarComponents/leading.svelte";
     import main from "./__lowerBarComponents/main.svelte";
 
+    let device: "ios" | "android" | "web" = getContext("device");
     let isEditing = false;
     let isRendered = false;
     let recipeAddDrawerShown = false;
@@ -34,7 +35,7 @@
     let recipeDeleteDrawerShow: () => void;
     let recipeDeleteDrawerHide: () => void;
 
-    $: recipeAddId = recipeAddDrawerValue?.match(/.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/)?.[1];
+    $: recipeAddId = recipeAddDrawerValue?.match(/.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=)([^#\&\?]*).*/)?.[1];
     $: recipeAddPreview = recipeAddId && recipeAddId.length === 11 ? fetch("/api/videoInfo", {
             method: "POST",
             body: recipeAddId
@@ -158,7 +159,7 @@
     }
 </script>
 
-<div class="section" in:flyingFade={{ delay: 0 }}>
+<div class="section" class:ios={device === "ios"} in:flyingFade={{ delay: 0 }}>
     <div class="title">
         {#if !isRendered}
             <Skeleton kind="heading" lines={2} />
@@ -239,6 +240,10 @@
     .section {
         width: 100%;
         padding-bottom: var(--space-3xl);
+
+        &.ios {
+            padding-bottom: calc(var(--space-3xl) + var(--space-2xs));
+        }
     }
 
     .title {

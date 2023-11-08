@@ -105,7 +105,7 @@
         }
 
         &.ios {
-            padding-bottom: calc(var(--space-3xl) + var(--space-l));
+            padding-bottom: 0;
         }
     }
 
