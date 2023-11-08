@@ -3,6 +3,7 @@
     import { fade, fly } from "svelte/transition";
     import { expoOut } from "svelte/easing";
     import { stacks } from "../store";
+    import { beforeNavigate } from "$app/navigation";
 
     export let heading: string | undefined = undefined;
     export let noBackgroundShrink = false;
@@ -36,9 +37,7 @@
         document.body.classList.add("drawer-shown");
     }
 
-    onMount(() => {
-        return hide;
-    });
+    beforeNavigate(() => hide());
 
     export function show()
     {
@@ -146,7 +145,7 @@
 
         & .handle {
             width: var(--space-3xl);
-            height: var(--space-2xs);
+            min-height: var(--space-2xs);
             margin-bottom: var(--space-m);
             background-color: var(--gray-200);
             border-radius: var(--radius-big);
