@@ -5,4 +5,4 @@
     import Button from "$components/Button.svelte";
 </script>
 
-<Button on:click={() => goto(`/${$page.params.id}`)}>{$_("page.recipe.goBack")}</Button>
+<Button on:click={() => goto(`/${$page.params.id}`, { replaceState: true })}>{$_("page.recipe.goBack")}</Button>

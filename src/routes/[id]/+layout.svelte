@@ -1,6 +1,7 @@
 <script lang="ts">
     import Player from "youtube-player";
     import type { Options, YouTubePlayer } from "youtube-player/dist/types";
+    import { getContext } from "svelte";
     import { beforeNavigate } from "$app/navigation";
     import { sharedPlayer } from "../../store";
 
@@ -18,12 +19,13 @@
 
     let player: YouTubePlayer | HTMLElement;
     let playerHeight: number;
+    let device: "ios" | "android" | "web" = getContext("device");
 
     $: if (player)
     {
         player = Player(player, options);
         player.loadVideoById(data.id);
-        sharedPlayer.set(player);
+        $sharedPlayer = player;
     }
 
     beforeNavigate(({ from }) => {
@@ -34,21 +36,25 @@
 
 <div class="player-container" bind:clientHeight={playerHeight}>
     <div id="player" class="player" bind:this={player} />
-    <div class="background" />
 </div>
-<div class="content" style="--top: {playerHeight}px;">
+<div class="background" class:ios={device === "ios"} />
+<div class="content" class:ios={device === "ios"} style="--top: {playerHeight}px;">
     <slot />
 </div>
 
-<style>
+<style lang="postcss">
     .background {
         width: 100%;
         height: calc(100vw * 9 / 16);
         background-color: var(--gray-900);
-        position: absolute;
+        position: fixed;
         top: 0;
-        z-index: -1;
+        z-index: 1;
         border-radius: 0 0 var(--radius) var(--radius);
+
+        &.ios {
+            top: calc(env(safe-area-inset-top) * -1);
+        }
     }
 
     .player-container {

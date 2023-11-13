@@ -3,24 +3,29 @@
     import { fade, fly } from "svelte/transition";
     import { expoOut } from "svelte/easing";
     import { stacks } from "../store";
+    import { beforeNavigate } from "$app/navigation";
 
     export let heading: string | undefined = undefined;
+    export let noBackgroundShrink = false;
+    export let noBottomPadding = false;
     export let shown = false;
     export let onShow: (() => void) | undefined = undefined;
     export let onHide: (() => void) | undefined = undefined;
 
     const device: "ios" | "android" | "web" = getContext("device");
 
+    let modifier = 1;
     let innerWidth = 0;
+    let innerHeight = 0;
     let drawerHeight = 0;
     let drawerBottomAdjustment = 0;
     let pressed = false;
     let startY = 0;
     let oldY = 0;
 
-    $: if (shown)
+    $: if (!noBackgroundShrink && shown)
     {
-        const modifier = Math.min(1, 1 - ((oldY - startY) / drawerHeight));
+        modifier = Math.min(1, 1 - ((oldY - startY) / drawerHeight));
         const medium = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--space-m"));
         const fontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
         const scale = (innerWidth - medium * fontSize * modifier) / innerWidth;
@@ -32,9 +37,7 @@
         document.body.classList.add("drawer-shown");
     }
 
-    onMount(() => {
-        return hide;
-    });
+    beforeNavigate(() => hide());
 
     export function show()
     {
@@ -54,6 +57,11 @@
         shown = false;
         $stacks = $stacks.slice(0, -1);
         onHide?.();
+    }
+
+    function moveToRoot(node: HTMLElement)
+    {
+        document.body.appendChild(node);
     }
 
     function startTouch(e: MouseEvent | TouchEvent)
@@ -83,31 +91,33 @@
     }
 </script>
 
-<svelte:window bind:innerWidth />
+<svelte:window bind:innerWidth bind:innerHeight />
 
 {#if shown}
-    <div class="drawer" class:transition={!pressed} class:ios={device === "ios"} style="--bottom: {drawerBottomAdjustment}px;"
+    <div class="drawer" class:no-shrink={noBackgroundShrink} class:transition={!pressed} class:ios={device === "ios"}
+        class:no-bottom-padding={noBottomPadding} style="--bottom: -{drawerBottomAdjustment}px;" bind:clientHeight={drawerHeight} 
         in:fly={{ y: "100vh", opacity: 1, easing: expoOut, duration: 600 }} out:fly={{ y: "100vh", opacity: 1, duration: 350 }}
-        bind:clientHeight={drawerHeight} on:touchstart={startTouch} on:touchmove={moveTouch} on:touchend={endTouch}>
-        <div class="handle"  />
+        on:touchstart={startTouch} on:touchmove={moveTouch} on:touchend={endTouch} use:moveToRoot>
+        <div class="handle" />
         {#if heading}
             <h3>{heading}</h3>
         {/if}
         <slot />
     </div>
-    <div class="overlay" role="button" tabindex="0" on:keydown={hide} on:click={hide} transition:fade={{ duration: 350 }} />
+    <div class="overlay" role="button" tabindex="0" style="--modifier: {modifier};" on:keydown={hide} on:click={hide} transition:fade={{ duration: 350 }} />
 {/if}
 
 <style lang="postcss">
     .drawer {
-        width: calc(100% + var(--space-m));
+        width: 100%;
         height: fit-content;
+        max-height: 90%;
         padding: var(--space-xs);
-        padding-bottom: calc(var(--space-3xl) + var(--space-xs));
+        padding-bottom: calc(var(--space-3xl) + var(--space-m));
         position: fixed;
-        left: calc(var(--space-xs) * -1);
-        bottom: calc(var(--space-xl) * -1 - var(--bottom));
-        z-index: 999;
+        left: 0;
+        bottom: calc(var(--bottom) - var(--space-xs));
+        z-index: 998;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -115,17 +125,27 @@
         border-radius: var(--radius) var(--radius) 0 0;
         touch-action: none;
 
+        &.no-shrink {
+            width: 100%;
+            left: 0;
+            bottom: calc(var(--bottom) * -1);
+        }
+
+        &.no-bottom-padding {
+            padding-bottom: 0;
+        }
+
         &.transition {
             transition: top 0.25s;
         }
 
         &.ios {
-            padding-bottom: calc(var(--space-3xl) + var(--space-s));
+            padding-bottom: calc(var(--space-3xl) + var(--space-l));
         }
 
         & .handle {
             width: var(--space-3xl);
-            height: var(--space-2xs);
+            min-height: var(--space-2xs);
             margin-bottom: var(--space-m);
             background-color: var(--gray-200);
             border-radius: var(--radius-big);
@@ -144,7 +164,7 @@
         top: 0;
         left: 0;
         z-index: 998;
-        background-color: rgba(0, 0, 0, var(--overlay-opacity));
+        background-color: rgba(0, 0, 0, calc(var(--overlay-opacity) * var(--modifier)));
         overflow-x: hidden;
     }
 </style>

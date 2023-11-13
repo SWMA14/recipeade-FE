@@ -1,5 +1,7 @@
 <script lang="ts">
     import { _ } from "svelte-i18n";
+    import { faBookmark } from "@fortawesome/free-solid-svg-icons";
+    import Fa from "svelte-fa";
     import { surveyedVideos } from "../store";
     import { getCategoryById } from "$lib/category";
     import type { SpaceType } from "$lib/types";
@@ -18,6 +20,7 @@
     export let selectable = false;
     export let selected = false;
     export let onSelect: ((selected: boolean, video: VideoData) => void) | undefined = undefined;
+    export let saved = false;
 
     function onClick()
     {
@@ -30,21 +33,27 @@
 </script>
 
 {#if skeleton}
-    <Skeleton {leftMargin} {rightMargin} {bottomMargin}>
-        <div class="fitter" />
-    </Skeleton>
-    <Skeleton kind="body" bottomMargin="xs" />
-    <Skeleton kind="smallBody" bottomMargin="xs" />
+    <Card backgroundColor="white" noRadius noPadding {leftMargin} {rightMargin} {bottomMargin}>
+        <Skeleton bottomMargin="xs">
+            <div class="fitter" />
+        </Skeleton>
+        <Skeleton kind="body" bottomMargin="xs" />
+        <Skeleton kind="smallBody"/>
+    </Card>
 {:else}
     <Card backgroundColor={selected ? "gray-900" : "gray-50"} visibleOverflow noPadding {leftMargin} {rightMargin} {bottomMargin}
         columnFlex scrollSnap>
         {#if video.temporary}
             <div class="overlay">
-                <h2>{$_("page.home.addRecipePending")}</h2>
-                <div />
+                <Skeleton />
             </div>
         {/if}
-        <a class:overflow={verbose} href={selectable || video.temporary ? "#" : `/${video.youtubeVideoId}`} on:click={onClick}>
+        {#if saved}
+            <div class="saved-label">
+                <Fa icon={faBookmark} />
+            </div>
+        {/if}
+        <a class:overflow={verbose} class:pending={video.temporary} href={selectable || video.temporary ? "#" : `/${video.youtubeVideoId}`} on:click={onClick}>
             {#if verbose}
                 <Carousel>
                     <div class="verbose fitter left-margin">
@@ -66,13 +75,13 @@
                 </Carousel>
             {:else}
                 <div class="fitter">
-                    <div>
+                    <div class="image">
                         <img alt="영상 썸네일" src={video.youtubeThumbnail.replace("/default", "/sddefault")} />
                     </div>
                 </div>
             {/if}
         </a>
-        <div class="info" class:selected>
+        <div class="info" class:selected class:pending={video.temporary}>
             <a class="upper typo-body-1" href={selectable ? "#" : `/${video.youtubeVideoId}`} on:click={onClick}>{video.youtubeTitle}</a>
             <span class="lower typo-body-2">{video.channel} · {$_("page.recipe.viewCounts", { values: { count: unitizeViews(video.youtubeViewCount, $_("locale")) }})}</span>
             <div class="badges">
@@ -95,20 +104,15 @@
         justify-content: center;
         border-radius: var(--radius);
         overflow: hidden;
+        opacity: 0.4;
 
         & h2 {
-            color: var(--white);
             z-index: 3;
         }
+    }
 
-        & div {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            z-index: 2;
-            background-color: var(--gray-900);
-            opacity: 0.8;
-        }
+    .pending {
+        opacity: 0.2;
     }
 
     .overflow {
@@ -130,7 +134,7 @@
         border-radius: var(--radius);
         overflow: hidden;
 
-        & div {
+        & .image {
             position: absolute;
             top: -16.75%;
             bottom: 0;
@@ -145,6 +149,21 @@
 
     .left-margin {
         margin-left: var(--space-xs);
+    }
+
+    .saved-label {
+        width: var(--space-xl);
+        height: var(--space-xl);
+        position: absolute;
+        top: -1px;
+        left: calc(100% - var(--space-xl));
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--white);
+        border-radius: 0 0 0 var(--radius);
+        color: var(--primary-500);
     }
 
     .info {

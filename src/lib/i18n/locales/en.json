@@ -3,6 +3,7 @@
     "page": {
         "cancel": "Cancel",
         "confirm": "Confirm",
+        "showAll": "Show All",
         "login": {
             "slogan": "Just Like Ade,<br>Cooling Down<br>Discomforts",
             "signInWithApple": "Continue with Apple",
@@ -23,7 +24,9 @@
             "onboardingOkay": "Got it",
             "surveyHeading": "Which recipes do you like?",
             "surveySelectMore": "Select {count} more",
-            "surveyStart": "Start"
+            "surveyStart": "Start",
+            "refreshAlertTitle": "Please sign in again",
+            "refreshAlertText": "Your sign-in information has expired. We apologize for the inconvenience."
         },
         "home": {
             "greeting": "What are you<br>Cooking today?",
@@ -54,7 +57,8 @@
             "featured": "Recommend<br>To You",
             "trendingOnYouTube": "Trending on YouTube",
             "easyToFollow": "Easy to follow",
-            "others": "There's a lot more"
+            "others": "There's a lot more",
+            "searchPlaceholder": "What are you cooking today?"
         },
         "recipe": {
             "autoNextStep": "Auto Next",
@@ -77,7 +81,13 @@
             "goBack": "Go back",
             "shareText": "Discover and easily follow the key highlights in YouTube recipe videos, with Recipeade.",
             "viewCounts": "{count} views",
-            "leaveWithoutSaving": "Leave without saving"
+            "leaveWithoutSaving": "Leave without saving",
+            "saved": "Saved",
+            "deleteIngredientsOrStepsAlertHeading": "Unable to delete",
+            "deleteIngredientsOrStepsAlertText": "The last ingredient or step cannot be deleted.",
+            "deleteRecipeConfirmHeading": "Delete recipe?",
+            "deleteRecipeConfirmText": "Deleting the recipe will remove all the changes you made as well.",
+            "overviewSave": "Save"
         }
     }
 }

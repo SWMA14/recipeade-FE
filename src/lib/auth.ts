@@ -1,4 +1,5 @@
 import { Preferences } from "@capacitor/preferences";
+import { goto } from "$app/navigation";
 
 export async function saveAuthTokens(accessToken: string, refreshToken: string)
 {
@@ -77,6 +78,12 @@ export async function authedFetch(input: RequestInfo | URL, init?: RequestInit):
         };
 
         response = await fetch(input, tempInit);
+    }
+
+    if (response.status === 402)
+    {
+        await removeAuthTokens();
+        goto("/login?alert");
     }
 
     return response;

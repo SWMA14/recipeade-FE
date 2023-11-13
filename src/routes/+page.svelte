@@ -20,6 +20,7 @@
     import leading from "./__lowerBarComponents/leading.svelte";
     import main from "./__lowerBarComponents/main.svelte";
 
+    let device: "ios" | "android" | "web" = getContext("device");
     let isEditing = false;
     let isRendered = false;
     let recipeAddDrawerShown = false;
@@ -34,7 +35,7 @@
     let recipeDeleteDrawerShow: () => void;
     let recipeDeleteDrawerHide: () => void;
 
-    $: recipeAddId = recipeAddDrawerValue?.match(/.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/)?.[1];
+    $: recipeAddId = recipeAddDrawerValue?.match(/.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=)([^#\&\?]*).*/)?.[1];
     $: recipeAddPreview = recipeAddId && recipeAddId.length === 11 ? fetch("/api/videoInfo", {
             method: "POST",
             body: recipeAddId
@@ -62,24 +63,20 @@
     });
 
     onMount(async () => {
-        if (await getAccessToken() !== null)
-        {
-            const pending = $savedVideos.filter(x => x.temporary);
-            const result = await authedFetch(`${PUBLIC_API_ENDPOINT}/customize/recipes`)
-                .then(response => response.json())
-                .catch(() => []);
-            const videos = await Promise.all(result
-                .map(async (video: any) => convertApiToVideoData(video)));
-
-            $savedVideos = [
-                ...pending.filter(x => !videos.map(y => y.youtubeVideoId).includes(x.youtubeVideoId)),
-                ...videos
-            ];
-            console.log($savedVideos)
-        }
+        if (await getAccessToken() !== null && $savedVideos.length === 0)
+            $savedVideos = await fetchSavedRecipes();
 
         isRendered = true;
     });
+
+    async function fetchSavedRecipes(): Promise<VideoData[]>
+    {
+        const result = await authedFetch(`${PUBLIC_API_ENDPOINT}/customize/recipes`)
+            .then(response => response.status === 404 ? [] : response.json());
+
+        return await Promise.all(result
+            .map(async (video: any) => convertApiToVideoData(video)));
+    }
 
     async function addRecipe(link: string)
     {
@@ -119,6 +116,16 @@
                 temporary: true
             } as VideoData, ...$savedVideos];
         recipeAddDrawerHide();
+
+        const interval = setInterval(async () => {
+            const videos = await fetchSavedRecipes();
+
+            if (videos.find(x => x.youtubeVideoId === id)?.ingredients !== undefined)
+            {
+                clearInterval(interval);
+                $savedVideos = videos;
+            }
+        }, 1000);
     }
 
     async function endEditRecipes()
@@ -152,21 +159,25 @@
     }
 </script>
 
-<div class="section" in:flyingFade={{ delay: 0 }}>
+<div class="section" class:ios={device === "ios"} in:flyingFade={{ delay: 0 }}>
     <div class="title">
-        <h1>{@html $_("page.home.greeting")}</h1>
-        <div class="buttons">
-            <Button kind="transparent" size="small" on:click={() => isEditing ? exitEditRecipes() : isEditing = true}>
-                {$_("page.home.editRecipes")}
-            </Button>
-        </div>
+        {#if !isRendered}
+            <Skeleton kind="heading" lines={2} />
+        {:else}
+            <h1>{@html $_("page.home.greeting")}</h1>
+            <div class="buttons">
+                <Button kind="transparent" size="small" on:click={() => isEditing ? exitEditRecipes() : isEditing = true}>
+                    {$_("page.home.editRecipes")}
+                </Button>
+            </div>
+        {/if}
     </div>
-    {#if !isEditing}
+    {#if !isEditing && isRendered}
         <Button kind="gray" icon={faPlus} bottomMargin="xs" on:click={recipeAddDrawerShow}>{$_("page.home.addRecipe")}</Button>
     {/if}
     {#if !isRendered}
         {#each Array(3) as _}
-            <Video video={DUMMY_VIDEO} bottomMargin="xs" skeleton />
+            <Video skeleton video={DUMMY_VIDEO} bottomMargin="xs" />
         {/each}
     {:else}
         {#key isEditing}
@@ -222,13 +233,17 @@
         </Card>
     {/if}
 </Drawer>
-<ConfirmationDrawer bind:show={recipeDeleteDrawerShow} bind:hide={recipeDeleteDrawerHide} onConfirm={endEditRecipes}
-    confirmText={$_("page.home.deleteRecipesConfirm")} />
+<ConfirmationDrawer heading={$_("page.recipe.deleteRecipeConfirmHeading")} text={$_("page.recipe.deleteRecipeConfirmText")}
+    bind:show={recipeDeleteDrawerShow} bind:hide={recipeDeleteDrawerHide} onConfirm={endEditRecipes} confirmText={$_("page.home.deleteRecipesConfirm")} />
 
 <style lang="postcss">
     .section {
         width: 100%;
         padding-bottom: var(--space-3xl);
+
+        &.ios {
+            padding-bottom: calc(var(--space-3xl) + var(--space-2xs));
+        }
     }
 
     .title {

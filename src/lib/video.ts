@@ -30,6 +30,33 @@ export interface Step
     description: string;
 }
 
+export interface VideoOverview
+{
+    id: string;
+    title: string;
+    thumbnail: string;
+    viewCounts: number;
+    date: string;
+    channel: string;
+}
+
+export function VideoOverviewToEmptyData(video: VideoOverview): VideoData
+{
+    return {
+        youtubeVideoId: video.id,
+        youtubeTitle: video.title,
+        youtubeViewCount: video.viewCounts,
+        difficulty: 0,
+        category: "",
+        youtubeThumbnail: video.thumbnail,
+        id: video.id,
+        channel: video.channel,
+        ingredients: [],
+        recipesteps: [],
+        tags: []
+    };
+}
+
 export function unitizeViews(views: number, locale: string): string
 {
     if (views < 1000)

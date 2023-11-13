@@ -31,16 +31,17 @@
 <style lang="postcss">
     @keyframes flicker {
         0% {
-            background-color: var(--gray-100);
+            background-position: 100% 50%;
         }
 
         100% {
-            background-color: var(--gray-200);
+            background-position: 20% 50%;
         }
     }
 
     .container {
         width: 100%;
+        height: 100%;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
@@ -48,8 +49,10 @@
 
     .skeleton {
         width: 100%;
-        background-color: var(--gray-100);
-        animation: flicker 2s infinite alternate;
+        height: 100%;
+        background-image: linear-gradient(to right, var(--gray-100) 40%, var(--gray-300) 60%, var(--gray-300) 70%, var(--gray-100) 70%);
+        background-size: 500% auto;
+        animation: flicker 2.5s infinite;
         border-radius: var(--radius);
 
         &.heading {

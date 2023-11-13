@@ -3,6 +3,7 @@
     "page": {
         "cancel": "취소",
         "confirm": "확인",
+        "showAll": "모두 보기",
         "login": {
             "slogan": "시원한 에이드처럼<br>불편함을 싹<br>내려 드릴게요",
             "signInWithApple": "Apple로 계속하기",
@@ -23,7 +24,9 @@
             "onboardingOkay": "알겠어요",
             "surveyHeading": "어떤 레시피를 좋아하세요?",
             "surveySelectMore": "레시피 {count}개를 더 선택해 주세요",
-            "surveyStart": "시작하기"
+            "surveyStart": "시작하기",
+            "refreshAlertTitle": "다시 로그인해 주세요",
+            "refreshAlertText": "로그인 정보가 만료되었어요. 불편을 드려 죄송해요."
         },
         "home": {
             "greeting": "오늘은 어떤<br>요리를 해 볼까요?",
@@ -54,7 +57,8 @@
             "featured": "이 레시피는<br>어때요?",
             "trendingOnYouTube": "유튜브에서 핫해요",
             "easyToFollow": "쉽게 따라해요",
-            "others": "다른 레시피들도 있어요"
+            "others": "다른 레시피들도 있어요",
+            "searchPlaceholder": "오늘은 어떤 요리를 해 볼까요?"
         },
         "recipe": {
             "autoNextStep": "자동 다음 단계",
@@ -77,7 +81,13 @@
             "goBack": "돌아가기",
             "shareText": "레시피에이드에서 YouTube 레시피 영상에서 중요한 부분만을 손쉽게 확인하고 따라하세요.",
             "viewCounts": "조회수 {count}회",
-            "leaveWithoutSaving": "저장하지 않고 떠나기"
+            "leaveWithoutSaving": "저장하지 않고 떠나기",
+            "saved": "저장됨",
+            "deleteIngredientsOrStepsAlertHeading": "삭제할 수 없어요",
+            "deleteIngredientsOrStepsAlertText": "마지막 재료 또는 단계는 삭제할 수 없어요.",
+            "deleteRecipeConfirmHeading": "레시피를 삭제할까요?",
+            "deleteRecipeConfirmText": "레시피를 삭제하면 모든 수정 사항들도 사라져요.",
+            "overviewSave": "저장하기"
         }
     }
 }

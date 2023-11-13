@@ -1,7 +1,8 @@
 <script lang="ts">
-    import type { DynamicBarContext } from "$lib/dynamicBar";
+    import { _ } from "svelte-i18n";
+    import { getContext } from "svelte";
+    import Drawer from "$components/Drawer.svelte";
     import Skeleton from "$components/Skeleton.svelte";
-    import Stack from "$components/Stack.svelte";
 
     export let skeleton = false;
     export let leftOverflow = false;
@@ -12,26 +13,9 @@
     export let onScroll: ((e: any) => void) | undefined = undefined;
     export let onScrollEnd: (() => void) | undefined = undefined;
 
-    const dynamicBarContext: DynamicBarContext = {
-        leadingProps: {
-            onClick: hide
-        },
-        mainProps: {
-            heading
-        }
-    };
-
-    let shown = false;
-
-    function show()
-    {
-        shown = true;
-    }
-
-    function hide()
-    {
-        shown = false;
-    }
+    let device = getContext("device");
+    let showAllDrawerShow: () => void;
+    let showAllDrawerHide: () => void;
 
     function onActualScroll(e: any)
     {
@@ -54,8 +38,8 @@
                     {/if}
                 {/if}
                 {#if canShowAll && !skeleton}
-                    <span class="show-all typo-body-2" role="button" tabindex="0" on:click={show} on:keydown={show}>
-                        모두 보기
+                    <span class="show-all typo-body-2" role="button" tabindex="0" on:click={showAllDrawerShow} on:keydown={showAllDrawerShow}>
+                        {$_("page.showAll")}
                     </span>
                 {/if}
             </div>
@@ -68,15 +52,14 @@
         <slot />
     </div>
 </div>
-{#if shown}
-    <Stack {dynamicBarContext} onBack={hide}>
-        <div class="grid">
-            <slot name="grid" />
-        </div>
-    </Stack>
-{/if}
+<Drawer {heading} noBottomPadding bind:show={showAllDrawerShow} bind:hide={showAllDrawerHide}>
+    <div class="grid" class:ios={device === "ios"}
+        on:touchstart={e => e.stopPropagation()} on:touchmove={e => e.stopPropagation()} on:touchend={e => e.stopPropagation}>
+        <slot name="grid" />
+    </div>
+</Drawer>
 
-<style>
+<style lang="postcss">
     .container {
         width: auto;
     }
@@ -98,20 +81,32 @@
     }
 
     .scroll {
+        padding: 0 var(--space-xs);
         display: flex;
         scroll-snap-type: x mandatory;
         scroll-padding-left: var(--space-xs);
         -webkit-overflow-scrolling: touch;
         overflow-x: scroll;
-    }
 
-    .scroll::-webkit-scrollbar {
-        display: none;
+        &::-webkit-scrollbar {
+            display: none;
+        }
     }
 
     .grid {
+        width: 100%;
+        padding-bottom: calc(var(--space-3xl) + var(--space-m));
         display: flex;
         flex-direction: column;
+        overflow-y: scroll;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+        &.ios {
+            padding-bottom: 0;
+        }
     }
 
     .left-overflow {
