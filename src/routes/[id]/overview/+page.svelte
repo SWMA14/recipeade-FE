@@ -8,7 +8,7 @@
     import { PUBLIC_API_ENDPOINT } from "$env/static/public";
     import { authedFetch } from "$lib/auth";
     import type { DynamicBarContext } from "$lib/dynamicBar";
-    import { unitizeViews, convertApiToVideoData, type VideoData } from "$lib/video";
+    import { unitizeViews, convertApiToVideoData, type VideoData, getVideoInfo } from "$lib/video";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
     import Skeleton from "$components/Skeleton.svelte";
@@ -42,17 +42,14 @@
         await authedFetch(`${PUBLIC_API_ENDPOINT}/customize/create_default?sourceLink=https://www.youtube.com/watch?v=${data.id}`, {
             method: "POST"
         });
-        const info = await fetch("/api/videoInfo", {
-            method: "POST",
-            body: data.id
-        }).then(response => response.json());
+        const info = await getVideoInfo(data.id);
 
         $savedVideos = [{
             youtubeVideoId: data.id,
-            youtubeTitle: info["title"],
-                youtubeThumbnail: info["thumbnail"],
-                youtubeViewCount: info["viewCounts"],
-                channel: info["channel"],
+            youtubeTitle: info.title,
+                youtubeThumbnail: info.thumbnail,
+                youtubeViewCount: info.viewCounts,
+                channel: info.channel,
                 temporary: true
             } as VideoData, ...$savedVideos];
 

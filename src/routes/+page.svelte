@@ -9,7 +9,7 @@
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { DUMMY_VIDEO } from "$lib/dummy";
     import { flyingFade } from "$lib/transition";
-    import { type VideoData, convertApiToVideoData } from "$lib/video";
+    import { type VideoData, convertApiToVideoData, getVideoInfo } from "$lib/video";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
     import ConfirmationDrawer from "$components/ConfirmationDrawer.svelte";
@@ -36,10 +36,7 @@
     let recipeDeleteDrawerHide: () => void;
 
     $: recipeAddId = recipeAddDrawerValue?.match(/.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=)([^#\&\?]*).*/)?.[1];
-    $: recipeAddPreview = recipeAddId && recipeAddId.length === 11 ? fetch("/api/videoInfo", {
-            method: "POST",
-            body: recipeAddId
-        }).then(response => response?.json()) : undefined;
+    $: recipeAddPreview = recipeAddId && recipeAddId.length === 11 ? getVideoInfo(recipeAddId) : undefined;
 
     getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
         isHidden: true
@@ -102,17 +99,14 @@
             return;
         }
 
-        const info = await fetch("/api/videoInfo", {
-            method: "POST",
-            body: id
-        }).then(response => response.json());
+        const info = await getVideoInfo(id);
         
         $savedVideos = [{
             youtubeVideoId: id,
-            youtubeTitle: info["title"],
-                youtubeThumbnail: info["thumbnail"],
-                youtubeViewCount: info["viewCounts"],
-                channel: info["channel"],
+            youtubeTitle: info.title,
+                youtubeThumbnail: info.thumbnail,
+                youtubeViewCount: info.viewCounts,
+                channel: info.channel,
                 temporary: true
             } as VideoData, ...$savedVideos];
         recipeAddDrawerHide();
