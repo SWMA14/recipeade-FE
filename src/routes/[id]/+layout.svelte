@@ -1,9 +1,11 @@
 <script lang="ts">
+    import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
     import Player from "youtube-player";
     import type { Options, YouTubePlayer } from "youtube-player/dist/types";
     import { getContext } from "svelte";
     import { beforeNavigate } from "$app/navigation";
     import { sharedPlayer } from "../../store";
+    import Button from "$components/Button.svelte";
 
     export let data;
 
@@ -32,9 +34,17 @@
         if (from && from.url.pathname.endsWith("/cook"))
             (player as YouTubePlayer).seekTo(0, true);
     });
+
+    function moveToRoot(node: HTMLElement)
+    {
+        document.body.appendChild(node);
+    }
 </script>
 
-<div class="player-container" bind:clientHeight={playerHeight}>
+<div class="player-container" use:moveToRoot bind:clientHeight={playerHeight}>
+    <div style="background-color: var(--gray-900);">
+        <Button kind="black" icon={faArrowLeft} style="width: var(--space-xl);" on:click={() => history.back()} />
+    </div>
     <div id="player" class="player" bind:this={player} />
 </div>
 <div class="background" class:ios={device === "ios"} />
@@ -46,6 +56,7 @@
     .background {
         width: 100%;
         height: calc(100vw * 9 / 16);
+        margin-top: calc(var(--space-xl) + env(safe-area-inset-top));
         background-color: var(--gray-900);
         position: fixed;
         top: 0;

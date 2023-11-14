@@ -47,7 +47,7 @@
         // main: surveyUpperMain  -- temporary
     });
     $: getContext<Writable<DynamicBarContext>>("lowerBar").update(x => x = {
-        isHidden: !isSignedIn || !endOnboardingButtonShown,
+        isHidden: !isSignedIn,
         main: onboardingMain,
         mainProps: {
             onClick: () => goto("/")
@@ -111,7 +111,8 @@
         };
 
         SignInWithApple.authorize(options)
-            .then(async signedInfo => await fetch(`${PUBLIC_API_ENDPOINT}/login/oauth/apple`, {
+            .then(async signedInfo => {
+                await fetch(`${PUBLIC_API_ENDPOINT}/login/oauth/apple`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -120,13 +121,16 @@
                         "token_type": "id_token",
                         "token": signedInfo.response.identityToken
                     })
-                }).then(response => response.json()).then(finishSignIn));
+                }).then(response => response.json()).then(finishSignIn);
+            });
     }
 
     function signInWithGoogle()
     {
         GoogleAuth.signIn()
-            .then(async signedInfo => await fetch(`${PUBLIC_API_ENDPOINT}/login/oauth/google`, {
+            .then(async signedInfo => {
+                console.log(signedInfo.imageUrl);
+                await fetch(`${PUBLIC_API_ENDPOINT}/login/oauth/google`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -135,7 +139,8 @@
                         "token_type": "id_token",
                         "token": signedInfo.authentication.idToken
                     })
-                }).then(response => response.json()).then(finishSignIn));
+                }).then(response => response.json()).then(finishSignIn);
+            });
     }
 
     function signInWithEmail()
