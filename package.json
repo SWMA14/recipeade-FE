@@ -38,6 +38,7 @@
   "dependencies": {
     "@capacitor-community/apple-sign-in": "^5.0.0",
     "@capacitor-community/firebase-analytics": "^5.0.1",
+    "@capacitor-community/speech-recognition": "^5.0.0",
     "@capacitor/android": "^5.2.2",
     "@capacitor/app": "^5.0.6",
     "@capacitor/cli": "5.2.2",
@@ -53,6 +54,10 @@
     "@fortawesome/free-brands-svg-icons": "^6.4.2",
     "@fortawesome/free-regular-svg-icons": "^6.4.0",
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
+    "@tensorflow-models/handpose": "^0.1.0",
+    "@tensorflow/tfjs-backend-webgl": "^4.13.0",
+    "@tensorflow/tfjs-converter": "^4.13.0",
+    "@tensorflow/tfjs-core": "^4.13.0",
     "@types/sortablejs": "^1.15.2",
     "intl-messageformat": "^10.5.3",
     "scriptjs": "^2.5.9",

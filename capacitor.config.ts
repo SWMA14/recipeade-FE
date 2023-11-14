@@ -6,8 +6,9 @@ const config: CapacitorConfig = {
   webDir: '.svelte-kit/cloudflare',
   server: {
     androidScheme: 'https',
-    // url: "http://172.16.100.158:5173/",
+    // url: "http://192.168.0.13:5173/",
     // cleartext: true
+    // url: "https://recipeade-demo.pages.dev/",
   },
   plugins: {
     GoogleAuth: {

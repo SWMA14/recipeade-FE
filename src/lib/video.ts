@@ -111,10 +111,17 @@ export function getUsedSteps(steps: Step[], ingredient: string): number[] | unde
 
 export async function convertApiToVideoData(video: any): Promise<VideoData>
 {
-    const info = await fetch("/api/videoInfo", {
-        method: "POST",
-        body: video["sourceId"]
-    }).then(response => response.json());
+    // TODO: 일단 더미로 대체
+    // const info = await fetch("/api/videoInfo", {
+    //     method: "POST",
+    //     body: video["sourceId"]
+    // }).then(response => response.json());
+    const info = {
+        title: "123",
+        viewCounts: 100,
+        thumbnail: "https://i.ytimg.com/vi/vHFJuVjmJyg/sddefault.jpg",
+        channel: "으아아악"
+    }
 
     return {
         youtubeVideoId: video["sourceId"],
