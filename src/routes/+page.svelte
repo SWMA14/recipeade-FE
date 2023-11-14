@@ -80,7 +80,7 @@
 
     async function addRecipe(link: string)
     {
-        const result = await authedFetch(`${PUBLIC_API_ENDPOINT}/customize/create_default?sourceLink=${link}`, {
+        const result = await authedFetch(`${PUBLIC_API_ENDPOINT}/customize/create_default?sourceLink=${link}&lang=${recipeAddLanguage}`, {
             method: "POST"
         });
 
@@ -119,8 +119,9 @@
 
         const interval = setInterval(async () => {
             const videos = await fetchSavedRecipes();
+            const target = videos.find(x => x.youtubeVideoId === id)?.ingredients;
 
-            if (videos.find(x => x.youtubeVideoId === id)?.ingredients !== undefined)
+            if (target !== undefined && target.length > 0)
             {
                 clearInterval(interval);
                 $savedVideos = videos;
