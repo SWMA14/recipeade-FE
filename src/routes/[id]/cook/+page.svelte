@@ -70,8 +70,8 @@
 
     let video: HTMLVideoElement;
     let model: handPose.HandPose;
+    let handFirstRecognized = 0;
     let handRecognized = 0;
-    let handRecognizedEffectShown = false;
     let previousTime = performance.now();
     let raf: number;
     let isRecognizing = true;
@@ -79,6 +79,7 @@
     let voiceRecognitionDrawerShow: () => void;
     let voiceRecognitionDrawerHide: () => void;
     let voiceResult: string | undefined = undefined;
+    let isVoiceFailed = false;
 
     onMount(async () => {
         analyticsService.setScreenName("recipe_cook");
@@ -95,7 +96,9 @@
         video.srcObject = mediaStream;
         video.onloadeddata = () => video.play();
 
-        model = await handPose.load();
+        model = await handPose.load({
+            detectionConfidence: 0.97
+        });
         raf = requestAnimationFrame(predictHand);
 
         if ((await SpeechRecognition.checkPermissions()).speechRecognition !== "granted")
@@ -147,17 +150,32 @@
         const deltaTime = currentTime - previousTime;
         previousTime = currentTime;
 
-        const hands = await model.estimateHands(video);
-        if (hands.length > 0 && hands[0].handInViewConfidence > 0.95)
+        const hands = await model.estimateHands(video, true);
+        console.log(hands);
+        if (hands.length > 0)
         {
-            handRecognized += deltaTime;
+            if (handFirstRecognized === 0)
+                handFirstRecognized += deltaTime;
+            else if (handFirstRecognized <= 1000)
+                handRecognized += deltaTime;
 
             if (handRecognized > 1000)
                 voiceRecognitionDrawerShow();
         }
+        else if (handFirstRecognized > 0)
+        {
+            handFirstRecognized += deltaTime;
 
-        return new Promise(resolve => raf = requestAnimationFrame(resolve))
-            .then(x => predictHand(x as number));
+            if (handFirstRecognized > 1000)
+            {
+                handFirstRecognized = 0;
+                handRecognized = 0;
+            }
+        }
+
+        setTimeout(() => raf = requestAnimationFrame(predictHand), 100)
+        // return new Promise(resolve => raf = requestAnimationFrame(resolve))
+        //     .then(x => predictHand(x as number));
     }
 
     async function selectStep(step: number)
@@ -216,28 +234,36 @@
         return result.length > 0 ? result.join(", ") : undefined;
     }
 
-    function onVoiceRecognitionStart()
+    async function onVoiceRecognitionStart()
     {
         player.pauseVideo();
         isRecognizing = false;
 
-        SpeechRecognition.start({
-            language: $_("locale") === "ko" ? "ko-KR" : "en-US",
-            maxResults: 1,
-            popup: false
-        })
-            .then(result => voiceResult = result.matches[0])
-            .then(() => setTimeout(async () => {
-                    await executeCommand();
-                    voiceRecognitionDrawerHide();
-                }, 500));
+        while (!isRecognizing)
+            await SpeechRecognition.start({
+                    language: $_("locale") === "ko" ? "ko-KR" : "en-US",
+                    maxResults: 1,
+                    popup: false
+                })
+                .then(result => {
+                    voiceResult = result.matches[0];
+                    isRecognizing = true;
+                    handRecognized = -250;
+                })
+                .catch(() => isVoiceFailed = true);
+
+        isVoiceFailed = false;
+        setTimeout(async () => {
+            await executeCommand();
+            voiceRecognitionDrawerHide();
+        }, 250);
     }
 
     function onVoiceRecognitionEnd()
     {
-        if (voiceResult !== "멈춰")
-            player.playVideo();
+        SpeechRecognition.stop();
         isRecognizing = true;
+        handFirstRecognized = 0;
         handRecognized = 0;
         voiceResult = undefined;
     }
@@ -278,14 +304,15 @@
     ]}
 />
 
-<video id="camera-preview" style="transform: scaleX(-1); opacity: 0.1; position: fixed; z-index: 1; bottom: 0; left: 0; display: none;" />
+<video id="camera-preview" />
+<div class="hand-indicator" style="--width: calc({handRecognized / 1000} * 100vw);" />
 <div class="section" in:flyingFade={{ delay: 0 }}>
     <Card visibleOverflow noPadding skeleton={!isRendered}>
         <div style="margin-top: 1rem;">
             <Carousel leftOverflow rightOverflow>
                 {#each [...Array(steps.length).keys()] as i}
                     <Button id="step-button-{i}" on:click={() => selectStep(i)} selected={i === selectedStep}
-                        leftMargin={i === 0 ? "m" : undefined} rightMargin={i < steps.length - 1 ? "xs" : "m"}
+                        leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs"
                         progress={i === selectedStep ? $progress * 100 : 0}>
                         <div style="width: var(--space-3xl);">{i + 1}</div>
                     </Button>
@@ -338,14 +365,48 @@
             <div class="ripple" />
             <div class="listening" />
         </div>
-        <span>말씀하세요.</span>
-        {#if voiceResult}
-            <h1>{voiceResult}</h1>
+        <span class="prompt">말씀하세요.</span>
+        <h1>{voiceResult ?? " "}</h1>
+        <Card backgroundColor="info-100" topMargin="xs">
+            <span class="tip-explain typo-body-2">
+                <strong>{$_("page.recipe.commentsTipExplainTitle")}</strong> 현재 레시피에이드는 이 명령들만 인식할 수 있어요. 정확히 말씀해 주시면 알맞는 명령을 실행해 드릴게요.
+            </span>
+            <ul>
+                <li>다음</li>
+                <li>이전</li>
+                <li>멈춰</li>
+                <li>실행</li>
+            </ul>
+        </Card>
+        {#if isVoiceFailed}
+            <Card backgroundColor="danger-100" topMargin="xs">
+                인식하지 못했어요. 다시 시도해 주세요.
+            </Card>
         {/if}
     </div>
 </Drawer>
 
 <style lang="postcss">
+    #camera-preview {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        transform: scaleX(-1);
+        display: none;
+    }
+
+    .hand-indicator {
+        width: var(--width);
+        height: 100vh;
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        z-index: 1;
+        opacity: 0.3;
+        background-color: var(--info-100);
+        transition: all 0.25s;
+    }
+
     .content {
         padding: var(--space-xs);
 
@@ -428,8 +489,8 @@
             }
         }
 
-        span {
-            margin-top: var(--space-xs);
+        .prompt {
+            margin-top: var(--space-m);
         }
     }
 
