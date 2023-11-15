@@ -37,7 +37,7 @@
     onMount(async () => {
         if ($allVideos.length === 0)
         {
-            const result = await fetch(`${PUBLIC_API_ENDPOINT}/customize/getAllDefaults`)
+            const result = await fetch(`${PUBLIC_API_ENDPOINT}/customize/getAllDefaults?lang=${$_("locale")}`)
                 .then(response => response.json());
             $allVideos = await Promise.all(result.map(async (video: any) => {
                 const info = await getVideoInfo(video["video_id"]);

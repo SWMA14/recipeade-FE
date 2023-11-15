@@ -56,6 +56,7 @@
     .background {
         width: 100%;
         height: calc(100vw * 9 / 16);
+        max-height: calc(50vh - calc(var(--space-xl) * 2 + env(safe-area-inset-top)));
         margin-top: calc(var(--space-xl) + env(safe-area-inset-top));
         background-color: var(--gray-900);
         position: fixed;
