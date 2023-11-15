@@ -17,6 +17,7 @@
     import { duration, flyingFade } from "$lib/transition";
     import { timestampToSeconds, type Step } from "$lib/video";
     import { sharedPlayer } from "../../../store";
+    import AlertDrawer from "$components/AlertDrawer.svelte";
     import Badge from "$components/Badge.svelte";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
@@ -74,8 +75,10 @@
     let handRecognized = 0;
     let previousTime = performance.now();
     let raf: number;
-    let isRecognizing = true;
+    let isRecognizing = false;
     let mediaStream: MediaStream;
+    let voiceRecognitionAlertDrawerShow: () => void;
+    let voiceRecognitionAlertDrawerHide: () => void;
     let voiceRecognitionDrawerShow: () => void;
     let voiceRecognitionDrawerHide: () => void;
     let voiceResult: string | undefined = undefined;
@@ -105,7 +108,7 @@
             await SpeechRecognition.requestPermissions();
 
         isRendered = true;
-        selectStep(0);
+        voiceRecognitionAlertDrawerShow();
 
         window.addEventListener("message", event => {
             if (player && event.source === videoContentWindow)
@@ -234,6 +237,12 @@
         return result.length > 0 ? result.join(", ") : undefined;
     }
 
+    function onVoiceRecognitionAlertEnd()
+    {
+        selectStep(0);
+        isRecognizing = true;
+    }
+
     async function onVoiceRecognitionStart()
     {
         player.pauseVideo();
@@ -358,6 +367,14 @@
         {/if}
     </Card>
 </div>
+<AlertDrawer bind:show={voiceRecognitionAlertDrawerShow} bind:hide={voiceRecognitionAlertDrawerHide} onHide={onVoiceRecognitionAlertEnd}
+    heading="음성 인식 사용" text="레시피에이드는 손을 쓰지 않고 음성만으로도 영상을 제어하는 기능을 제공해요. 음성 인식을 보다 정확하고 편리하게 사용하려면 다음 사항들을 확인해 주세요.">
+    <ul>
+        <li>전면 카메라에 한쪽 손을 약 1초간 보이고 있으면 영상이 멈추고 음성 인식이 시작돼요.</li>
+        <li>음성 인식이 시작됐을 때 안내되는 명령 중 하나를 말씀하시면 원하는 대로 영상을 제어할 수 있어요.</li>
+        <li>손이 카메라에서 40cm ~ 1m 이상 떨어져서 카메라에 손 전체가 완전히 들어와야 인식률이 높아요.</li>
+    </ul>
+</AlertDrawer>
 <Drawer bind:show={voiceRecognitionDrawerShow} onShow={onVoiceRecognitionStart}
     bind:hide={voiceRecognitionDrawerHide} onHide={onVoiceRecognitionEnd}>
     <div class="voice">
