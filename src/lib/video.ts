@@ -119,7 +119,7 @@ export async function getVideoInfo(id: string)
     return {
         title: result["title"],
         channel: result["channel"],
-        viewCounts: parseInt(result["views"]),
+        viewCounts: parseInt(result["views"].replace(",", "")),
         date: result["date"],
         thumbnail: `https://i.ytimg.com/vi/${id}/sddefault.jpg`
     };
