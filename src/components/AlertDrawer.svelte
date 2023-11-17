@@ -11,6 +11,7 @@
     export let shown = false;
     export let show: (() => void) | undefined = undefined;
     export let hide: (() => void) | undefined = undefined;
+    export let onHide: (() => void) | undefined = undefined;
     export let confirmText = $_("page.confirm");
 
     const lowerBar = getContext<Writable<DynamicBarContext>>("lowerBar");
@@ -32,9 +33,11 @@
     function revert()
     {
         lowerBar.update(x => x = cached);
+        onHide?.();
     }
 </script>
 
 <Drawer {heading} bind:shown bind:show onShow={updateLowerBar} bind:hide onHide={revert}>
     <span style="align-self: flex-start;">{text}</span>
+    <slot />
 </Drawer>

@@ -9,7 +9,7 @@
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { DUMMY_VIDEO } from "$lib/dummy";
     import { flyingFade } from "$lib/transition";
-    import { type VideoData, convertApiToVideoData } from "$lib/video";
+    import { type VideoData, convertApiToVideoData, getVideoInfo } from "$lib/video";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
     import ConfirmationDrawer from "$components/ConfirmationDrawer.svelte";
@@ -36,10 +36,7 @@
     let recipeDeleteDrawerHide: () => void;
 
     $: recipeAddId = recipeAddDrawerValue?.match(/.*(?:youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=)([^#\&\?]*).*/)?.[1];
-    $: recipeAddPreview = recipeAddId && recipeAddId.length === 11 ? fetch("/api/videoInfo", {
-            method: "POST",
-            body: recipeAddId
-        }).then(response => response?.json()) : undefined;
+    $: recipeAddPreview = recipeAddId && recipeAddId.length === 11 ? getVideoInfo(recipeAddId) : undefined;
 
     getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
         isHidden: true
@@ -80,7 +77,7 @@
 
     async function addRecipe(link: string)
     {
-        const result = await authedFetch(`${PUBLIC_API_ENDPOINT}/customize/create_default?sourceLink=${link}`, {
+        const result = await authedFetch(`${PUBLIC_API_ENDPOINT}/customize/create_default?sourceLink=${link}&lang=${recipeAddLanguage}`, {
             method: "POST"
         });
 
@@ -102,25 +99,23 @@
             return;
         }
 
-        const info = await fetch("/api/videoInfo", {
-            method: "POST",
-            body: id
-        }).then(response => response.json());
+        const info = await getVideoInfo(id);
         
         $savedVideos = [{
             youtubeVideoId: id,
-            youtubeTitle: info["title"],
-                youtubeThumbnail: info["thumbnail"],
-                youtubeViewCount: info["viewCounts"],
-                channel: info["channel"],
+            youtubeTitle: info.title,
+                youtubeThumbnail: info.thumbnail,
+                youtubeViewCount: info.viewCounts,
+                channel: info.channel,
                 temporary: true
             } as VideoData, ...$savedVideos];
         recipeAddDrawerHide();
 
         const interval = setInterval(async () => {
             const videos = await fetchSavedRecipes();
+            const target = videos.find(x => x.youtubeVideoId === id)?.ingredients;
 
-            if (videos.find(x => x.youtubeVideoId === id)?.ingredients !== undefined)
+            if (target !== undefined && target.length > 0)
             {
                 clearInterval(interval);
                 $savedVideos = videos;
@@ -172,7 +167,11 @@
             </div>
         {/if}
     </div>
-    {#if !isEditing && isRendered}
+    {#if !isRendered}
+        <Card skeleton bottomMargin="xs">
+            <div style="height: var(--space-xs);" />
+        </Card>
+    {:else if !isEditing}
         <Button kind="gray" icon={faPlus} bottomMargin="xs" on:click={recipeAddDrawerShow}>{$_("page.home.addRecipe")}</Button>
     {/if}
     {#if !isRendered}

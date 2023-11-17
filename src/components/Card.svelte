@@ -134,7 +134,7 @@
         overflow: hidden;
 
         &.skeleton {
-            background-color: var(--gray-200);
+            overflow: hidden;
         }
     }
 

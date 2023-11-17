@@ -1,3 +1,5 @@
+import { PUBLIC_API_ENDPOINT } from "$env/static/public";
+
 export interface VideoData
 {
     youtubeVideoId: string;
@@ -109,22 +111,33 @@ export function getUsedSteps(steps: Step[], ingredient: string): number[] | unde
     return result.length > 0 ? result : undefined;
 }
 
+export async function getVideoInfo(id: string)
+{
+    const result = await fetch(`${PUBLIC_API_ENDPOINT}/customize/get_youtube_info?url=https://youtu.be/${id}`)
+        .then(response => response.json());
+
+    return {
+        title: result["title"],
+        channel: result["channel"],
+        viewCounts: parseInt(result["views"].replace(",", "")),
+        date: result["date"],
+        thumbnail: `https://i.ytimg.com/vi/${id}/sddefault.jpg`
+    };
+}
+
 export async function convertApiToVideoData(video: any): Promise<VideoData>
 {
-    const info = await fetch("/api/videoInfo", {
-        method: "POST",
-        body: video["sourceId"]
-    }).then(response => response.json());
+    const info = await getVideoInfo(video["sourceId"]);
 
     return {
         youtubeVideoId: video["sourceId"],
-        youtubeTitle: info["title"],
-        youtubeViewCount: info["viewCounts"],
+        youtubeTitle: info.title,
+        youtubeViewCount: info.viewCounts,
         difficulty: video["difficulty"],
         category: video["category"],
-        youtubeThumbnail: info["thumbnail"],
+        youtubeThumbnail: info.thumbnail,
         id: video["id"],
-        channel: info["channel"],
+        channel: info.channel,
         ingredients: video["ingredients"],
         recipesteps: video["steps"].map((step: any) => ({
             seconds: timestampToSeconds(step["timestamp"]),

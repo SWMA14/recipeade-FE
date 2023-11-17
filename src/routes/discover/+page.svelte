@@ -9,7 +9,7 @@
     import { PUBLIC_API_ENDPOINT } from "$env/static/public";
     import { DUMMY_VIDEO } from "$lib/dummy";
     import type { DynamicBarContext } from "$lib/dynamicBar";
-    import { type VideoData, type VideoOverview, VideoOverviewToEmptyData } from "$lib/video";
+    import { type VideoData, type VideoOverview, VideoOverviewToEmptyData, getVideoInfo } from "$lib/video";
     import Carousel from "$components/Carousel.svelte";
     import Card from "$components/Card.svelte";
     import Video from "$components/Video.svelte";
@@ -37,13 +37,10 @@
     onMount(async () => {
         if ($allVideos.length === 0)
         {
-            const result = await fetch(`${PUBLIC_API_ENDPOINT}/customize/getAllDefaults`)
+            const result = await fetch(`${PUBLIC_API_ENDPOINT}/customize/getAllDefaults?lang=${$_("locale")}`)
                 .then(response => response.json());
             $allVideos = await Promise.all(result.map(async (video: any) => {
-                const info = await fetch("/api/videoInfo", {
-                    method: "POST",
-                    body: video["video_id"]
-                }).then(response => response.json());
+                const info = await getVideoInfo(video["video_id"]);
 
                 return {
                     id: video["video_id"],
