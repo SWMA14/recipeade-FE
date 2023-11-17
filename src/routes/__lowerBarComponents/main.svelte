@@ -1,6 +1,6 @@
 <script lang="ts">
     import { _ } from "svelte-i18n";
-    import { faBookmark, faFire, faGear } from "@fortawesome/free-solid-svg-icons";
+    import { faBookmark, faFire, faGear, faRobot } from "@fortawesome/free-solid-svg-icons";
     import Fa from "svelte-fa";
     import { page } from "$app/stores";
     import Button from "$components/Button.svelte";
@@ -20,6 +20,10 @@
         {
             href: "/discover",
             icon: faFire
+        },
+        {
+            href: "/assistant",
+            icon: faRobot
         },
         {
             href: "/settings",

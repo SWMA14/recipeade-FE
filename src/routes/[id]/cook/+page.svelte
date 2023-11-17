@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { faAngleDown, faAngleUp, faStar } from "@fortawesome/free-solid-svg-icons";
+    import { faAngleDown, faAngleUp, faStar, faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
     import * as handPose from "@tensorflow-models/handpose";
     import "@tensorflow/tfjs-backend-webgl";
     import { SpeechRecognition } from "@capacitor-community/speech-recognition";
@@ -12,6 +12,7 @@
     import { faArrowRight, faRepeat } from "@fortawesome/free-solid-svg-icons";
     import { beforeNavigate } from "$app/navigation";
     import { analyticsService } from "$lib/analytics";
+    import { type AssistantResponse, sendMessage } from "$lib/assistant";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { pausableTweened } from "$lib/pausableTween";
     import { duration, flyingFade } from "$lib/transition";
@@ -24,6 +25,8 @@
     import Carousel from "$components/Carousel.svelte";
     import Drawer from "$components/Drawer.svelte";
     import Ingredient from "$components/Ingredient.svelte";
+    import Input from "$components/Input.svelte";
+    import Skeleton from "$components/Skeleton.svelte";
 
     export let data;
 
@@ -69,6 +72,7 @@
     let isCommentsTipExpanded = false;
     let isIngredientsExpanded = false;
 
+
     let video: HTMLVideoElement;
     let model: handPose.HandPose;
     let handFirstRecognized = 0;
@@ -83,6 +87,11 @@
     let voiceRecognitionDrawerHide: () => void;
     let voiceResult: string | undefined = undefined;
     let isVoiceFailed = false;
+
+    let askTipsValue = "";
+    let askTipsResponse: Promise<AssistantResponse> | undefined = undefined;
+    let askTipsDrawerShow: () => void;
+    let askTipsDrawerHide: () => void;
 
     onMount(async () => {
         analyticsService.setScreenName("recipe_cook");
@@ -286,6 +295,11 @@
         else if (voiceResult === "실행")
             await player.playVideo();
     }
+
+    function askTipsSubmit()
+    {
+        askTipsResponse = sendMessage(askTipsValue);
+    }
 </script>
 
 <MetaTags
@@ -344,6 +358,7 @@
                 <Button kind="white" icon={faArrowRight} rightMargin="xs" selected={isAutoNext} on:click={enableAutoNext}>{$_("page.recipe.autoNextStep")}</Button>
                 <Button kind="white" icon={faRepeat} selected={isRepeating} on:click={enableRepeat}>{$_("page.recipe.repeatStep")}</Button>
             </div>
+            <Button kind="primary" icon={faWandMagicSparkles} on:click={askTipsDrawerShow}>재료 손질법 물어보기</Button>
         </div>
     </Card>
     <Card topMargin="2xs" skeleton={!isRendered}>
@@ -402,6 +417,28 @@
         {/if}
     </div>
 </Drawer>
+<Drawer bind:show={askTipsDrawerShow} bind:hide={askTipsDrawerHide} heading="어떤 손질법이 궁금하세요?">
+    <div class="ask">
+        <Card backgroundColor="info-100" bottomMargin="xs">
+            <span class="tip-explain typo-body-2">
+                <strong>{$_("page.recipe.commentsTipExplainTitle")}</strong> 궁금하신 재료 손질법을 입력하시면 검색을 통해 적절한 방법을 알려 드려요.
+            </span>
+        </Card>
+        <Input placeholder="닭고기 손질법" bottomMargin="xs" bind:value={askTipsValue} />
+        <Button kind={askTipsValue !== "" ? "primary" : "gray"} bottomMargin="xs" on:click={() => askTipsValue !== "" ? askTipsSubmit() : undefined}>전송하기</Button>
+        {#if askTipsResponse !== undefined}
+            {#await askTipsResponse}
+                <Skeleton kind="body" lines={2} />
+            {:then data}
+                {data.text.replace(/(?:\[|【)\d+†.+(?:\]|】)/, "")}
+            {:catch}
+                <Card backgroundColor="danger-100">
+                    오류가 발생했어요. 다시 시도해 주세요.
+                </Card>
+            {/await}
+        {/if}
+    </div>
+</Drawer>
 
 <style lang="postcss">
     #camera-preview {
@@ -436,7 +473,7 @@
         }
 
         & .buttons {
-            margin-top: var(--space-xs);
+            margin: var(--space-xs) 0;
             display: flex;
             align-items: center;
             justify-content: left;
@@ -511,4 +548,10 @@
         }
     }
 
+    .ask {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
 </style>

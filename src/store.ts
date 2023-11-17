@@ -7,3 +7,5 @@ export const savedVideos = writable([] as VideoData[]);
 export const allVideos = writable([] as VideoOverview[]);
 export const sharedPlayer = writable<YouTubePlayer>();
 export const stacks = writable([] as (() => void)[]);
+export const assistantThreadID = writable("");
+export const assistantRunID = writable("");
