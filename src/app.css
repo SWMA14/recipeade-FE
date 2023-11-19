@@ -183,3 +183,9 @@ li::marker {
     background-clip: padding-box;
     border: 4px solid transparent;
 }
+
+a.underline {
+    text-decoration: underline;
+    text-decoration-color: var(--gray-500);
+    text-underline-offset: 4.35px;
+}

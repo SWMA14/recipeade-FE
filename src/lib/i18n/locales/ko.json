@@ -10,7 +10,7 @@
             "signInWithGoogle": "Google로 계속하기",
             "signInOr": "또는",
             "signUp": "이메일로 계속하기",
-            "signInTOS": "서비스를 이용함으로써 이용약관과 개인정보처리방침에 동의한 것으로 간주됩니다.",
+            "signInTOS": "서비스를 이용함으로써 <a class=\"underline\" href=\"https://recipeade.pages.dev/terms-of-service\" target=\"_black\">이용약관</a>과 <a class=\"underline\" href=\"https://recipeade.pages.dev/privacy\" target=\"_black\">개인정보처리방침</a>에 동의한 것으로 간주됩니다.",
             "enterEmail": "이메일을<br>입력하세요",
             "enterEmailPlaceholder": "이메일",
             "enterPassword": "비밀번호를<br>입력하세요",

@@ -10,7 +10,7 @@
             "signInWithGoogle": "Continue with Google",
             "signInOr": "Or",
             "signUp": "Continue with Email",
-            "signInTOS": "By using the service, it is considered that you have agreed to the Terms of Service and Privacy Policy.",
+            "signInTOS": "By using the service, it is considered that you have agreed to the <a class=\"underline\" href=\"https://recipeade.pages.dev/terms-of-service\" target=\"_black\">Terms of Service</a> and <a class=\"underline\" href=\"https://recipeade.pages.dev/privacy\" target=\"_black\">Privacy Policy</a>.",
             "enterEmail": "Enter Your<br>Email",
             "enterEmailPlaceholder": "Email",
             "enterPassword": "Enter Your<br>Password",
