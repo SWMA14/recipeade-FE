@@ -5,6 +5,7 @@
     import { _, format } from "svelte-i18n";
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
+    import { fade } from "svelte/transition";
     import { allVideos, surveyedVideos } from "../../store";
     import { page } from "$app/stores";
     import { beforeNavigate, goto } from "$app/navigation";
@@ -27,6 +28,8 @@
     let isSigningWithEmail = false;
     let isOnboarded = false;
     let endOnboardingButtonShown = false;
+    let onboardingIndex = 0;
+    let maxIndex = 3;
     let isSurveyed = true; // temporary
 
     let videos = Array<HTMLVideoElement>(4);
@@ -50,7 +53,8 @@
         isHidden: !isSignedIn,
         main: onboardingMain,
         mainProps: {
-            onClick: () => goto("/")
+            isFinished: onboardingIndex === maxIndex,
+            onClick: onOnboardingNext
         }
         // main: !isOnboarded ? onboardingMain : surveyMain,
         // mainProps: !isOnboarded ? {
@@ -90,6 +94,11 @@
         else
             console.log("cancelled")
     });
+
+    function onOnboardingNext()
+    {
+        onboardingIndex < maxIndex ? onboardingIndex++ : goto("/");
+    }
 
     async function finishSignIn(result: any)
     {
@@ -202,19 +211,15 @@
         </div>
     {:else if !isOnboarded}
         <div class="onboarding">
-            <Carousel leftOverflow rightOverflow onScroll={checkVideosVisible} onScrollEnd={completeOnboarding}>
-                {#each Array(3) as _, i}
-                    <Card leftMargin={i === 0 ? "xs" : undefined} rightMargin="xs" columnFlex scrollSnap>
-                        <div class="feature-video">
-                            <video src="/videos/landing-{i + 1}.mp4" bind:this={videos[i]} muted autoplay={i === 0} playsinline />
-                        </div>
-                        <div class="description">
-                            <h2>{$format(`page.login.onboardingHeader${i + 1}`)}</h2>
-                            <span>{$format(`page.login.onboardingDescription${i + 1}`)}</span>
-                        </div>
-                    </Card>
-                {/each}
-            </Carousel>
+            {#key onboardingIndex}
+                <div class="section" in:fade={{ duration: 250 }}>
+                    <img src="/images/landing-{onboardingIndex + 1}.png" alt="온보딩 이미지"  />
+                    <div class="description">
+                        <h2>{$format(`page.login.onboardingHeader${onboardingIndex + 1}`)}</h2>
+                        <span>{$format(`page.login.onboardingDescription${onboardingIndex + 1}`)}</span>
+                    </div>
+                </div>
+            {/key}
         </div>
     <!-- {:else if !isSurveyed}
         <div class="survey">
