@@ -18,7 +18,7 @@
     import { pausableTweened } from "$lib/pausableTween";
     import { duration, flyingFade } from "$lib/transition";
     import { timestampToSeconds, type Step } from "$lib/video";
-    import { sharedPlayer } from "../../../store";
+    import { sharedPlayer, savedVideos, handModel } from "../../../store";
     import AlertDrawer from "$components/AlertDrawer.svelte";
     import Badge from "$components/Badge.svelte";
     import Button from "$components/Button.svelte";
@@ -32,6 +32,8 @@
 
     export let data;
 
+    const target = $savedVideos.find(x => x.youtubeVideoId === data.id)!;
+
     getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
         isHidden: true
     });
@@ -40,14 +42,14 @@
     });
 
     const progressDuration = 0;
-    const title = data.video.youtubeTitle;
+    const title = target.youtubeTitle;
     const description = "";
 
-    let steps = data.video.recipesteps.map(step => ({
+    let steps = target.recipesteps.map(step => ({
         seconds: timestampToSeconds(step.timestamp),
         description: step.description
     }) as Step);
-    let ingredients = data.video.ingredients.map(ingredient => ({
+    let ingredients = target.ingredients.map(ingredient => ({
         ...ingredient,
         usedSteps: getUsedStepsString(ingredient.name)
     }));
@@ -55,8 +57,6 @@
     let progress = pausableTweened(0, { duration: progressDuration });
     let player: YouTubePlayer = $sharedPlayer;
     let isPaused = false;
-
-    $: console.log(isPaused);
 
     $: if (player) {
         player.getIframe().then(x => videoContentWindow = x.contentWindow);
@@ -86,7 +86,7 @@
     let handRecognized = 0;
     let previousTime = performance.now();
     let raf: number;
-    let isRecognizing = false;
+    let isRecognizing = true;
     let mediaStream: MediaStream;
     let voiceRecognitionGuideDrawerShow: () => void;
     let voiceRecognitionGuideDrawerHide: () => void;
@@ -100,28 +100,35 @@
     let askTipsDrawerShow: () => void;
     let askTipsDrawerHide: () => void;
 
+    let isEscapingPage = false;
+
     onMount(async () => {
         analyticsService.setScreenName("recipe_cook");
         analyticsService.logEvent("recipe_cook_page", {
             page_title: "recipe_cook_page"
         });
 
-        if (!mediaStream)
-            mediaStream = await navigator.mediaDevices.getUserMedia({
-                audio: false,
-                video: true
-            });
-        video = document.querySelector("video#camera-preview") as HTMLVideoElement;
-        video.srcObject = mediaStream;
-        video.onloadeddata = () => video.play();
-
-        model = await handPose.load({
-            detectionConfidence: 0.97
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: {
+                width: 600,
+                height: 600
+            }
         });
-        raf = requestAnimationFrame(predictHand);
 
         if ((await SpeechRecognition.checkPermissions()).speechRecognition !== "granted")
             await SpeechRecognition.requestPermissions();
+
+        video = document.querySelector("video#camera-preview") as HTMLVideoElement;
+        video.srcObject = mediaStream;
+        video.onloadeddata = () => video.play();
+        await checkVideoDimension();
+
+        if (!$handModel)
+            $handModel = await handPose.load({
+                detectionConfidence: 0.97
+            });
+        model = $handModel;
 
         isRendered = true;
         if (!await getVoiceGuided())
@@ -154,18 +161,36 @@
                 }
             }
         });
+
+        raf = requestAnimationFrame(predictHand);
     });
 
     beforeNavigate(() => {
-        mediaStream.getTracks().forEach(x => x.stop());
+        mediaStream.removeTrack(mediaStream.getTracks()[0]);
+        isEscapingPage = true;
         cancelAnimationFrame(raf);
     })
 
-    async function predictHand(currentTime: number): Promise<void>
+    async function checkVideoDimension()
     {
+        if (video.videoWidth === 0 || video.videoHeight < 1)
+        {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            await checkVideoDimension();
+        }
+    }
+
+    async function predictHand(currentTime: number)
+    {
+        console.log(isRecognizing);
+        if (isEscapingPage)
+            return;
+
         if (!isRecognizing || !model || !mediaStream)
-            return new Promise(resolve => raf = requestAnimationFrame(resolve))
-                .then(x => predictHand(x as number));
+        {
+            raf = requestAnimationFrame(predictHand);
+            return;
+        }
 
         const deltaTime = currentTime - previousTime;
         previousTime = currentTime;
@@ -192,7 +217,7 @@
             }
         }
 
-        setTimeout(() => raf = requestAnimationFrame(predictHand), 250)
+        setTimeout(() => raf = requestAnimationFrame(predictHand), 100);
     }
 
     async function selectStep(step: number)
@@ -345,7 +370,7 @@
     ]}
 />
 
-<video id="camera-preview" />
+<video id="camera-preview" width="600" height="600" />
 <div class="hand-indicator" style="--width: calc({handRecognized / 1000} * 100vw);" />
 <div class="section" in:flyingFade={{ delay: 0 }}>
     <Card visibleOverflow noPadding skeleton={!isRendered}>
@@ -461,6 +486,8 @@
 
 <style lang="postcss">
     #camera-preview {
+        width: 600px;
+        height: 600px;
         position: fixed;
         left: 0;
         bottom: 0;
