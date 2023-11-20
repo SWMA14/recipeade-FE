@@ -42,6 +42,8 @@
     let navigateDestination: NavigationTarget | null = null;
     let recipeDeleteDrawerShow: () => void;
     let recipeDeleteDrawerHide: () => void;
+    let noDuplicatesDrawerShow: () => void;
+    let noDuplicatesDrawerHide: () => void;
 
     $: anyChanges = JSON.stringify(recipe) !== JSON.stringify(cache);
     getContext<Writable<DynamicBarContext>>("upperBar").update(x => x = {
@@ -125,6 +127,14 @@
 
     function onEditExit()
     {
+        const ingredientsDuplicate = new Set(cache.ingredients.map(x => x.name)).size !== cache.ingredients.length;
+        const stepsDuplicate = new Set(cache.recipesteps.map(x => x.description)).size !== cache.recipesteps.length;
+        if (ingredientsDuplicate || stepsDuplicate)
+        {
+            noDuplicatesDrawerShow();
+            return;
+        }
+
         isEditing = false;
 
         cache.ingredients = cache.ingredients.filter(x => x.name);
@@ -271,7 +281,7 @@
         </div>
         {#if isEditing}
             <SortableList class="sortable-list" handle=".handle" onEnd={handleIngredientsSort}>
-                {#each cache.ingredients as ingredient, i (ingredient.name)}
+                {#each cache.ingredients as ingredient, i}
                     <Card bottomMargin="xs">
                         <div class="list-content">
                             <div class="ingredient" class:edit={isEditing}>
@@ -387,6 +397,7 @@
         confirmText={$_("page.recipe.leaveWithoutSaving")} />
     <AlertDrawer heading={$_("page.recipe.deleteIngredientsOrStepsAlertHeading")} text={$_("page.recipe.deleteIngredientsOrStepsAlertText")}
         bind:show={recipeEditAlertDrawerShow} bind:hide={recipeEditAlertDrawerHide} />
+    <AlertDrawer heading={$_("page.recipe.duplicateNotAllowedAlertHeading")} text={$_("page.recipe.duplicateNotAllowedAlertText")} bind:show={noDuplicatesDrawerShow} bind:hide={noDuplicatesDrawerHide} />
     <ConfirmationDrawer heading={$_("page.recipe.deleteRecipeConfirmHeading")} text={$_("page.recipe.deleteRecipeConfirmText")} bind:show={recipeDeleteDrawerShow} bind:hide={recipeDeleteDrawerHide}
         onConfirm={deleteRecipe} confirmText={$_("page.home.deleteRecipesConfirm")} />
 {/if}

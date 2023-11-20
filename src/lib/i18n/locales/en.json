@@ -90,7 +90,9 @@
             "deleteIngredientsOrStepsAlertText": "The last ingredient or step cannot be deleted.",
             "deleteRecipeConfirmHeading": "Delete recipe?",
             "deleteRecipeConfirmText": "Deleting the recipe will remove all the changes you made as well.",
-            "overviewSave": "Save"
+            "overviewSave": "Save",
+            "duplicateNotAllowedAlertHeading": "There are duplicates",
+            "duplicateNotAllowedAlertText": "There can't be more than one of the same ingredient name or step description. Please edit the duplicates."
         }
     }
 }
