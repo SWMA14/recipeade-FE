@@ -98,6 +98,8 @@
     function saveRecipe()
     {
         recipe = cache;
+        $savedVideos[$savedVideos.indexOf($savedVideos.find(x => x.youtubeVideoId === data.id)!)] = recipe;
+        $savedVideos = $savedVideos;
 
         console.log(authedFetch(`${PUBLIC_API_ENDPOINT}/customize/update/${data.video.id}`, {
             method: "POST",
