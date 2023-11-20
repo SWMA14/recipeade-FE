@@ -39,7 +39,7 @@
     {
         pending = true;
 
-        await authedFetch(`${PUBLIC_API_ENDPOINT}/customize/create_default?sourceLink=https://www.youtube.com/watch?v=${data.id}`, {
+        await authedFetch(`${PUBLIC_API_ENDPOINT}/customize/create_default?sourceLink=https://www.youtube.com/watch?v=${data.id}&lang=${$_("locale")}`, {
             method: "POST"
         });
         const info = await getVideoInfo(data.id);
