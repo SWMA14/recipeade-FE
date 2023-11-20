@@ -13,6 +13,7 @@
     import { beforeNavigate } from "$app/navigation";
     import { analyticsService } from "$lib/analytics";
     import { type AssistantResponse, sendMessage } from "$lib/assistant";
+    import { getVoiceGuided, saveVoiceGuided } from "$lib/auth";
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { pausableTweened } from "$lib/pausableTween";
     import { duration, flyingFade } from "$lib/transition";
@@ -23,6 +24,7 @@
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
     import Carousel from "$components/Carousel.svelte";
+    import ConfirmationDrawer from "$components/ConfirmationDrawer.svelte";
     import Drawer from "$components/Drawer.svelte";
     import Ingredient from "$components/Ingredient.svelte";
     import Input from "$components/Input.svelte";
@@ -52,6 +54,9 @@
 
     let progress = pausableTweened(0, { duration: progressDuration });
     let player: YouTubePlayer = $sharedPlayer;
+    let isPaused = false;
+
+    $: console.log(isPaused);
 
     $: if (player) {
         player.getIframe().then(x => videoContentWindow = x.contentWindow);
@@ -59,7 +64,10 @@
             if (event.data === PlayerStates.PAUSED)
                 progress.pause();
             else if (event.data === PlayerStates.PLAYING && progress.paused)
+            {
+                isPaused = false;
                 progress.continue();
+            }
         });
     }
     let videoDuration: number;
@@ -72,7 +80,6 @@
     let isCommentsTipExpanded = false;
     let isIngredientsExpanded = false;
 
-
     let video: HTMLVideoElement;
     let model: handPose.HandPose;
     let handFirstRecognized = 0;
@@ -81,8 +88,8 @@
     let raf: number;
     let isRecognizing = false;
     let mediaStream: MediaStream;
-    let voiceRecognitionAlertDrawerShow: () => void;
-    let voiceRecognitionAlertDrawerHide: () => void;
+    let voiceRecognitionGuideDrawerShow: () => void;
+    let voiceRecognitionGuideDrawerHide: () => void;
     let voiceRecognitionDrawerShow: () => void;
     let voiceRecognitionDrawerHide: () => void;
     let voiceResult: string | undefined = undefined;
@@ -117,7 +124,8 @@
             await SpeechRecognition.requestPermissions();
 
         isRendered = true;
-        voiceRecognitionAlertDrawerShow();
+        if (!await getVoiceGuided())
+            voiceRecognitionGuideDrawerShow();
 
         window.addEventListener("message", event => {
             if (player && event.source === videoContentWindow)
@@ -163,7 +171,6 @@
         previousTime = currentTime;
 
         const hands = await model.estimateHands(video, true);
-        console.log(hands);
         if (hands.length > 0)
         {
             if (handFirstRecognized === 0)
@@ -185,15 +192,15 @@
             }
         }
 
-        setTimeout(() => raf = requestAnimationFrame(predictHand), 100)
-        // return new Promise(resolve => raf = requestAnimationFrame(resolve))
-        //     .then(x => predictHand(x as number));
+        setTimeout(() => raf = requestAnimationFrame(predictHand), 250)
     }
 
     async function selectStep(step: number)
     {
+        if (!isPaused)
+            player.playVideo();
+
         selectedStep = step;
-        player.playVideo();
         player.seekTo(steps[step].seconds, true);
 
         const element = document.querySelector(`#step-button-${step}`);
@@ -284,16 +291,27 @@
         handFirstRecognized = 0;
         handRecognized = 0;
         voiceResult = undefined;
+
+        if (!isPaused)
+            player.playVideo();
     }
 
     async function executeCommand()
     {
-        if (voiceResult === "다음" && selectedStep < steps.length - 1)
+        if (!voiceResult)
+            return;
+
+        if (voiceResult.includes("다음") && selectedStep < steps.length - 1)
             await selectStep(selectedStep + 1);
-        else if (voiceResult === "이전" && selectedStep > 0)
+        else if (voiceResult.includes("이전") && selectedStep > 0)
             await selectStep(selectedStep - 1);
-        else if (voiceResult === "실행")
+        else if (voiceResult.includes("실행"))
+        {
+            isPaused = false;
             await player.playVideo();
+        }
+        else if (voiceResult.includes("멈춰"))
+            isPaused = true;
     }
 
     function askTipsSubmit()
@@ -382,14 +400,15 @@
         {/if}
     </Card>
 </div>
-<AlertDrawer bind:show={voiceRecognitionAlertDrawerShow} bind:hide={voiceRecognitionAlertDrawerHide} onHide={onVoiceRecognitionAlertEnd}
+<ConfirmationDrawer bind:show={voiceRecognitionGuideDrawerShow} bind:hide={voiceRecognitionGuideDrawerHide} onHide={onVoiceRecognitionAlertEnd}
+    confirmText="다시 보지 않기" onConfirm={saveVoiceGuided} cancelText={$_("page.confirm")}
     heading="음성 인식 사용" text="레시피에이드는 손을 쓰지 않고 음성만으로도 영상을 제어하는 기능을 제공해요. 음성 인식을 보다 정확하고 편리하게 사용하려면 다음 사항들을 확인해 주세요.">
     <ul>
         <li>전면 카메라에 한쪽 손을 약 1초간 보이고 있으면 영상이 멈추고 음성 인식이 시작돼요.</li>
         <li>음성 인식이 시작됐을 때 안내되는 명령 중 하나를 말씀하시면 원하는 대로 영상을 제어할 수 있어요.</li>
         <li>손이 카메라에서 40cm ~ 1m 이상 떨어져서 카메라에 손 전체가 완전히 들어와야 인식률이 높아요.</li>
     </ul>
-</AlertDrawer>
+</ConfirmationDrawer>
 <Drawer bind:show={voiceRecognitionDrawerShow} onShow={onVoiceRecognitionStart}
     bind:hide={voiceRecognitionDrawerHide} onHide={onVoiceRecognitionEnd}>
     <div class="voice">
