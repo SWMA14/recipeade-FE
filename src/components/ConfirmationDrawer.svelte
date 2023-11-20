@@ -12,8 +12,10 @@
     export let shown = false;
     export let show: (() => void) | undefined = undefined;
     export let hide: (() => void) | undefined = undefined;
+    export let onHide: (() => void) | undefined = undefined;
     export let confirmText = $_("page.confirm");
-    export let onConfirm: () => void;
+    export let onConfirm: (() => void) | undefined = undefined;
+    export let cancelText = $_("page.cancel");
     export let onCancel: (() => void) | undefined = undefined;
 
     const lowerBar = getContext<Writable<DynamicBarContext>>("lowerBar");
@@ -28,6 +30,7 @@
             mainProps: {
                 text: confirmText,
                 hide,
+                onHide,
                 onConfirm
             }
         });
@@ -46,8 +49,9 @@
     {/if}
     <Button kind="gray" on:click={() => {
             hide?.();
+            onHide?.();
             cancelAndrevertDynamicBar();
-        }}>{$_("page.cancel")}</Button>
+        }}>{cancelText}</Button>
 </Drawer>
 
 <style>
