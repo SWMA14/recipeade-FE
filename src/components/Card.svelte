@@ -56,10 +56,13 @@
             setInterval(async () => {
                 player = player as YouTubePlayer;
 
+                if (!player)
+                    return;
+
                 if (!duration)
                     duration = await player.getDuration();
 
-                if (player && await player.getCurrentTime() >= duration - 10)
+                if (await player.getCurrentTime() >= duration - 10)
                     player.seekTo(0, true);
             }, 500);
         }
@@ -84,7 +87,7 @@
 
 <svelte:window on:scroll={checkVideoVisible} />
 
-<div class="container" class:skeleton role="button" tabindex="0" on:click={onClick} on:keydown={onClick}
+<div class="container" class:skeleton role="button" tabindex="0" on:click={onClick} on:keydown={onClick} bind:this={container}
     style="--card-background-color: var(--{backgroundColor}); --left-margin: {leftMarginValue}; --right-margin: {rightMarginValue};
     --top-margin: {topMarginValue}; --bottom-margin: {bottomMarginValue};"
     class:no-radius={noRadius} class:no-padding={noPadding} class:no-min-width={noMinWidth} class:large-padding={largePadding}
