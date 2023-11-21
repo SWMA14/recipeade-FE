@@ -103,3 +103,18 @@ export async function getIsOnboarded(): Promise<boolean>
         key: "onboarded"
     }).then(result => result.value === "true");
 }
+
+export async function getVoiceGuided(): Promise<boolean>
+{
+    return await Preferences.get({
+        key: "voiceGuided"
+    }).then(result => result.value === "true");
+}
+
+export async function saveVoiceGuided()
+{
+    await Preferences.set({
+        key: "voiceGuided",
+        value: "true"
+    });
+}

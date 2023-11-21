@@ -113,8 +113,12 @@ export function getUsedSteps(steps: Step[], ingredient: string): number[] | unde
 
 export async function getVideoInfo(id: string)
 {
-    const result = await fetch(`${PUBLIC_API_ENDPOINT}/customize/get_youtube_info?url=https://youtu.be/${id}`)
+    let result = await fetch(`${PUBLIC_API_ENDPOINT}/customize/get_youtube_info?url=https://www.youtube.com/watch?v=${id}`)
         .then(response => response.json());
+
+    while (result["msg"] === "failed")
+        result = await fetch(`${PUBLIC_API_ENDPOINT}/customize/get_youtube_info?url=https://www.youtube.com/watch?v=${id}`)
+            .then(response => response.json());
 
     return {
         title: result["title"],

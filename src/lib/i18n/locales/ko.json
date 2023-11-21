@@ -90,7 +90,9 @@
             "deleteIngredientsOrStepsAlertText": "마지막 재료 또는 단계는 삭제할 수 없어요.",
             "deleteRecipeConfirmHeading": "레시피를 삭제할까요?",
             "deleteRecipeConfirmText": "레시피를 삭제하면 모든 수정 사항들도 사라져요.",
-            "overviewSave": "저장하기"
+            "overviewSave": "저장하기",
+            "duplicateNotAllowedAlertHeading": "중복되는 항목이 있어요",
+            "duplicateNotAllowedAlertText": "동일한 재료명 또는 단계 설명이 두 개 이상 있을 수 없어요. 중복되는 항목을 수정해 주세요."
         }
     }
 }
