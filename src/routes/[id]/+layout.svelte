@@ -4,7 +4,7 @@
     import type { Options, YouTubePlayer } from "youtube-player/dist/types";
     import { getContext } from "svelte";
     import { beforeNavigate } from "$app/navigation";
-    import { sharedPlayer } from "../../store";
+    import { sharedPlayer, cookingFullscreen } from "../../store";
     import Button from "$components/Button.svelte";
 
     export let data;
@@ -41,11 +41,13 @@
     }
 </script>
 
-<div class="player-container" use:moveToRoot bind:clientHeight={playerHeight}>
-    <div style="background-color: var(--gray-900);">
-        <Button kind="black" icon={faArrowLeft} style="width: var(--space-xl);" on:click={() => history.back()} />
-    </div>
-    <div id="player" class="player" bind:this={player} />
+<div class="player-container" class:fullscreen={$cookingFullscreen} use:moveToRoot bind:clientHeight={playerHeight}>
+    {#if !$cookingFullscreen}
+        <div style="background-color: var(--gray-900);">
+            <Button kind="black" icon={faArrowLeft} style="width: var(--space-xl);" on:click={() => history.back()} />
+        </div>
+    {/if}
+    <div id="player" class="player" class:fullscreen={$cookingFullscreen} bind:this={player} />
 </div>
 <div class="background" class:ios={device === "ios"} />
 <div class="content" class:ios={device === "ios"} style="--top: {playerHeight}px;">
@@ -77,6 +79,21 @@
         top: 0;
         z-index: 9;
         overflow: hidden;
+
+        &.fullscreen {
+            width: 100vw;
+            height: 100vh;
+            max-height: unset;
+            margin-top: 0;
+
+            & .player {
+                width: 100vw;
+                height: 100vh;
+                max-height: unset;
+                border-radius: 0;
+                touch-action: none;
+            }
+        }
     }
 
     .player {

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { faAngleDown, faAngleUp, faStar, faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
+    import { faAngleDown, faAngleUp, faExpand, faStar, faWandMagicSparkles } from "@fortawesome/free-solid-svg-icons";
     import * as handPose from "@tensorflow-models/handpose";
     import "@tensorflow/tfjs-backend-webgl";
     import { SpeechRecognition } from "@capacitor-community/speech-recognition";
@@ -18,8 +18,7 @@
     import { pausableTweened } from "$lib/pausableTween";
     import { duration, flyingFade } from "$lib/transition";
     import { timestampToSeconds, type Step } from "$lib/video";
-    import { sharedPlayer, savedVideos, handModel } from "../../../store";
-    import AlertDrawer from "$components/AlertDrawer.svelte";
+    import { sharedPlayer, savedVideos, handModel, cookingFullscreen } from "../../../store";
     import Badge from "$components/Badge.svelte";
     import Button from "$components/Button.svelte";
     import Card from "$components/Card.svelte";
@@ -29,6 +28,7 @@
     import Ingredient from "$components/Ingredient.svelte";
     import Input from "$components/Input.svelte";
     import Skeleton from "$components/Skeleton.svelte";
+    import StepComponent from "$components/Step.svelte";
 
     export let data;
 
@@ -75,7 +75,6 @@
 
     let selectedStep = 0;
     let isRendered = false;
-    let isAutoNext = true;
     let isRepeating = false;
     let isCommentsTipExpanded = false;
     let isIngredientsExpanded = false;
@@ -116,8 +115,8 @@
             }
         });
 
-        if ((await SpeechRecognition.checkPermissions()).speechRecognition !== "granted")
-            await SpeechRecognition.requestPermissions();
+        // if ((await SpeechRecognition.checkPermissions()).speechRecognition !== "granted")
+        //     await SpeechRecognition.requestPermissions();
 
         video = document.querySelector("video#camera-preview") as HTMLVideoElement;
         video.srcObject = mediaStream;
@@ -152,12 +151,7 @@
                     progress.set((now - start) / (end - start), { duration: progressDuration });
 
                     if (selectedStep < steps.length - 1 && $progress >= 1)
-                    {
-                        if (isAutoNext || isRepeating)
-                            selectStep(isRepeating ? selectedStep : selectedStep + 1);
-                        else
-                            player.pauseVideo();
-                    }
+                        selectStep(isRepeating ? selectedStep : selectedStep + 1);
                 }
             }
         });
@@ -169,6 +163,7 @@
         mediaStream.removeTrack(mediaStream.getTracks()[0]);
         isEscapingPage = true;
         cancelAnimationFrame(raf);
+        $cookingFullscreen = false;
     })
 
     async function checkVideoDimension()
@@ -182,7 +177,6 @@
 
     async function predictHand(currentTime: number)
     {
-        console.log(isRecognizing);
         if (isEscapingPage)
             return;
 
@@ -237,16 +231,14 @@
             });
     }
 
-    function enableAutoNext()
+    function enableFullscreen()
     {
-        isAutoNext = true;
-        isRepeating = false;
+        $cookingFullscreen = true;
     }
 
-    function enableRepeat()
+    function onRepeatClick()
     {
-        isRepeating = true;
-        isAutoNext = false;
+        isRepeating = !isRepeating;
     }
 
     function includes(source: string, target: string): boolean
@@ -372,6 +364,18 @@
 
 <video id="camera-preview" width="600" height="600" />
 <div class="hand-indicator" style="--width: calc({handRecognized / 1000} * 100vw);" />
+{#if $cookingFullscreen}
+    <div class="fullscreen-overlay">
+        <div class="used-ingredients">
+            {#each ingredients as ingredient (ingredient.name)}
+                {#if includes(steps[selectedStep].description, ingredient.name)}
+                    <Ingredient name={ingredient.name} amount={ingredient.quantity ?? ""}{ingredient.unit ?? ""} />
+                {/if}
+            {/each}
+        </div>
+        <StepComponent index={selectedStep + 1} description={steps[selectedStep].description} />
+    </div>
+{/if}
 <div class="section" in:flyingFade={{ delay: 0 }}>
     <Card visibleOverflow noPadding skeleton={!isRendered}>
         <div style="margin-top: 1rem;">
@@ -398,8 +402,8 @@
                 {/each}
             </div>
             <div class="buttons">
-                <Button kind="white" icon={faArrowRight} rightMargin="xs" selected={isAutoNext} on:click={enableAutoNext}>{$_("page.recipe.autoNextStep")}</Button>
-                <Button kind="white" icon={faRepeat} selected={isRepeating} on:click={enableRepeat}>{$_("page.recipe.repeatStep")}</Button>
+                <Button kind="white" icon={faExpand} rightMargin="xs" on:click={enableFullscreen}>{$_("page.recipe.autoNextStep")}</Button>
+                <Button kind="white" icon={faRepeat} selected={isRepeating} on:click={onRepeatClick}>{$_("page.recipe.repeatStep")}</Button>
             </div>
             <Button kind="primary" icon={faWandMagicSparkles} on:click={askTipsDrawerShow}>재료 손질법 물어보기</Button>
         </div>
@@ -507,16 +511,19 @@
         transition: all 0.25s;
     }
 
+    .fullscreen-overlay {
+        width: 40vw;
+        position: fixed;
+        top: 50%;
+        right: var(--space-xs);
+        transform: translateY(-50%);
+        z-index: 10;
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
     .content {
         padding: var(--space-xs);
-
-        & .used-ingredients {
-            margin-top: var(--space-m);
-            width: 100%;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: var(--space-xs);
-        }
 
         & .buttons {
             margin: var(--space-xs) 0;
@@ -524,6 +531,14 @@
             align-items: center;
             justify-content: left;
         }
+    }
+
+    .used-ingredients {
+        margin-top: var(--space-m);
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-xs);
     }
 
     .expandable {
