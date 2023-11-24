@@ -408,7 +408,7 @@
             <Button kind="primary" icon={faWandMagicSparkles} on:click={askTipsDrawerShow}>재료 손질법 물어보기</Button>
         </div>
     </Card>
-    <Card topMargin="2xs" skeleton={!isRendered}>
+    <!-- <Card topMargin="2xs" skeleton={!isRendered}>
         <div class="expandable">
             <div class="badge-header">
                 <Badge primary small icon={faStar} rightMargin>Pro</Badge>
@@ -427,7 +427,7 @@
             </Card>
             <span>이 요리 팁은 찜닭을 만드는 방법에 대한 것입니다. 당근, 양파, 감자 대신 무를 사용하고, 춘장 대신 굴소스를 사용할 수 있습니다. 다시다가 없으면 넣지 않아도 되지만 넣으면 완성도가 더 높아집니다. 닭을 익힐 때는 뚜껑을 안덮고, 특히 닭다리는 피가 계속 흘러나오지 않도록 주의해야 합니다. 굴소스가 없으면 꽃게액젓 한숟가락을 넣어서 맛을 낼 수 있습니다. 닭의 속이 양념이 잘 베어들게 하려면 칼집을 내거나 양념에 재워 놓는 것이 좋습니다. 춘장 없이 할 경우 맛과 색깔 모두 부족하므로 춘장은 반드시 넣어야 합니다. 요리를 좋아하는 사람들에게는 맛술 들어간 찜닭이 추천되며, 이 경우 간이 퍽살까지 잘 베고 맛있습니다.</span>
         {/if}
-    </Card>
+    </Card> -->
 </div>
 <ConfirmationDrawer bind:show={voiceRecognitionGuideDrawerShow} bind:hide={voiceRecognitionGuideDrawerHide} onHide={onVoiceRecognitionAlertEnd}
     confirmText="다시 보지 않기" onConfirm={saveVoiceGuided} cancelText={$_("page.confirm")}

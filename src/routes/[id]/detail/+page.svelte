@@ -2,7 +2,7 @@
     import { _ } from "svelte-i18n";
     import { Share } from "@capacitor/share";
     import { SortableList } from "@jhubbardsf/svelte-sortablejs";
-    import { faAngleDown, faCheck, faClock, faGripLinesVertical, faPlus, faShare, faTag, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
+    import { faStar, faCheck, faClock, faGripLinesVertical, faPlus, faShare, faTag, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
     import type { NavigationTarget } from "@sveltejs/kit";
     import { getContext, onMount } from "svelte";
     import type { Writable } from "svelte/store";
@@ -13,7 +13,7 @@
     import type { DynamicBarContext } from "$lib/dynamicBar";
     import { tags } from "$lib/tag";
     import { flyingFade } from "$lib/transition";
-    import { type VideoData, convertVideoDataToApi, unitizeViews } from "$lib/video";
+    import { type VideoData, convertVideoDataToApi, unitizeViews, getUsedSteps } from "$lib/video";
     import { savedVideos, sharedPlayer } from "../../../store";
     import AlertDrawer from "$components/AlertDrawer.svelte";
     import AsymmetricGrid from "$components/AsymmetricGrid.svelte";
@@ -66,8 +66,25 @@
     let isRendered = false;
     let device: "ios" | "android" | "web" = getContext("device");
     let tagsModalShown = false;
+    let tips: string[] | undefined = undefined;
+    let info: {
+        original: string;
+        alters: string[];
+        summary: string
+    }[] | undefined = undefined;
 
-    onMount(() => {
+    onMount(async () => {
+        const result = await fetch(`https://recipeadedemo-1-z1779051.deta.app/info?id=${data.id}`);
+
+        if (result.status === 200)
+        {
+            const json = await result.json();
+            tips = json.tips;
+            info = json.info;
+
+            console.log(info);
+        }
+
         isRendered = true;
 
         analyticsService.setScreenName("recipe");
@@ -256,11 +273,11 @@
                     <Badge>{tag}</Badge>
                 {/each}
             {/if}
-            {#if isEditing}
+            <!-- {#if isEditing}
                 <Button kind="gray" size="medium" style="width: fit-content;" icon={faTag} on:click={() => tagsModalShown = true}>
                     {$_("page.recipe.editTags")}
                 </Button>
-            {/if}
+            {/if} -->
         </div>
         <div class="title no-margin">
             <h2>{data.video.youtubeTitle}</h2>
@@ -311,13 +328,15 @@
         {:else}
             <AsymmetricGrid>
                 {#each recipe.ingredients as ingredient (ingredient.name)}
+                    {@const ingredientInfo = info?.find(x => x.original === ingredient.name)}
                     <Ingredient name={ingredient.name} amount={ingredient.quantity ?? ""}{ingredient.unit ?? ""} 
-                        usedSteps={ingredient.usedSteps} />
+                        usedSteps={getUsedSteps(recipe.recipesteps, ingredient.name)}
+                        alters={ingredientInfo?.alters ?? []} summary={ingredientInfo?.summary ?? undefined} />
                 {/each}
             </AsymmetricGrid>
         {/if}
     </div>
-    <div class="section last" class:ios={device === "ios"}
+    <div class="section" class:ios={device === "ios"}
         in:flyingFade={{ delay: 0 }}>
         <div class="title">
             <h2>{$_("page.recipe.steps")}</h2>
@@ -358,6 +377,23 @@
             {#each recipe.recipesteps as step, i (step.description)}
                 <Step index={i + 1} description={step.description} bottomMargin="xs" />
             {/each}
+        {/if}
+    </div>
+    <div class="section last" class:ios={device === "ios"}>
+        <h2>✨ {$_("page.recipe.commentsTip")}</h2>
+        <Card backgroundColor="info-100" topMargin="xs" bottomMargin="xs">
+            <span class="tip-explain typo-body-2">
+                <strong style="color: var(--info-500);">{$_("page.recipe.commentsTipExplainTitle")}</strong> {$_("page.recipe.commentsTipExplainDescription")}
+            </span>
+        </Card>
+        {#if tips}
+            <ul class="tips">
+                {#each tips as tip}
+                    <li>{tip}</li>
+                {/each}
+            </ul>
+        {:else}
+            <span>이 영상에는 분석할 댓글이 충분하지 않아서 팁을 제공해드릴 수 없어요.</span>
         {/if}
     </div>
     <!-- {#if !isEditing}
@@ -559,6 +595,15 @@
 
         & .tag {
             width: fit-content;
+        }
+    }
+
+    .tips {
+        padding-left: var(--space-3xs);
+
+        & li {
+            margin-bottom: var(--space-2xs);
+            padding-right: var(--space-2xs);
         }
     }
 </style>

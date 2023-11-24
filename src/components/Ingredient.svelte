@@ -9,11 +9,12 @@
     export let name: string;
     export let amount: string | undefined = undefined;
     export let usedSteps: number[] | undefined = undefined;
+    export let alters: string[] = [];
     export let summary: string | undefined = undefined;
     export let bottomMargin: SpaceType | undefined = undefined;
     export let white = false;
 
-    let summaryExpanded = false;
+    let flipped = false;
     let bottomMarginValue = bottomMargin ? `var(--space-${bottomMargin})` : undefined;
 
     function getUsedStepsString(): string
@@ -23,33 +24,48 @@
 
         return result.join(" &bull; ");
     }
+
+    function flip()
+    {
+        if (alters.length === 0 && !summary)
+            return;
+
+        flipped = !flipped;
+    }
 </script>
 
-<div bind:this={ref} class="wrapper" class:bottom-margin={bottomMargin} style="--bottom-margin: {bottomMarginValue};">
-    <Card backgroundColor={white ? "white" : "gray-50"}>
-        <span>{name}</span>
-        {#if !usedSteps && summary}
-            <div class="summary-wrapper">
-                <span class="amount">{amount}</span>
-                <Button kind="transparent" icon={faAngleDown} fitted />
-            </div>
-        {:else if amount}
-            <span class="amount">{amount}</span>
-        {/if}
-        {#if usedSteps}
-            <div class="divider" class:white />
-            <div class="summary-wrapper">
-                <span class="typo-body-2 steps">{@html getUsedStepsString()}</span>
-                {#if summary}
-                    <Button kind="transparent" icon={summaryExpanded ? faAngleUp : faAngleDown} fitted leftMargin="2xs"
-                        on:click={() => summaryExpanded = !summaryExpanded} />
-                {/if}
-            </div>
-            {#if summaryExpanded}
-                <span class="typo-body-2 summary">{summary}</span>
+<div bind:this={ref} class="wrapper" class:bottom-margin={bottomMargin} style="--bottom-margin: {bottomMarginValue};" on:click={flip}>
+    {#if flipped}
+        <Card backgroundColor="gray-900">
+            {#if alters.length > 0}
+                <span style="color: var(--gray-400);">대체 가능: </span><span class="black">{alters.join(", ")}</span>
             {/if}
-        {/if}
-    </Card>
+            {#if summary}
+                {#if alters.length > 0}
+                    <div class="divider black"/>
+                {/if}
+                <span class="summary black">{summary}</span>
+            {/if}
+        </Card>
+    {:else}
+        <Card backgroundColor={white ? "white" : "gray-50"}>
+            <span>{name}</span>
+            {#if !usedSteps && summary}
+                <div class="summary-wrapper">
+                    <span class="amount">{amount}</span>
+                    <Button kind="transparent" icon={faAngleDown} fitted />
+                </div>
+            {:else if amount}
+                <span class="amount">{amount}</span>
+            {/if}
+            {#if usedSteps}
+                <div class="divider" class:white />
+                <div class="summary-wrapper">
+                    <span class="typo-body-2 steps">{@html getUsedStepsString()}</span>
+                </div>
+            {/if}
+        </Card>
+    {/if}
 </div>
 
 <style lang="postcss">
@@ -97,6 +113,10 @@
         & .summary {
             margin-top: var(--space-2xs);
             word-wrap: break-word;
+        }
+
+        & .black {
+            color: var(--white);
         }
     }
 </style>
