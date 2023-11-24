@@ -50,7 +50,7 @@
     <div id="player" class="player" class:fullscreen={$cookingFullscreen} bind:this={player} />
 </div>
 <div class="background" class:ios={device === "ios"} />
-<div class="content" class:ios={device === "ios"} style="--top: {playerHeight}px;">
+<div class="content" class:ios={device === "ios"} class:fullscreen={$cookingFullscreen} style="--top: {playerHeight}px;">
     <slot />
 </div>
 
@@ -91,7 +91,6 @@
                 height: 100vh;
                 max-height: unset;
                 border-radius: 0;
-                touch-action: none;
             }
         }
     }
@@ -106,5 +105,11 @@
         width: 100%;
         margin-top: calc(var(--top) + var(--space-xs) + env(safe-area-inset-top));
         padding-bottom: calc(var(--space-xl) + var(--space-xs));
+
+        &.fullscreen {
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
     }
 </style>

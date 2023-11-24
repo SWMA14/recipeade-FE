@@ -52,7 +52,7 @@
         random = $allVideos.sort(() => 0.5 - Math.random())[0];
         rest = $allVideos.filter(x => x !== random);
 
-        const tempHighViews = rest.sort((a, b) => b.viewCounts - a.viewCounts).slice(0, 5);
+        const tempHighViews = rest.sort((a, b) => b.viewCounts - a.viewCounts).slice(0, 3);
         const tempOthers = rest.filter(x => !tempHighViews.includes(x));
 
         highViews = tempHighViews.map(VideoOverviewToEmptyData);
