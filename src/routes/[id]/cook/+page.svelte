@@ -115,8 +115,8 @@
             }
         });
 
-        // if ((await SpeechRecognition.checkPermissions()).speechRecognition !== "granted")
-        //     await SpeechRecognition.requestPermissions();
+        if ((await SpeechRecognition.checkPermissions()).speechRecognition !== "granted")
+            await SpeechRecognition.requestPermissions();
 
         video = document.querySelector("video#camera-preview") as HTMLVideoElement;
         video.srcObject = mediaStream;
@@ -402,7 +402,7 @@
                 {/each}
             </div>
             <div class="buttons">
-                <Button kind="white" icon={faExpand} rightMargin="xs" on:click={enableFullscreen}>{$_("page.recipe.autoNextStep")}</Button>
+                <!-- <Button kind="white" icon={faExpand} rightMargin="xs" on:click={enableFullscreen}>{$_("page.recipe.autoNextStep")}</Button> -->
                 <Button kind="white" icon={faRepeat} selected={isRepeating} on:click={onRepeatClick}>{$_("page.recipe.repeatStep")}</Button>
             </div>
             <Button kind="primary" icon={faWandMagicSparkles} on:click={askTipsDrawerShow}>재료 손질법 물어보기</Button>
