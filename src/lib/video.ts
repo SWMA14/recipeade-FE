@@ -86,9 +86,13 @@ export function unitizeViews(views: number, locale: string): string
 
 export function timestampToSeconds(timestamp: string): number
 {
-    const regex = /\d{1,}:\d{2}/;
-    const match = timestamp.match(regex)![0];
-    const [minute, second] = match.split(":").map((x) => parseInt(x));
+    let regex = /\d{1,}:\d{2}/;
+
+    if (timestamp.split(":").length === 3)
+        regex = /(?<=:)\d+:\d+/;
+
+    const match = timestamp.match(regex)?.[0] ?? "0:00";
+    const [minute, second] = match.split(":").map(x => parseInt(x));
 
     return minute * 60 + second;
 }
